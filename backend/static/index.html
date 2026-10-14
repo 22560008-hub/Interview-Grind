@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <title>后端八股刷题助手</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .tabs {
+            margin-bottom: 20px;
+        }
+
+        .tabs button {
+            padding: 8px 16px;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .tabs button.active {
+            background: #1890ff;
+            color: white;
+            border: none;
+        }
+
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .option {
+            display: block;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .option:hover {
+            background: #f0f0f0;
+        }
+
+        .correct {
+            background: #d4edda;
+        }
+
+        .wrong {
+            background: #f8d7da;
+        }
+
+        button.action {
+            padding: 10px 24px;
+            background: #1890ff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>后端八股刷题助手</h1>
+    <div class="tabs">
+        <button onclick="showTab('quiz')" id="tab-quiz">答题</button>
+        <button onclick="showTab('wrong')" id="tab-wrong">错题本</button>
+        <button onclick="showTab('stats')" id="tab-stats">统计</button>
+    </div>
+
+    <div id="view-quiz">
+        <div class="card" id="question-card">
+            <p>点"下一题"开始刷题</p>
+            <button class="action" onclick="loadQuestion()">下一题</button>
+        </div>
+    </div>
+
+    <div id="view-wrong" style="display:none"></div>
+    <div id="view-stats" style="display:none"></div>
+
+    <script>
+        const API = "http://127.0.0.1:8000";
+        let currentQuestion = null;
+
+        function showTab(name) {
+            for (const t of ['quiz', 'wrong', 'stats']) {
+                document.getElementById('view-' + t).style.display = 'none';
+                document.getElementById('tab-' + t).classList.remove('active');
+            }
+            document.getElementById('view-' + name).style.display = 'block';
+            document.getElementById('tab-' + name).classList.add('active');
+            if (name === 'wrong') loadWrong();
+            if (name === 'stats') loadStats();
+        }
+
+        async function loadQuestion() {
+            const res = await fetch(API + '/api/questions?limit=1');
+            const data = await res.json();
+            if (data.length === 0) return;
+            currentQuestion = data[0];
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = currentQuestion;
+            let html = `<h3>[${q.module}] ${q.stem}</h3>`;
+            if (q.options) {
+                for (const [k, v] of Object.entries(q.options)) {
+                    html += `<div class="option" onclick="submitAnswer('${k}')">${k}. ${v}</div>`;
+                }
+            } else {
+                html += `<input type="text" id="short-answer" placeholder="输入你的答案">`;
+                html += `<p><button class="action" onclick="submitShort()">提交</button></p>`;
+            }
+            document.getElementById('question-card').innerHTML = html;
+        }
+
+        async function submitAnswer(choice) {
+            const res = await fetch(API + '/api/answers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question_id: currentQuestion.id, user_answer: choice })
+            });
+            const result = await res.json();
+            showResult(result);
+        }
+
+        function submitShort() {
+            const ans = document.getElementById('short-answer').value;
+            fetch(API + '/api/answers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question_id: currentQuestion.id, user_answer: ans })
+            }).then(r => r.json()).then(showResult);
+        }
+
+        function showResult(result) {
+            const color = result.is_correct ? 'correct' : 'wrong';
+            document.getElementById('question-card').innerHTML = `
+    <div class="${color}">
+      <h3>${result.is_correct ? '✓ 答对了！' : '✗ 答错了'}</h3>
+      <p>正确答案：${result.correct_answer}</p>
+      <p>解析：${result.explanation}</p>
+    </div>
+    <button class="action" onclick="loadQuestion()">下一题</button>
+  `;
+        }
+
+        async function loadWrong() {
+            const res = await fetch(API + '/api/wrong-questions');
+            const data = await res.json();
+            let html = `<h2>错题本（共 ${data.length} 题）</h2>`;
+            for (const w of data) {
+                html += `<div class="card"><p>[${w.module}] ${w.stem}</p><p>正确答案：${w.answer}（错了 ${w.wrong_count} 次）</p><p>${w.explanation}</p></div>`;
+            }
+            document.getElementById('view-wrong').innerHTML = html;
+        }
+
+        async function loadStats() {
+            const res = await fetch(API + '/api/stats');
+            const s = await res.json();
+            let html = `<h2>学习统计</h2>`;
+            html += `<div class="card"><p>总答题：${s.total} 题</p><p>答对：${s.correct} 题</p><p>总正确率：${s.accuracy}%</p></div>`;
+            html += '<h3>各模块</h3>';
+            for (const m of s.by_module) {
+                html += `<div class="card"><p>${m.module}：${m.total} 题，正确率 ${m.accuracy}%</p></div>`;
+            }
+            document.getElementById('view-stats').innerHTML = html;
+        }
+    </script>
+</body>
+
+</html>

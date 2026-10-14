@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from fastapi.staticfiles import StaticFiles
 from app.api import questions, answers, wrong, stats
 from app.core.config import settings
 from app.core.database import Base, engine
@@ -27,3 +28,4 @@ app.include_router(questions.router)
 app.include_router(answers.router)
 app.include_router(wrong.router)
 app.include_router(stats.router)
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
