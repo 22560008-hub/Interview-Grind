@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import questions
+from app.api import questions, answers, wrong
 from app.core.config import settings
 from app.core.database import Base, engine
-from app.models import question  # noqa: F401
+from app.models import question, answer  # noqa: F401
 
 Base.metadata.create_all(bind=engine)
 
@@ -24,3 +24,5 @@ def health():
 
 
 app.include_router(questions.router)
+app.include_router(answers.router)
+app.include_router(wrong.router)
