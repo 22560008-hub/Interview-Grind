@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import questions, answers, wrong
+from app.api import questions, answers, wrong, stats
 from app.core.config import settings
 from app.core.database import Base, engine
 from app.models import question, answer  # noqa: F401
@@ -26,3 +26,4 @@ def health():
 app.include_router(questions.router)
 app.include_router(answers.router)
 app.include_router(wrong.router)
+app.include_router(stats.router)
