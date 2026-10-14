@@ -22,6 +22,21 @@
             cursor: pointer;
         }
 
+        #module-bar button {
+            padding: 6px 12px;
+            margin-right: 6px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+        }
+        #module-bar button.active {
+            background: #1890ff;
+            color: white;
+            border-color: #1890ff;
+        }
+
         .tabs button.active {
             background: #1890ff;
             color: white;
@@ -78,6 +93,13 @@
     </div>
 
     <div id="view-quiz">
+        <div id="module-bar" style="margin-bottom: 16px;">
+            <button onclick="setModule('')">全部</button>
+            <button onclick="setModule('network')">计算机网络</button>
+            <button onclick="setModule('os')">操作系统</button>
+            <button onclick="setModule('mysql')">MySQL</button>
+            <button onclick="setModule('redis')">Redis</button>
+        </div>
         <div class="card" id="question-card">
             <p>点"下一题"开始刷题</p>
             <button class="action" onclick="loadQuestion()">下一题</button>
@@ -91,6 +113,14 @@
     <script>
         const API = "http://127.0.0.1:8000";
         let currentQuestion = null;
+        let currentModule = '';
+
+        function setModule(m) {
+            currentModule = m;
+            document.querySelectorAll('#module-bar button').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            loadQuestion();
+        }
 
         function showTab(name) {
             for (const t of ['quiz', 'wrong', 'favorites', 'stats']) {
@@ -105,9 +135,14 @@
         }
 
         async function loadQuestion() {
-            const res = await fetch(API + '/api/questions?limit=1');
+            let url = API + '/api/questions?limit=1';
+            if (currentModule) url += '&module=' + currentModule;
+            const res = await fetch(url);
             const data = await res.json();
-            if (data.length === 0) return;
+            if (data.length === 0) {
+                document.getElementById('question-card').innerHTML = '<p>这个模块还没有题目</p>';
+                return;
+            }
             currentQuestion = data[0];
             renderQuestion();
         }
