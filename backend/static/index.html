@@ -63,6 +63,7 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            margin-right: 8px;
         }
     </style>
 </head>
@@ -72,6 +73,7 @@
     <div class="tabs">
         <button onclick="showTab('quiz')" id="tab-quiz">答题</button>
         <button onclick="showTab('wrong')" id="tab-wrong">错题本</button>
+        <button onclick="showTab('favorites')" id="tab-favorites">收藏</button>
         <button onclick="showTab('stats')" id="tab-stats">统计</button>
     </div>
 
@@ -83,6 +85,7 @@
     </div>
 
     <div id="view-wrong" style="display:none"></div>
+    <div id="view-favorites" style="display:none"></div>
     <div id="view-stats" style="display:none"></div>
 
     <script>
@@ -90,13 +93,14 @@
         let currentQuestion = null;
 
         function showTab(name) {
-            for (const t of ['quiz', 'wrong', 'stats']) {
+            for (const t of ['quiz', 'wrong', 'favorites', 'stats']) {
                 document.getElementById('view-' + t).style.display = 'none';
                 document.getElementById('tab-' + t).classList.remove('active');
             }
             document.getElementById('view-' + name).style.display = 'block';
             document.getElementById('tab-' + name).classList.add('active');
             if (name === 'wrong') loadWrong();
+            if (name === 'favorites') loadFavorites();
             if (name === 'stats') loadStats();
         }
 
@@ -144,13 +148,19 @@
         function showResult(result) {
             const color = result.is_correct ? 'correct' : 'wrong';
             document.getElementById('question-card').innerHTML = `
-    <div class="${color}">
-      <h3>${result.is_correct ? '✓ 答对了！' : '✗ 答错了'}</h3>
-      <p>正确答案：${result.correct_answer}</p>
-      <p>解析：${result.explanation}</p>
-    </div>
-    <button class="action" onclick="loadQuestion()">下一题</button>
-  `;
+                <div class="${color}">
+                    <h3>${result.is_correct ? '✓ 答对了！' : '✗ 答错了'}</h3>
+                    <p>正确答案：${result.correct_answer}</p>
+                    <p>解析：${result.explanation}</p>
+                </div>
+                <button class="action" onclick="favoriteCurrent()">⭐ 收藏本题</button>
+                <button class="action" onclick="loadQuestion()">下一题</button>
+            `;
+        }
+
+        async function favoriteCurrent() {
+            await fetch(API + '/api/favorites/' + currentQuestion.id, { method: 'POST' });
+            alert('已收藏！');
         }
 
         async function loadWrong() {
@@ -166,6 +176,21 @@
         async function removeWrong(questionId) {
             await fetch(API + '/api/wrong-questions/' + questionId, { method: 'DELETE' });
             loadWrong();
+        }
+
+        async function loadFavorites() {
+            const res = await fetch(API + '/api/favorites');
+            const data = await res.json();
+            let html = `<h2>收藏（共 ${data.length} 题）</h2>`;
+            for (const f of data) {
+                html += `<div class="card"><p>[${f.module}] ${f.stem}</p><p>答案：${f.answer}</p><p>${f.explanation}</p><button class="action" onclick="removeFavorite(${f.question_id})">取消收藏</button></div>`;
+            }
+            document.getElementById('view-favorites').innerHTML = html;
+        }
+
+        async function removeFavorite(questionId) {
+            await fetch(API + '/api/favorites/' + questionId, { method: 'DELETE' });
+            loadFavorites();
         }
 
         async function loadStats() {
