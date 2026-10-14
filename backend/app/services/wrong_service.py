@@ -28,3 +28,12 @@ def list_wrong_questions(db: Session):
             }
         )
     return result
+
+
+def remove_wrong_question(db: Session, question_id: int) -> bool:
+    wrong = db.query(WrongQuestion).filter_by(question_id=question_id).first()
+    if wrong is None:
+        return False
+    db.delete(wrong)
+    db.commit()
+    return True

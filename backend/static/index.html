@@ -158,9 +158,14 @@
             const data = await res.json();
             let html = `<h2>错题本（共 ${data.length} 题）</h2>`;
             for (const w of data) {
-                html += `<div class="card"><p>[${w.module}] ${w.stem}</p><p>正确答案：${w.answer}（错了 ${w.wrong_count} 次）</p><p>${w.explanation}</p></div>`;
+                html += `<div class="card"><p>[${w.module}] ${w.stem}</p><p>正确答案：${w.answer}（错了 ${w.wrong_count} 次）</p><p>${w.explanation}</p><button class="action" onclick="removeWrong(${w.question_id})">已掌握，移出</button></div>`;
             }
             document.getElementById('view-wrong').innerHTML = html;
+        }
+
+        async function removeWrong(questionId) {
+            await fetch(API + '/api/wrong-questions/' + questionId, { method: 'DELETE' });
+            loadWrong();
         }
 
         async function loadStats() {
