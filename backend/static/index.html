@@ -88,6 +88,7 @@
     <div class="tabs">
         <button onclick="showTab('quiz')" id="tab-quiz">答题</button>
         <button onclick="showTab('daily')" id="tab-daily">每日一练</button>
+        <button onclick="showTab('review')" id="tab-review">复习</button>
         <button onclick="showTab('wrong')" id="tab-wrong">错题本</button>
         <button onclick="showTab('favorites')" id="tab-favorites">收藏</button>
         <button onclick="showTab('stats')" id="tab-stats">统计</button>
@@ -111,6 +112,7 @@
     <div id="view-favorites" style="display:none"></div>
     <div id="view-stats" style="display:none"></div>
     <div id="view-daily" style="display:none"></div>
+    <div id="view-review" style="display:none"></div>
     <script>
         const API = "http://127.0.0.1:8000";
         let currentQuestion = null;
@@ -124,13 +126,14 @@
         }
 
         function showTab(name) {
-                for (const t of ['quiz', 'daily', 'wrong', 'favorites', 'stats']) {
+                for (const t of ['quiz', 'daily', 'review', 'wrong', 'favorites', 'stats']) {
                 document.getElementById('view-' + t).style.display = 'none';
                 document.getElementById('tab-' + t).classList.remove('active');
             }
             document.getElementById('view-' + name).style.display = 'block';
             document.getElementById('tab-' + name).classList.add('active');
             if (name === 'wrong') loadWrong();
+            if (name === 'review') loadReview();
             if (name === 'favorites') loadFavorites();
             if (name === 'stats') loadStats();
             if (name === 'daily') loadDaily();
@@ -324,6 +327,92 @@
                         `<div class="card" style="text-align:center">
                 <h2>今日得分：${correct} / ${window.dailyQuestions.length}</h2>
             </div>`;
+                }
+            }
+            async function loadReview() {
+                const res = await fetch(API + '/api/review');
+                const data = await res.json();
+                let html = `<h2>待复习（${data.count} 题）</h2>`;
+                if (data.count === 0) {
+                    html += `<p>太棒了，今天没有需要复习的题！</p>`;
+                }
+                data.questions.forEach((q, i) => {
+                    let badge = '';
+                    if (q.mastery_level === 1) badge = '<span style="color:red">薄弱</span>';
+                    else if (q.mastery_level === 2) badge = '<span style="color:orange">一般</span>';
+                    html += `<div class="card">
+                    <p>${i + 1}. [${q.module}] ${q.stem} ${badge}</p>`;
+                    if (q.options) {
+                        for (const [k, v] of Object.entries(q.options)) {
+                            html += `<div class="option" onclick="submitReviewAnswer(${i}, '${k}', this)">${k}. ${v}</div>`;
+                        }
+                    } else {
+                        html += `<input type="text" id="review-input-${i}" placeholder="输入你的答案">`;
+                        html += `<p><button class="action" onclick="submitReviewShort(${i})">提交</button></p>`;
+                    }
+                    html += `</div>`;
+                });
+                html += `<div id="review-score"></div>`;
+                document.getElementById('view-review').innerHTML = html;
+                window.reviewQuestions = data.questions;
+                window.reviewAnswers = [];
+            }
+
+            async function submitReviewAnswer(index, choice, el) {
+                const q = window.reviewQuestions[index];
+                const res = await fetch(API + '/api/answers', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question_id: q.id, user_answer: choice })
+                });
+                const result = await res.json();
+                const options = el.parentNode.querySelectorAll('.option');
+                options.forEach(o => o.style.pointerEvents = 'none');
+                if (result.is_correct) {
+                    el.classList.add('correct');
+                } else {
+                    el.classList.add('wrong');
+                    options.forEach(o => {
+                        if (o.textContent.startsWith(result.correct_answer + '.')) {
+                            o.classList.add('correct');
+                        }
+                    });
+                }
+                window.reviewAnswers[index] = result.is_correct;
+                const answered = window.reviewAnswers.filter(a => a !== undefined).length;
+                if (answered === window.reviewQuestions.length) {
+                    const correct = window.reviewAnswers.filter(a => a).length;
+                    document.getElementById('review-score').innerHTML =
+                        `<div class="card" style="text-align:center">
+                        <h2>复习完成：${correct} / ${window.reviewQuestions.length}</h2>
+                    </div>`;
+                }
+            }
+
+            async function submitReviewShort(index) {
+                const q = window.reviewQuestions[index];
+                const ans = document.getElementById('review-input-' + index).value;
+                const res = await fetch(API + '/api/answers', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question_id: q.id, user_answer: ans })
+                });
+                const result = await res.json();
+                const card = document.querySelectorAll('#view-review .card')[index];
+                card.innerHTML = `<p>${index + 1}. [${q.module}] ${q.stem}</p>
+                <div class="${result.is_correct ? 'correct' : 'wrong'}">
+                    <p>${result.is_correct ? '✓ 答对了！' : '✗ 答错了'}</p>
+                    <p>正确答案：${result.correct_answer}</p>
+                    <p>解析：${result.explanation}</p>
+                </div>`;
+                window.reviewAnswers[index] = result.is_correct;
+                const answered = window.reviewAnswers.filter(a => a !== undefined).length;
+                if (answered === window.reviewQuestions.length) {
+                    const correct = window.reviewAnswers.filter(a => a).length;
+                    document.getElementById('review-score').innerHTML =
+                        `<div class="card" style="text-align:center">
+                        <h2>复习完成：${correct} / ${window.reviewQuestions.length}</h2>
+                    </div>`;
                 }
             }
     </script>
