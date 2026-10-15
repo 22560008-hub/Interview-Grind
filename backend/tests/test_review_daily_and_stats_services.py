@@ -14,16 +14,24 @@ def test_review_returns_only_due_questions_that_are_not_mastered(
     due = question_factory(stem="到期题", options={"A": "正确"})
     future = question_factory(stem="未来题", options={"A": "正确"})
     mastered = question_factory(stem="熟练题", options={"A": "正确"})
-    progress_factory(due, mastery_level=1, next_review_at=datetime.now() - timedelta(minutes=5))
-    progress_factory(future, mastery_level=1, next_review_at=datetime.now() + timedelta(days=1))
-    progress_factory(mastered, mastery_level=3, next_review_at=datetime.now() - timedelta(minutes=5))
+    progress_factory(
+        due, mastery_level=1, next_review_at=datetime.now() - timedelta(minutes=5)
+    )
+    progress_factory(
+        future, mastery_level=1, next_review_at=datetime.now() + timedelta(days=1)
+    )
+    progress_factory(
+        mastered, mastery_level=3, next_review_at=datetime.now() - timedelta(minutes=5)
+    )
 
     result = get_review_questions(db)
 
     assert [question["id"] for question in result] == [due.id]
 
 
-def test_review_orders_due_questions_by_oldest_review_time(db, question_factory, progress_factory):
+def test_review_orders_due_questions_by_oldest_review_time(
+    db, question_factory, progress_factory
+):
     oldest = question_factory(stem="最早到期", options={"A": "正确"})
     latest = question_factory(stem="较晚到期", options={"A": "正确"})
     progress_factory(oldest, next_review_at=datetime.now() - timedelta(days=2))
@@ -62,7 +70,9 @@ def test_daily_questions_returns_all_available_questions_when_pool_is_smaller_th
     assert {question["id"] for question in result} == {questions[1].id, questions[2].id}
 
 
-def test_daily_questions_include_current_mastery_level(db, question_factory, progress_factory):
+def test_daily_questions_include_current_mastery_level(
+    db, question_factory, progress_factory
+):
     question = question_factory(stem="带掌握度的每日题", options={"A": "正确"})
     progress_factory(question, mastery_level=2)
 
@@ -103,18 +113,32 @@ def test_daily_five_question_plan_balances_due_weak_and_new_questions(
         for index in range(3)
     ]
     for question in due_questions:
-        progress_factory(question, mastery_level=2, next_review_at=datetime.now() - timedelta(minutes=1))
+        progress_factory(
+            question,
+            mastery_level=2,
+            next_review_at=datetime.now() - timedelta(minutes=1),
+        )
     for question in weak_questions:
-        progress_factory(question, mastery_level=1, next_review_at=datetime.now() + timedelta(days=1))
+        progress_factory(
+            question, mastery_level=1, next_review_at=datetime.now() + timedelta(days=1)
+        )
 
     result_ids = {question["id"] for question in get_daily_questions(db, count=5)}
 
-    assert len(result_ids.intersection({question.id for question in due_questions})) == 2
-    assert len(result_ids.intersection({question.id for question in weak_questions})) == 2
-    assert len(result_ids.intersection({question.id for question in new_questions})) == 1
+    assert (
+        len(result_ids.intersection({question.id for question in due_questions})) == 2
+    )
+    assert (
+        len(result_ids.intersection({question.id for question in weak_questions})) == 2
+    )
+    assert (
+        len(result_ids.intersection({question.id for question in new_questions})) == 1
+    )
 
 
-def test_stats_reports_answer_accuracy_module_breakdown_and_mastery(db, question_factory):
+def test_stats_reports_answer_accuracy_module_breakdown_and_mastery(
+    db, question_factory
+):
     network = question_factory(
         module="network", stem="网络统计题", options={"A": "正确", "B": "错误"}
     )
