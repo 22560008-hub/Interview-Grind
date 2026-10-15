@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.models.answer import AnswerRecord
 from app.models.question import Question
+from app.models.progress import QuestionProgress
 
 
 def get_stats(db: Session):
@@ -35,10 +36,24 @@ def get_stats(db: Session):
                 "accuracy": round(cor / cnt * 100, 1) if cnt > 0 else 0,
             }
         )
+    mastery_rows = (
+        db.query(QuestionProgress.mastery_level, func.count(QuestionProgress.id))
+        .group_by(QuestionProgress.mastery_level)
+        .all()
+    )
+    mastery = {"薄弱": 0, "一般": 0, "熟练": 0}
+    for level, cnt in mastery_rows:
+        if level == 1:
+            mastery["薄弱"] = cnt
+        elif level == 2:
+            mastery["一般"] = cnt
+        elif level == 3:
+            mastery["熟练"] = cnt
 
     return {
         "total": total,
         "correct": correct,
         "accuracy": accuracy,
         "by_module": module_stats,
+        "mastery": mastery,
     }

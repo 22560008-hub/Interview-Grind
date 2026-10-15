@@ -2,21 +2,34 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.schemas.question import QuestionOut
 from app.services.question_service import pick_questions
+from app.models.progress import QuestionProgress
 
 router = APIRouter(prefix="/api/questions", tags=["题目"])
 
 
-@router.get(
-    "", response_model=list[QuestionOut], summary="组卷：按模块/题型/题量随机抽题"
-)
+@router.get("", summary="组卷：按模块/题型/题量随机抽题")
 def list_questions(
-    module: str | None = Query(
-        None, description="模块：os/network/db/algorithm/pattern"
-    ),
-    type: str | None = Query(None, description="题型：choice/judge/short_answer"),
-    limit: int = Query(10, ge=1, le=50, description="抽题数量 1-50"),
+    module: str | None = Query(None),
+    type: str | None = Query(None),
+    limit: int = Query(10, ge=1, le=50),
     db: Session = Depends(get_db),
 ):
-    return pick_questions(db, module=module, q_type=type, limit=limit)
+    questions = pick_questions(db, module=module, q_type=type, limit=limit)
+    result = []
+    for q in questions:
+        progress = db.query(QuestionProgress).filter_by(question_id=q.id).first()
+        result.append(
+            {
+                "id": q.id,
+                "module": q.module,
+                "chapter": q.chapter,
+                "type": q.type,
+                "stem": q.stem,
+                "options": q.options,
+                "answer": q.answer,
+                "explanation": q.explanation,
+                "mastery_level": progress.mastery_level if progress else 0,
+            }
+        )
+    return result

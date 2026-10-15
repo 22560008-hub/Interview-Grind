@@ -154,7 +154,7 @@
 
         function renderQuestion() {
             const q = currentQuestion;
-            let html = `<h3>[${q.module}] ${q.stem}</h3>`;
+            let html = `<h3>[${q.module}] ${q.stem} ${masteryBadge(q.mastery_level)}</h3>`;
             if (q.options) {
                 for (const [k, v] of Object.entries(q.options)) {
                     html += `<div class="option" onclick="submitAnswer('${k}')">${k}. ${v}</div>`;
@@ -238,6 +238,12 @@
             const s = await res.json();
             let html = `<h2>学习统计</h2>`;
             html += `<div class="card"><p>总答题：${s.total} 题</p><p>答对：${s.correct} 题</p><p>总正确率：${s.accuracy}%</p></div>`;
+            html += '<h3>掌握度</h3>';
+            html += `<div class="card">
+                <p><span style="color:red">薄弱</span>：${s.mastery['薄弱']} 道</p>
+                <p><span style="color:orange">一般</span>：${s.mastery['一般']} 道</p>
+                <p><span style="color:green">熟练</span>：${s.mastery['熟练']} 道</p>
+            </div>`;
             html += '<h3>各模块</h3>';
             for (const m of s.by_module) {
                 html += `<div class="card"><p>${m.module}：${m.total} 题，正确率 ${m.accuracy}%</p></div>`;
@@ -251,7 +257,7 @@
             html += `<p>今日 ${data.count} 道题，开始吧！</p>`;
             data.questions.forEach((q, i) => {
                 html += `<div class="card" id="daily-card-${i}">
-            <p>${i + 1}. [${q.module}] ${q.stem}</p>`;
+            <p>${i + 1}. [${q.module}] ${q.stem} ${masteryBadge(q.mastery_level)}</p>`;
                 if (q.options) {
                     for (const [k, v] of Object.entries(q.options)) {
                         html += `<div class="option" onclick="submitDailyAnswer(${i}, '${k}', this)">${k}. ${v}</div>`;
@@ -302,6 +308,12 @@
         </div>`;
             }
         }
+        function masteryBadge(level) {
+                if (level === 1) return '<span style="color:red;font-size:14px">薄弱</span>';
+                if (level === 2) return '<span style="color:orange;font-size:14px">一般</span>';
+                if (level === 3) return '<span style="color:green;font-size:14px">熟练</span>';
+                return '';
+            }
 
         async function submitDailyShort(index) {
                 const q = window.dailyQuestions[index];
