@@ -7,8 +7,12 @@ router = APIRouter(prefix="/api/daily", tags=["每日一练"])
 
 
 @router.get("", summary="获取今日题目")
-def daily(db: Session = Depends(get_db)):
-    questions = get_daily_questions(db, count=5)
+def daily(
+    exclude: str | None = None,
+    db: Session = Depends(get_db),
+):
+    exclude_ids = [int(x) for x in exclude.split(",")] if exclude else []
+    questions = get_daily_questions(db, count=5, exclude_ids=exclude_ids)
     return {
         "date": str(__import__("datetime").date.today()),
         "count": len(questions),

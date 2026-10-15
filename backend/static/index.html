@@ -272,6 +272,9 @@
             document.getElementById('view-daily').innerHTML = html;
             window.dailyQuestions = data.questions;
             window.dailyAnswers = [];
+            window.dailyDoneIds = [];
+            data.questions.forEach(q => window.dailyDoneIds.push(q.id));
+            renderLoadMoreButton();
         }
 
         async function submitDailyAnswer(index, choice, el) {
@@ -296,6 +299,7 @@
                     }
                 });
             }
+            window.dailyDoneIds.push(q.id);
             // 记录这道题的结果
             window.dailyAnswers[index] = result.is_correct;
             // 全部答完后算分
@@ -331,6 +335,7 @@
             <p>正确答案：${result.correct_answer}</p>
             <p>解析：${result.explanation}</p>
         </div>`;
+                window.dailyDoneIds.push(q.id);
                 window.dailyAnswers[index] = result.is_correct;
                 const answered = window.dailyAnswers.filter(a => a !== undefined).length;
                 if (answered === window.dailyQuestions.length) {
@@ -341,6 +346,38 @@
             </div>`;
                 }
             }
+            async function loadMoreDaily() {
+                    const res = await fetch(API + '/api/daily?exclude=' + window.dailyDoneIds.join(','));
+                    const data = await res.json();
+                    const container = document.getElementById('view-daily');
+                    let html = '';
+                    const startIndex = window.dailyQuestions.length;
+                    data.questions.forEach((q, i) => {
+                        const realIndex = startIndex + i;
+                        html += `<div class="card" id="daily-card-${realIndex}">
+            <p>${realIndex + 1}. [${q.module}] ${q.stem} ${masteryBadge(q.mastery_level)}</p>`;
+                        if (q.options) {
+                            for (const [k, v] of Object.entries(q.options)) {
+                                html += `<div class="option" onclick="submitDailyAnswer(${realIndex}, '${k}', this)">${k}. ${v}</div>`;
+                            }
+                        } else {
+                            html += `<input type="text" id="daily-input-${realIndex}" placeholder="输入你的答案">`;
+                            html += `<p><button class="action" onclick="submitDailyShort(${realIndex})">提交</button></p>`;
+                        }
+                        html += `</div>`;
+                        window.dailyQuestions.push(q);
+                    });
+                    container.insertAdjacentHTML('beforeend', html);
+                    renderLoadMoreButton();
+                }
+            function renderLoadMoreButton() {
+                    const container = document.getElementById('view-daily');
+                    let btn = document.getElementById('load-more-btn');
+                    if (btn) btn.remove();
+                    container.insertAdjacentHTML('beforeend',
+                        `<p id="load-more-btn" style="text-align:center;margin-top:20px"><button class="action" onclick="loadMoreDaily()">再来5题</button></p>`);
+                }
+
             async function loadReview() {
                 const res = await fetch(API + '/api/review');
                 const data = await res.json();
