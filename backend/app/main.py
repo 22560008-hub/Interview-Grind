@@ -4,9 +4,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from app.api import questions, answers, wrong, stats, favorites, daily, review
 from app.core.config import settings
-from app.core.database import Base, engine
+from app.core.database import Base, engine, ensure_question_key_points_column
 from app.models import question, answer, favorite, progress  # noqa: F401
 
+ensure_question_key_points_column(engine)
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title=settings.app_name, version="0.1.0")

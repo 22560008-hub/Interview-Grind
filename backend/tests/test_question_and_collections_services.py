@@ -1,6 +1,28 @@
 from app.models.answer import WrongQuestion
+from app.models.question import Question
 from app.services.favorite_service import add_favorite, list_favorites, remove_favorite
 from app.services.question_service import pick_questions
+
+
+def test_question_persists_structured_short_answer_key_points(db):
+    question = Question(
+        module="network",
+        chapter="TCP",
+        type="short_answer",
+        stem="TCP 如何保证可靠传输？",
+        options=None,
+        answer="TCP 通过多种机制保证可靠传输。",
+        explanation="测试解析",
+        difficulty=2,
+        key_points=["序列号", "确认应答", "超时重传"],
+    )
+    db.add(question)
+    db.commit()
+    db.expire_all()
+
+    saved = db.get(Question, question.id)
+
+    assert saved.key_points == ["序列号", "确认应答", "超时重传"]
 from app.services.wrong_service import list_wrong_questions, remove_wrong_question
 
 

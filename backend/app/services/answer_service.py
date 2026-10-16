@@ -1,11 +1,34 @@
-from sqlalchemy.orm import Session
+from datetime import datetime, timedelta
 from html import escape
+
+from sqlalchemy.orm import Session
 
 from app.models.answer import AnswerRecord, WrongQuestion
 from app.models.daily import DailyPractice, DailyPracticeItem
-from app.models.question import Question
 from app.models.progress import QuestionProgress
-from datetime import datetime, timedelta
+from app.models.question import Question
+
+
+def analyze_short_answer(question: Question, user_answer: str) -> dict:
+    if question.type == "choice":
+        raise ValueError("选择题不支持简答题预判")
+
+    key_points = question.key_points or []
+    normalized_answer = user_answer.casefold()
+    matched_points = [
+        point for point in key_points if point.casefold() in normalized_answer
+    ]
+    missing_points = [point for point in key_points if point not in matched_points]
+    coverage = round(len(matched_points) / len(key_points) * 100) if key_points else 0
+    return {
+        "display_user_answer": escape(user_answer),
+        "correct_answer": question.answer,
+        "explanation": question.explanation,
+        "matched_points": matched_points,
+        "missing_points": missing_points,
+        "coverage": coverage,
+        "requires_self_rating": True,
+    }
 
 
 def grade_answer(
@@ -13,11 +36,14 @@ def grade_answer(
     question_id: int,
     user_answer: str,
     daily_practice_id: int | None = None,
+    self_rating: str | None = None,
 ) -> dict:
     # 1. 根据 question_id 查出这道题
     question = db.get(Question, question_id)
     if question is None:
         return {"error": "题目不存在"}
+    if question.type != "choice" and self_rating is None:
+        raise ValueError("简答题提交前请选择掌握程度")
 
     daily_item = None
     practice = None
@@ -39,6 +65,7 @@ def grade_answer(
                 "correct_answer": question.answer,
                 "explanation": question.explanation,
                 "display_user_answer": escape(daily_item.user_answer),
+                "self_rating": None,
             }
 
     # 2. 判分：忽略大小写和首尾空格，比较用户答案和正确答案
@@ -46,10 +73,8 @@ def grade_answer(
         # 选择题：精确匹配（A/B/C/D）
         is_correct = user_answer.strip().upper() == question.answer.strip().upper()
     else:
-        # 简答题：把正确答案按顿号拆成关键词，用户答案里包含所有关键词就算对
-        keywords = [k.strip() for k in question.answer.split("、") if k.strip()]
-        user_lower = user_answer.lower()
-        is_correct = all(kw.lower() in user_lower for kw in keywords)
+        # 简答题先展示关键点反馈，再由用户自评决定本次学习结果。
+        is_correct = self_rating == "mastered"
 
     # 3. 写一条作答流水
     db.add(
@@ -104,8 +129,11 @@ def grade_answer(
     else:
         progress.consecutive_correct = 0
         progress.mastery_level = 1  # 薄弱
-        # 答错了，马上再复习
-        progress.next_review_at = datetime.now()
+        if question.type != "choice" and self_rating == "fuzzy":
+            progress.next_review_at = datetime.now() + timedelta(days=1)
+        else:
+            # 选择题答错或简答题选择“不会”，马上再复习。
+            progress.next_review_at = datetime.now()
 
     if daily_item is not None:
         daily_item.user_answer = user_answer
@@ -134,4 +162,5 @@ def grade_answer(
         "correct_answer": question.answer,
         "explanation": question.explanation,
         "display_user_answer": escape(user_answer),
+        "self_rating": self_rating,
     }

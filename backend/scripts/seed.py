@@ -4,7 +4,12 @@
 目录组织；题干、答案与解析均为独立编写。
 """
 
-from app.core.database import Base, SessionLocal, engine
+from app.core.database import (
+    Base,
+    SessionLocal,
+    engine,
+    ensure_question_key_points_column,
+)
 from app.models.question import Question
 
 
@@ -22,6 +27,284 @@ def C(module, chapter, stem, choices, answer, explanation, difficulty=2):
     }
 
 
+SHORT_ANSWER_KEY_POINTS = {
+    "简述 MAC 地址与 IP 地址在通信中的分工。": [
+        "IP 地址",
+        "逻辑寻址",
+        "路由",
+        "MAC 地址",
+        "帧交付",
+    ],
+    "从浏览器输入 URL 到页面显示，按顺序列出主要网络步骤。": [
+        "DNS",
+        "ARP",
+        "TCP",
+        "TLS",
+        "HTTP",
+        "渲染",
+    ],
+    "DNS 查询中递归查询与迭代查询有什么区别？": [
+        "递归查询",
+        "最终答案",
+        "迭代查询",
+        "下一步",
+    ],
+    "简述 Linux 发送网络包的主要路径。": [
+        "socket",
+        "传输层",
+        "网络层",
+        "路由",
+        "发送队列",
+        "DMA",
+    ],
+    "RPC 与 HTTP 是什么关系，为什么内部服务常使用 RPC？": [
+        "远程调用",
+        "HTTP/2",
+        "接口定义",
+        "代码生成",
+        "序列化",
+        "服务治理",
+    ],
+    "WebSocket 相比普通 HTTP 请求响应模式解决了什么问题？": [
+        "HTTP Upgrade",
+        "持久连接",
+        "全双工",
+        "服务端推送",
+        "低延迟",
+    ],
+    "简述 TLS 1.3 握手为何通常比 TLS 1.2 更快。": [
+        "精简",
+        "1-RTT",
+        "密钥协商",
+        "会话恢复",
+        "0-RTT",
+        "重放",
+    ],
+    "为什么仅使用 TCP 也不能保证业务数据绝对不丢？": [
+        "接收缓冲区",
+        "持久化",
+        "业务处理",
+        "应用层确认",
+        "重试",
+        "幂等",
+    ],
+    "主机断电与仅进程崩溃时，已有 TCP 连接的表现有何不同？": [
+        "FIN",
+        "RST",
+        "断电",
+        "重传超时",
+        "保活",
+        "应用超时",
+    ],
+    "若要基于 UDP 实现可靠传输，通常需要补充哪些机制？": [
+        "序列号",
+        "确认",
+        "重传",
+        "乱序重排",
+        "流量控制",
+        "拥塞控制",
+    ],
+    "说明 MTU、IP 分片与 TCP MSS 的关系。": [
+        "MTU",
+        "IP 分片",
+        "MSS",
+        "TCP 负载",
+        "避免分片",
+    ],
+    "为什么 CPU 中需要多级缓存？": ["CPU", "主存", "L1", "L2", "L3", "局部性"],
+    "分页与分段的主要区别是什么？": ["固定大小", "逻辑单元", "内部碎片", "外部碎片"],
+    "系统内存紧张时，Linux 可能采取哪些措施？": [
+        "页缓存",
+        "swap",
+        "内存压缩",
+        "OOM Killer",
+    ],
+    "产生死锁的四个必要条件是什么？": ["互斥", "持有并等待", "不可剥夺", "循环等待"],
+    "预防死锁有哪些常见思路？": [
+        "破坏必要条件",
+        "统一锁顺序",
+        "一次申请",
+        "超时",
+        "回滚",
+    ],
+    "进程上下文切换通常需保存和恢复什么？": [
+        "寄存器",
+        "程序计数器",
+        "栈指针",
+        "调度状态",
+        "地址空间",
+        "TLB",
+    ],
+    "评价 CPU 调度算法时常看哪些指标？": [
+        "CPU 利用率",
+        "吞吐量",
+        "周转时间",
+        "等待时间",
+        "响应时间",
+        "公平性",
+    ],
+    "页缓存在文件 I/O 中有什么作用？": [
+        "缓存文件",
+        "读命中",
+        "合并写",
+        "后台回写",
+        "掉电丢失",
+    ],
+    "“零拷贝”是否意味着一次内存/DMA 拷贝都没有？": [
+        "用户空间",
+        "内核空间",
+        "CPU 拷贝",
+        "DMA",
+    ],
+    "为什么同一条 SQL 在数据分布改变后可能选择不同索引？": [
+        "统计信息",
+        "扫描行数",
+        "回表",
+        "I/O 成本",
+        "数据分布",
+        "执行计划",
+    ],
+    "一条 InnoDB 记录除业务列外，常见隐藏信息有哪些？": [
+        "DB_TRX_ID",
+        "DB_ROLL_PTR",
+        "隐藏行 ID",
+    ],
+    "什么是回表，如何减少回表？": [
+        "二级索引",
+        "主键",
+        "聚簇索引",
+        "覆盖索引",
+        "筛选性",
+    ],
+    "建立索引时应如何考虑区分度？": [
+        "区分度",
+        "扫描范围",
+        "联合索引",
+        "范围条件",
+        "排序",
+        "查询频率",
+    ],
+    "说明脏读、不可重复读和幻读。": [
+        "未提交",
+        "同一行",
+        "值改变",
+        "条件查询",
+        "结果集",
+        "行出现或消失",
+    ],
+    "MVCC 为什么能提高读写并发？": [
+        "Read View",
+        "undo",
+        "可见版本",
+        "读写不阻塞",
+        "写写冲突",
+    ],
+    "排查和减少 MySQL 死锁的常见方法有哪些？": [
+        "死锁日志",
+        "访问顺序",
+        "缩短事务",
+        "索引",
+        "锁范围",
+        "幂等重试",
+    ],
+    "redo log 与 binlog 有哪些主要区别？": [
+        "InnoDB",
+        "物理日志",
+        "崩溃恢复",
+        "Server 层",
+        "归档日志",
+        "复制",
+    ],
+    "为什么 Buffer Pool 很大时仍需要 redo log？": [
+        "易失内存",
+        "脏页",
+        "WAL",
+        "持久化",
+        "崩溃恢复",
+    ],
+    "主从复制的基本数据流是什么？": [
+        "binlog",
+        "I/O 线程",
+        "relay log",
+        "重放",
+        "异步复制",
+        "延迟",
+    ],
+    "为什么 Redis 快不等于可以无限堆积请求？": [
+        "CPU",
+        "内存",
+        "网络",
+        "大 Key",
+        "慢命令",
+        "输出缓冲区",
+    ],
+    "设计排行榜时为什么常用 ZSet？": [
+        "成员唯一",
+        "score",
+        "有序",
+        "更新分数",
+        "排名",
+        "范围查询",
+    ],
+    "AOF 的 always、everysec、no 三种刷盘策略如何取舍？": [
+        "always",
+        "everysec",
+        "no",
+        "fsync",
+        "性能",
+        "数据丢失",
+    ],
+    "对比 RDB 和 AOF 的主要优缺点。": [
+        "RDB",
+        "快照",
+        "加载快",
+        "AOF",
+        "数据安全",
+        "恢复成本",
+    ],
+    "分布式锁的 TTL 太短时有什么风险，如何处理？": [
+        "锁过期",
+        "临界区",
+        "合理 TTL",
+        "续期",
+        "fencing token",
+        "幂等",
+    ],
+    "主从复制能否单独保证主节点故障时自动恢复？": [
+        "不能",
+        "数据副本",
+        "故障检测",
+        "领导者选举",
+        "主从切换",
+        "Sentinel",
+    ],
+    "Sentinel 故障转移大致经过哪些步骤？": [
+        "客观下线",
+        "领导 Sentinel",
+        "从库升主",
+        "复制新主",
+        "通知客户端",
+    ],
+    "Redis Cluster 的扩容本质上做了什么？": ["新节点", "哈希槽", "键迁移", "槽映射"],
+    "说明大 Key 可能带来的问题。": [
+        "阻塞",
+        "流量尖峰",
+        "分片不均",
+        "持久化",
+        "主从同步",
+        "COW",
+    ],
+    "如何降低“更新数据库后删除缓存失败”的影响？": [
+        "重试",
+        "幂等",
+        "消息队列",
+        "binlog",
+        "CDC",
+        "TTL",
+    ],
+}
+
+
 def S(module, chapter, stem, answer, explanation=None, difficulty=2):
     """构造简答题。"""
     return {
@@ -31,6 +314,7 @@ def S(module, chapter, stem, answer, explanation=None, difficulty=2):
         "stem": stem,
         "options": None,
         "answer": answer,
+        "key_points": SHORT_ANSWER_KEY_POINTS[stem],
         "explanation": explanation or answer,
         "difficulty": difficulty,
     }
@@ -2517,19 +2801,29 @@ QUESTIONS = [
 ]
 
 
+def sync_questions(db, questions):
+    added = 0
+    updated = 0
+    for question_data in questions:
+        existing = db.query(Question).filter_by(stem=question_data["stem"]).first()
+        if existing is None:
+            db.add(Question(**question_data))
+            added += 1
+        elif existing.key_points != question_data.get("key_points"):
+            existing.key_points = question_data.get("key_points")
+            updated += 1
+    db.commit()
+    return added, updated
+
+
 def run():
+    ensure_question_key_points_column(engine)
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
-    added = 0
     try:
-        for question_data in QUESTIONS:
-            exists = db.query(Question).filter_by(stem=question_data["stem"]).first()
-            if not exists:
-                db.add(Question(**question_data))
-                added += 1
-        db.commit()
+        added, updated = sync_questions(db, QUESTIONS)
         total = db.query(Question).count()
-        print(f"新增 {added} 道题，题库现有 {total} 道题。")
+        print(f"新增 {added} 道题，更新 {updated} 道题，题库现有 {total} 道题。")
     except Exception:
         db.rollback()
         raise

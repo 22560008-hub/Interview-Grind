@@ -106,18 +106,74 @@ def test_wrong_answer_after_correct_streak_resets_progress(db, question_factory)
     assert progress.next_review_at <= datetime.now() + timedelta(seconds=1)
 
 
-def test_short_answer_requires_every_keyword_but_ignores_case(db, question_factory):
+def test_mastered_short_answer_counts_as_correct_after_self_assessment(
+    db, question_factory
+):
     question = question_factory(
-        stem="简答关键词",
+        stem="简答题掌握自评",
         q_type="short_answer",
-        answer="TCP、拥塞控制",
+        answer="TCP 具有拥塞控制机制",
+        key_points=["TCP", "拥塞控制"],
     )
 
-    incorrect = grade_answer(db, question_id=question.id, user_answer="只回答 TCP")
-    correct = grade_answer(db, question_id=question.id, user_answer="tcp 有拥塞控制机制")
+    result = grade_answer(
+        db,
+        question_id=question.id,
+        user_answer="我已经理解",
+        self_rating="mastered",
+    )
 
-    assert incorrect["is_correct"] is False
-    assert correct["is_correct"] is True
+    assert result["is_correct"] is True
+    assert result["self_rating"] == "mastered"
+    progress = db.query(QuestionProgress).filter_by(question_id=question.id).one()
+    assert progress.mastery_level == 2
+    assert progress.consecutive_correct == 1
+
+
+def test_fuzzy_short_answer_is_due_tomorrow(db, question_factory):
+    question = question_factory(
+        stem="简答题模糊自评",
+        q_type="short_answer",
+        answer="参考答案",
+        key_points=["关键点"],
+    )
+
+    result = grade_answer(
+        db,
+        question_id=question.id,
+        user_answer="不太确定",
+        self_rating="fuzzy",
+    )
+
+    assert result["is_correct"] is False
+    assert result["self_rating"] == "fuzzy"
+    progress = db.query(QuestionProgress).filter_by(question_id=question.id).one()
+    assert progress.mastery_level == 1
+    assert abs(
+        (progress.next_review_at - (datetime.now() + timedelta(days=1))).total_seconds()
+    ) < 60
+
+
+def test_unknown_short_answer_is_due_immediately(db, question_factory):
+    question = question_factory(
+        stem="简答题不会自评",
+        q_type="short_answer",
+        answer="参考答案",
+        key_points=["关键点"],
+    )
+
+    result = grade_answer(
+        db,
+        question_id=question.id,
+        user_answer="不知道",
+        self_rating="unknown",
+    )
+
+    assert result["is_correct"] is False
+    assert result["self_rating"] == "unknown"
+    progress = db.query(QuestionProgress).filter_by(question_id=question.id).one()
+    assert progress.mastery_level == 1
+    assert progress.next_review_at <= datetime.now() + timedelta(seconds=1)
 
 
 def test_unknown_question_returns_error_without_creating_records(db):

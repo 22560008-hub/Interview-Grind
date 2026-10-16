@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import BaseModel
 
 
@@ -7,6 +9,22 @@ class AnswerSubmit(BaseModel):
     question_id: int
     user_answer: str
     daily_practice_id: int | None = None
+    self_rating: Literal["mastered", "fuzzy", "unknown"] | None = None
+
+
+class ShortAnswerPreviewSubmit(BaseModel):
+    question_id: int
+    user_answer: str
+
+
+class ShortAnswerPreviewResult(BaseModel):
+    display_user_answer: str
+    correct_answer: str
+    explanation: str = ""
+    matched_points: list[str]
+    missing_points: list[str]
+    coverage: int
+    requires_self_rating: bool = True
 
 
 class GradeResult(BaseModel):
@@ -16,3 +34,4 @@ class GradeResult(BaseModel):
     correct_answer: str
     explanation: str = ""
     display_user_answer: str
+    self_rating: Literal["mastered", "fuzzy", "unknown"] | None = None

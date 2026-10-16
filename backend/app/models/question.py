@@ -15,5 +15,8 @@ class Question(Base):
     stem: Mapped[str] = mapped_column(Text, comment="题干")
     options: Mapped[dict | None] = mapped_column(JSON, nullable=True, comment="选项")
     answer: Mapped[str] = mapped_column(Text, comment="参考答案")
+    key_points: Mapped[list[str] | None] = mapped_column(
+        JSON, nullable=True, comment="简答题关键点"
+    )
     explanation: Mapped[str] = mapped_column(Text, default="", comment="解析")
     difficulty: Mapped[int] = mapped_column(Integer, default=1, comment="难度")

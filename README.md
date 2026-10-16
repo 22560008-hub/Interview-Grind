@@ -6,7 +6,7 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-框架-009688)
 ![Database](https://img.shields.io/badge/SQLite-3-003B57)
 ![Questions](https://img.shields.io/badge/题库-224%20道-orange)
-![Tests](https://img.shields.io/badge/pytest-43%20用例-success)
+![Tests](https://img.shields.io/badge/pytest-57%20用例-success)
 
 前后端一体、开箱即用：后端基于 **FastAPI + SQLAlchemy + SQLite**，前端为零依赖的**原生 HTML/JavaScript 单页应用**，无需单独启动前端、无需 Docker、无需外部数据库。
 
@@ -32,7 +32,7 @@
 ## 功能特性
 
 - **组卷刷题**：按模块、题型、题量随机抽题，支持选择题与简答题混合作答。
-- **自动判分**：选择题精确匹配答案字母；简答题按顿号拆分关键词，全部关键词命中后判对，答完即出正确答案与解析。
+- **分题型评价**：选择题自动判分；简答题先分析关键点覆盖与遗漏，再由用户结合参考答案自评“掌握 / 模糊 / 不会”。
 - **错题本**：答错自动收录并累计错次，确认"已掌握"后可移出。
 - **题目收藏**：一键收藏 / 取消收藏，随时回看重点题。
 - **掌握度追踪**：每题维护学习档案，自动标注薄弱（红）/ 一般（橙）/ 熟练（绿）。
@@ -174,7 +174,8 @@ uvicorn app.main:app --reload
 | --- | --- | --- |
 | GET | `/health` | 健康检查 |
 | GET | `/api/questions` | 组卷抽题，支持 `module`、`type`、`limit`（1–50）参数 |
-| POST | `/api/answers` | 提交答案（每日练习额外传入 `daily_practice_id`），返回判分结果与解析 |
+| POST | `/api/answers/preview` | 分析简答题已覆盖和遗漏的关键点，不写入答题记录 |
+| POST | `/api/answers` | 最终提交答案；简答题额外传入 `self_rating`，每日练习额外传入 `daily_practice_id` |
 | GET | `/api/wrong-questions` | 查看错题本列表 |
 | DELETE | `/api/wrong-questions/{question_id}` | 将错题标记为已掌握并移出 |
 | GET | `/api/favorites` | 查看收藏列表 |
@@ -196,7 +197,8 @@ uvicorn app.main:app --reload
 ### 判分规则
 
 - **选择题**：与标准答案字母（A / B / C / D）精确匹配。
-- **简答题**：将参考答案按顿号拆分为关键词，用户答案包含全部关键词时判定正确，不要求与参考答案逐字一致。
+- **简答题**：每道题维护独立的结构化关键点。用户提交初稿后，系统展示关键点覆盖率、已覆盖项、遗漏项、参考答案与解析，但不立即写入记录；用户选择“掌握 / 模糊 / 不会”后才正式更新学习进度。
+- **简答题复习安排**：“掌握”沿用连续答对的 1 → 3 → 7 → 14 天间隔；“模糊”安排在 1 天后复习；“不会”立即进入待复习状态。选择“掌握”但覆盖率低于 50% 时，前端会要求再次确认。
 - 每次作答都会自动更新错题本与题目进度。
 
 ### 掌握度（mastery_level）
@@ -228,7 +230,7 @@ uvicorn app.main:app --reload
 
 | 表名 | 作用 | 关键字段 |
 | --- | --- | --- |
-| `question` | 题目库 | `module`、`chapter`、`type`、`stem`、`options`、`answer`、`explanation`、`difficulty` |
+| `question` | 题目库 | `module`、`chapter`、`type`、`stem`、`options`、`answer`、`key_points`、`explanation`、`difficulty` |
 | `answer_record` | 答题流水 | `question_id`、`user_answer`、`is_correct` |
 | `wrong_question` | 错题本 | `question_id`、`wrong_count`、`last_wrong_at` |
 | `favorite` | 收藏 | `question_id`、`created_at` |
@@ -247,7 +249,7 @@ pip install -r requirements-dev.txt
 pytest
 ```
 
-当前共 **43 个测试用例**，覆盖答题判分与间隔复习、收藏 / 错题本、统计接口、每日一练选题与持久化、重复提交、历史统计与详情、旧数据兼容、参数校验、HTML 安全转义，以及关键前端交互。当前测试全部通过。
+当前共 **57 个测试用例**，覆盖选择题判分、简答题关键点预判与自评、间隔复习、收藏 / 错题本、统计接口、每日一练选题与持久化、重复提交、历史统计与详情、数据库兼容升级、参数校验、HTML 安全转义，以及关键前端交互。当前测试全部通过。
 
 ---
 
@@ -270,8 +272,8 @@ pytest
 
 详见 [DEV_LOG.md](DEV_LOG.md)，规划方向包括：
 
-1. 改进简答题评价（自评 + 关键点遗漏提示）；
-2. 补齐工程质量（数据库迁移、统一模块枚举、统一错误响应等）；
+1. 改进关键点匹配（同义表达、近义词与更细的关键点维护）；
+2. 补齐工程质量（正式数据库迁移工具、统一模块枚举、统一错误响应等）；
 3. 丰富学习分析（历史筛选、趋势统计与薄弱知识点聚合）；
 4. 用户体系与上线（登录、多用户隔离、PostgreSQL、部署）；
 5. AI 能力（简答题点评、个性化追问、模拟面试）。

@@ -40,6 +40,7 @@ def question_factory(db: Session) -> Callable[..., Question]:
         stem: str,
         answer: str = "A",
         options: dict[str, str] | None = None,
+        key_points: list[str] | None = None,
         explanation: str = "测试解析",
         difficulty: int = 2,
     ) -> Question:
@@ -50,6 +51,7 @@ def question_factory(db: Session) -> Callable[..., Question]:
             stem=stem,
             answer=answer,
             options=options if q_type == "choice" else None,
+            key_points=key_points,
             explanation=explanation,
             difficulty=difficulty,
         )

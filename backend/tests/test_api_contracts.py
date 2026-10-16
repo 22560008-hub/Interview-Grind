@@ -7,6 +7,69 @@ from app.models.daily import DailyPractice
 from app.models.progress import QuestionProgress
 
 
+def test_short_answer_preview_reports_coverage_without_persisting(
+    client, db, question_factory
+):
+    question = question_factory(
+        stem="简答题预判",
+        q_type="short_answer",
+        answer="TCP 通过序列号、确认应答和超时重传保证可靠传输。",
+        key_points=["序列号", "确认应答", "超时重传"],
+        explanation="三个机制共同保证可靠性。",
+    )
+
+    response = client.post(
+        "/api/answers/preview",
+        json={
+            "question_id": question.id,
+            "user_answer": '<b>序列号</b>和确认应答',
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "display_user_answer": "&lt;b&gt;序列号&lt;/b&gt;和确认应答",
+        "correct_answer": question.answer,
+        "explanation": "三个机制共同保证可靠性。",
+        "matched_points": ["序列号", "确认应答"],
+        "missing_points": ["超时重传"],
+        "coverage": 67,
+        "requires_self_rating": True,
+    }
+    assert db.query(AnswerRecord).count() == 0
+    assert db.query(QuestionProgress).count() == 0
+
+
+def test_short_answer_preview_rejects_choice_question(client, question_factory):
+    question = question_factory(stem="选择题不能预判", options={"A": "正确"})
+
+    response = client.post(
+        "/api/answers/preview",
+        json={"question_id": question.id, "user_answer": "A"},
+    )
+
+    assert response.status_code == 400
+
+
+def test_short_answer_cannot_be_finalized_without_self_rating(
+    client, db, question_factory
+):
+    question = question_factory(
+        stem="简答题需要自评",
+        q_type="short_answer",
+        answer="参考答案",
+        key_points=["关键点"],
+    )
+
+    response = client.post(
+        "/api/answers",
+        json={"question_id": question.id, "user_answer": "我的回答"},
+    )
+
+    assert response.status_code == 400
+    assert db.query(AnswerRecord).count() == 0
+
+
 def test_health_endpoint_reports_running_app(client):
     response = client.get("/health")
 
@@ -183,6 +246,7 @@ def test_daily_short_answer_provides_html_safe_display_text(
         stem="每日简答题安全显示",
         q_type="short",
         answer="安全关键词",
+        key_points=["安全", "关键词"],
     )
     practice_id = client.get("/api/daily").json()["practice_id"]
     unsafe_answer = '<img src=x onerror="alert(1)">'
@@ -193,6 +257,7 @@ def test_daily_short_answer_provides_html_safe_display_text(
             "question_id": question.id,
             "user_answer": unsafe_answer,
             "daily_practice_id": practice_id,
+            "self_rating": "fuzzy",
         },
     )
     restored = client.get("/api/daily").json()["questions"][0]
@@ -201,6 +266,45 @@ def test_daily_short_answer_provides_html_safe_display_text(
     assert submitted.json()["display_user_answer"] == expected
     assert restored["user_answer"] == unsafe_answer
     assert restored["display_user_answer"] == expected
+
+
+def test_daily_short_answer_preview_does_not_complete_practice(
+    client, db, question_factory
+):
+    question = question_factory(
+        stem="预判不完成每日练习",
+        q_type="short_answer",
+        answer="参考答案",
+        key_points=["关键点一", "关键点二"],
+    )
+    daily = client.get("/api/daily").json()
+
+    preview = client.post(
+        "/api/answers/preview",
+        json={"question_id": question.id, "user_answer": "关键点一"},
+    )
+    after_preview = client.get("/api/daily").json()
+
+    assert preview.status_code == 200
+    assert after_preview["is_completed"] is False
+    assert after_preview["questions"][0]["user_answer"] is None
+    assert db.query(AnswerRecord).count() == 0
+
+    finalized = client.post(
+        "/api/answers",
+        json={
+            "question_id": question.id,
+            "user_answer": "关键点一",
+            "daily_practice_id": daily["practice_id"],
+            "self_rating": "fuzzy",
+        },
+    )
+    after_final = client.get("/api/daily").json()
+
+    assert finalized.status_code == 200
+    assert after_final["is_completed"] is True
+    assert after_final["correct"] == 0
+    assert after_final["questions"][0]["user_answer"] == "关键点一"
 
 
 def test_question_delivery_hides_answer_and_explanation_before_submission(

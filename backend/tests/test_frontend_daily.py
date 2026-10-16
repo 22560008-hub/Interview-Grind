@@ -224,3 +224,214 @@ global.fetch = async () => {
     assert result["arrow"] == "▲"
     assert result["display"] == "block"
     assert result["expanded"] == "true"
+
+
+def test_quiz_short_answer_previews_key_points_before_persisting(tmp_path):
+    output = run_frontend_script(
+        tmp_path,
+        """
+const input = { value: "<img src=x> 序列号" };
+const card = { innerHTML: "" };
+global.window = { confirm: () => true };
+global.document = {
+    getElementById: id => {
+        if (id === "short-answer") return input;
+        if (id === "question-card") return card;
+        return null;
+    }
+};
+currentQuestion = { id: 7, module: "network", stem: "可靠传输" };
+const calls = [];
+global.fetch = async (url, options) => {
+    calls.push({ url, body: JSON.parse(options.body) });
+    return {
+        ok: true,
+        json: async () => ({
+            display_user_answer: "&lt;img src=x&gt; 序列号",
+            correct_answer: "参考答案",
+            explanation: "解析",
+            matched_points: ["序列号"],
+            missing_points: ["确认应答"],
+            coverage: 50,
+            requires_self_rating: true
+        })
+    };
+};
+(async () => {
+    await submitShort();
+    console.log(JSON.stringify({ calls, html: card.innerHTML }));
+})().catch(error => { console.error(error); process.exit(1); });
+""",
+    )
+    result = json.loads(output)
+
+    assert len(result["calls"]) == 1
+    assert result["calls"][0]["url"].endswith("/api/answers/preview")
+    assert result["calls"][0]["body"] == {
+        "question_id": 7,
+        "user_answer": "<img src=x> 序列号",
+    }
+    assert "覆盖率：50%" in result["html"]
+    assert "确认应答" in result["html"]
+    assert "掌握" in result["html"]
+    assert "<img src=x>" not in result["html"]
+    assert "&lt;img src=x&gt;" in result["html"]
+
+
+def test_quiz_short_answer_self_rating_performs_final_submission(tmp_path):
+    output = run_frontend_script(
+        tmp_path,
+        """
+const input = { value: "序列号和确认应答" };
+const card = { innerHTML: "" };
+global.window = { confirm: () => true };
+global.document = {
+    getElementById: id => {
+        if (id === "short-answer") return input;
+        if (id === "question-card") return card;
+        return null;
+    }
+};
+currentQuestion = { id: 8, module: "network", stem: "可靠传输" };
+const calls = [];
+global.fetch = async (url, options) => {
+    calls.push({ url, body: JSON.parse(options.body) });
+    if (url.endsWith("/preview")) {
+        return {
+            ok: true,
+            json: async () => ({
+                display_user_answer: "序列号和确认应答",
+                correct_answer: "参考答案",
+                explanation: "解析",
+                matched_points: ["序列号", "确认应答"],
+                missing_points: [],
+                coverage: 100,
+                requires_self_rating: true
+            })
+        };
+    }
+    return {
+        ok: true,
+        json: async () => ({
+            is_correct: true,
+            correct_answer: "参考答案",
+            explanation: "解析",
+            display_user_answer: "序列号和确认应答",
+            self_rating: "mastered"
+        })
+    };
+};
+(async () => {
+    await submitShort();
+    await finalizeShortAnswer("quiz", "mastered");
+    console.log(JSON.stringify({ calls, html: card.innerHTML }));
+})().catch(error => { console.error(error); process.exit(1); });
+""",
+    )
+    result = json.loads(output)
+
+    assert len(result["calls"]) == 2
+    assert result["calls"][1]["url"].endswith("/api/answers")
+    assert result["calls"][1]["body"]["self_rating"] == "mastered"
+    assert result["calls"][1]["body"]["question_id"] == 8
+    assert "已标记为掌握" in result["html"]
+
+
+def test_daily_short_answer_final_submission_keeps_practice_context(tmp_path):
+    output = run_frontend_script(
+        tmp_path,
+        """
+const input = { value: "关键点" };
+const card = { innerHTML: "" };
+const dailyView = { insertAdjacentHTML: () => {} };
+const question = { id: 9, module: "mysql", stem: "事务", type: "short_answer" };
+global.window = {
+    confirm: () => true,
+    dailyQuestions: [question],
+    dailyPracticeId: 31,
+    dailyDate: "2026-10-16",
+    dailyAnswers: [undefined]
+};
+global.document = {
+    getElementById: id => {
+        if (id === "daily-input-0") return input;
+        if (id === "daily-card-0") return card;
+        if (id === "view-daily") return dailyView;
+        return null;
+    }
+};
+const calls = [];
+global.fetch = async (url, options) => {
+    calls.push({ url, body: JSON.parse(options.body) });
+    if (url.endsWith("/preview")) {
+        return { ok: true, json: async () => ({
+            display_user_answer: "关键点", correct_answer: "参考答案",
+            explanation: "解析", matched_points: ["关键点"],
+            missing_points: [], coverage: 100, requires_self_rating: true
+        }) };
+    }
+    return { ok: true, json: async () => ({
+        is_correct: false, correct_answer: "参考答案", explanation: "解析",
+        display_user_answer: "关键点", self_rating: "fuzzy"
+    }) };
+};
+(async () => {
+    await submitDailyShort(0);
+    await finalizeShortAnswer("daily-0", "fuzzy");
+    console.log(JSON.stringify({ calls, answer: window.dailyAnswers[0], html: card.innerHTML }));
+})().catch(error => { console.error(error); process.exit(1); });
+""",
+    )
+    result = json.loads(output)
+
+    assert result["calls"][1]["body"]["daily_practice_id"] == 31
+    assert result["calls"][1]["body"]["self_rating"] == "fuzzy"
+    assert result["answer"] is False
+    assert "已标记为模糊" in result["html"]
+
+
+def test_review_short_answer_final_submission_updates_review_score(tmp_path):
+    output = run_frontend_script(
+        tmp_path,
+        """
+const input = { value: "不会" };
+const card = { innerHTML: "" };
+const score = { innerHTML: "" };
+const question = { id: 10, module: "redis", stem: "持久化", type: "short_answer" };
+global.window = {
+    confirm: () => true,
+    reviewQuestions: [question],
+    reviewAnswers: []
+};
+global.document = {
+    getElementById: id => {
+        if (id === "review-input-0") return input;
+        if (id === "review-score") return score;
+        return null;
+    },
+    querySelectorAll: selector => selector === "#view-review .card" ? [card] : []
+};
+global.fetch = async (url) => {
+    if (url.endsWith("/preview")) {
+        return { ok: true, json: async () => ({
+            display_user_answer: "不会", correct_answer: "参考答案",
+            explanation: "解析", matched_points: [], missing_points: ["AOF"],
+            coverage: 0, requires_self_rating: true
+        }) };
+    }
+    return { ok: true, json: async () => ({
+        is_correct: false, correct_answer: "参考答案", explanation: "解析",
+        display_user_answer: "不会", self_rating: "unknown"
+    }) };
+};
+(async () => {
+    await submitReviewShort(0);
+    await finalizeShortAnswer("review-0", "unknown");
+    console.log(JSON.stringify({ answer: window.reviewAnswers[0], score: score.innerHTML }));
+})().catch(error => { console.error(error); process.exit(1); });
+""",
+    )
+    result = json.loads(output)
+
+    assert result["answer"] is False
+    assert "复习完成：0 / 1" in result["score"]
