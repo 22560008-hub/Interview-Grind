@@ -1,15 +1,21 @@
-from fastapi import APIRouter, Depends
+from datetime import date
+import random
+
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+
 from app.core.database import get_db
+from app.models.daily import DailyPractice, DailyPracticeItem
+from app.models.question import Question
+from app.services.daily_history_service import (
+    get_daily_history,
+    get_daily_history_detail,
+)
 from app.services.daily_service import (
     ensure_daily_items,
     get_daily_questions,
     parse_question_ids,
 )
-from app.models.daily import DailyPractice, DailyPracticeItem
-from app.models.question import Question
-from datetime import date
-import random
 
 router = APIRouter(prefix="/api/daily", tags=["每日一练"])
 
@@ -67,3 +73,19 @@ def extend_daily(db: Session = Depends(get_db)):
     results_by_id = {item["id"]: item for item in all_results}
     result = [results_by_id[question_id] for question_id in new_ids]
     return {"questions": result, "count": len(result)}
+
+
+@router.get("/history", summary="获取最近30天练习历史")
+def daily_history(
+    db: Session = Depends(get_db),
+    days: int = Query(default=30, ge=1, le=365),
+):
+    return get_daily_history(db, days=days)
+
+
+@router.get("/history/{day}", summary="查看某一天的练习详情")
+def daily_history_detail(day: date, db: Session = Depends(get_db)):
+    result = get_daily_history_detail(db, day=day)
+    if result is None:
+        raise HTTPException(status_code=404, detail="没有这一天的练习记录")
+    return result

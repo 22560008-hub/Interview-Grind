@@ -81,6 +81,21 @@
             cursor: pointer;
             margin-right: 8px;
         }
+
+        .history-toggle {
+            width: 100%;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            text-align: left;
+            font: inherit;
+        }
+
+        .history-toggle:focus-visible {
+            outline: 2px solid #1890ff;
+            outline-offset: 4px;
+        }
     </style>
 </head>
 
@@ -93,6 +108,7 @@
         <button onclick="showTab('wrong')" id="tab-wrong">错题本</button>
         <button onclick="showTab('favorites')" id="tab-favorites">收藏</button>
         <button onclick="showTab('stats')" id="tab-stats">统计</button>
+        <button onclick="showTab('history')" id="tab-history">历史</button>
     </div>
 
     <div id="view-quiz">
@@ -114,10 +130,12 @@
     <div id="view-stats" style="display:none"></div>
     <div id="view-daily" style="display:none"></div>
     <div id="view-review" style="display:none"></div>
+    <div id="view-history" style="display:none"></div>
     <script>
         const API = "http://127.0.0.1:8000";
         let currentQuestion = null;
         let currentModule = '';
+        const dailyHistoryCache = new Map();
 
         function setModule(m) {
             currentModule = m;
@@ -127,7 +145,7 @@
         }
 
         function showTab(name) {
-                for (const t of ['quiz', 'daily', 'review', 'wrong', 'favorites', 'stats']) {
+                for (const t of ['quiz', 'daily', 'review', 'wrong', 'favorites', 'stats', 'history']) {
                 document.getElementById('view-' + t).style.display = 'none';
                 document.getElementById('tab-' + t).classList.remove('active');
             }
@@ -138,6 +156,7 @@
             if (name === 'favorites') loadFavorites();
             if (name === 'stats') loadStats();
             if (name === 'daily') loadDaily();
+            if (name === 'history') loadHistory();
         }
 
         async function loadQuestion() {
@@ -241,15 +260,107 @@
             html += `<div class="card"><p>总答题：${s.total} 题</p><p>答对：${s.correct} 题</p><p>总正确率：${s.accuracy}%</p></div>`;
             html += '<h3>掌握度</h3>';
             html += `<div class="card">
-                <p><span style="color:red">薄弱</span>：${s.mastery['薄弱']} 道</p>
-                <p><span style="color:orange">一般</span>：${s.mastery['一般']} 道</p>
-                <p><span style="color:green">熟练</span>：${s.mastery['熟练']} 道</p>
-            </div>`;
+            <p><span style="color:red">薄弱</span>：${s.mastery['薄弱']} 道</p>
+            <p><span style="color:orange">一般</span>：${s.mastery['一般']} 道</p>
+            <p><span style="color:green">熟练</span>：${s.mastery['熟练']} 道</p>
+        </div>`;
             html += '<h3>各模块</h3>';
             for (const m of s.by_module) {
                 html += `<div class="card"><p>${m.module}：${m.total} 题，正确率 ${m.accuracy}%</p></div>`;
             }
+
             document.getElementById('view-stats').innerHTML = html;
+        }
+
+        async function loadHistory() {
+            const view = document.getElementById('view-history');
+            view.innerHTML = '<p>正在加载练习历史...</p>';
+            try {
+                const res = await fetch(API + '/api/daily/history');
+                if (!res.ok) throw new Error('加载历史记录失败');
+                const data = await res.json();
+                let html = `<h2>练习历史（连续打卡 ${data.streak} 天）</h2>`;
+                if (data.records.length === 0) {
+                    html += '<p>还没有练习记录</p>';
+                } else {
+                    for (const record of data.records) {
+                        const status = record.is_completed
+                            ? '<span style="color:green">已完成</span>'
+                            : '<span style="color:orange">未完成</span>';
+                        html += `<div class="card">
+                            <button class="history-toggle" id="history-toggle-${record.date}" type="button"
+                                aria-expanded="false"
+                                aria-controls="history-${record.date}"
+                                onclick="loadDailyHistory('${record.date}')">
+                                ${record.date}　已答 ${record.answered}/${record.total}　
+                                已答正确率 ${record.accuracy}%　完成率 ${record.completion_rate}%　
+                                ${status}　<span id="history-arrow-${record.date}">▼</span>
+                            </button>
+                            <div id="history-${record.date}" style="display:none"></div>
+                        </div>`;
+                    }
+                }
+                view.innerHTML = html;
+            } catch (error) {
+                view.innerHTML = '<p style="color:red">历史记录加载失败，请稍后重试</p>';
+            }
+        }
+
+        async function loadDailyHistory(day) {
+            const box = document.getElementById('history-' + day);
+            const arrow = document.getElementById('history-arrow-' + day);
+            const toggle = document.getElementById('history-toggle-' + day);
+            if (box.style.display === 'block') {
+                box.style.display = 'none';
+                if (arrow) arrow.textContent = '▼';
+                if (toggle) toggle.setAttribute('aria-expanded', 'false');
+                return;
+            }
+
+            if (dailyHistoryCache.has(day)) {
+                box.innerHTML = dailyHistoryCache.get(day);
+                box.style.display = 'block';
+                if (arrow) arrow.textContent = '▲';
+                if (toggle) toggle.setAttribute('aria-expanded', 'true');
+                return;
+            }
+
+            box.innerHTML = '<p>正在加载详情...</p>';
+            box.style.display = 'block';
+            if (arrow) arrow.textContent = '▲';
+            if (toggle) toggle.setAttribute('aria-expanded', 'true');
+            try {
+                const res = await fetch(API + '/api/daily/history/' + encodeURIComponent(day));
+                if (!res.ok) throw new Error('加载历史详情失败');
+                const data = await res.json();
+                let html = '';
+                data.questions.forEach((q, i) => {
+                    html += `<p style="margin-top:10px">${i + 1}. [${q.module}] ${q.stem}</p>`;
+                    if (q.user_answer !== null && q.user_answer !== undefined) {
+                        const answerStatus = q.is_correct
+                            ? '<span style="color:green">答对</span>'
+                            : '<span style="color:red">答错</span>';
+                        html += `<p>${answerStatus}</p>`;
+                        if (q.type === 'choice') {
+                            for (const [k, v] of Object.entries(q.options)) {
+                                let cls = '';
+                                if (k === q.correct_answer) cls = 'correct';
+                                else if (k === q.user_answer && !q.is_correct) cls = 'wrong';
+                                html += `<div class="option ${cls}" style="cursor:default">${k}. ${v}</div>`;
+                            }
+                        } else {
+                            html += `<p style="color:red">你的答案：${q.display_user_answer}</p>`;
+                            html += `<div class="correct"><p>正确答案：${q.correct_answer}</p><p>解析：${q.explanation}</p></div>`;
+                        }
+                    } else {
+                        html += `<p style="color:#999">未作答</p>`;
+                    }
+                });
+                dailyHistoryCache.set(day, html);
+                box.innerHTML = html;
+            } catch (error) {
+                box.innerHTML = '<p style="color:red">详情加载失败，请收起后重试</p>';
+            }
         }
 
         async function loadDaily() {
@@ -302,6 +413,7 @@
                 document.getElementById('view-daily').innerHTML = html;
                 window.dailyQuestions = data.questions;
                 window.dailyPracticeId = data.practice_id;
+                window.dailyDate = data.date;
                 window.dailyAnswers = data.questions.map(q => q.is_correct);
                 window.dailyDoneIds = data.questions.map(q => q.id);
                 renderDailyScore();
@@ -320,6 +432,7 @@
                 })
             });
             const result = await res.json();
+            if (window.dailyDate) dailyHistoryCache.delete(window.dailyDate);
             // 标记对错
             const options = el.parentNode.querySelectorAll('.option');
             options.forEach(o => o.style.pointerEvents = 'none');
@@ -358,6 +471,7 @@
                     })
                 });
                 const result = await res.json();
+                if (window.dailyDate) dailyHistoryCache.delete(window.dailyDate);
                 const card = document.getElementById('daily-card-' + index);
                 let inner = `<p>${index + 1}. [${q.module}] ${q.stem} ${masteryBadge(result.mastery_level || 0)}</p>`;
                 if (result.is_correct) {
@@ -382,6 +496,7 @@
                 document.getElementById('load-more-btn').querySelector('button').disabled = true;
                 const res = await fetch(API + '/api/daily/extend', { method: 'POST' });
                 const data = await res.json();
+                if (window.dailyDate) dailyHistoryCache.delete(window.dailyDate);
                 if (data.count === 0) {
                     alert('没有更多题了');
                     return;

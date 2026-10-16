@@ -112,3 +112,115 @@ global.fetch = async () => ({
 
     assert "<img src=x onerror=alert(1)>" not in output
     assert "&lt;img src=x onerror=alert(1)&gt;" in output
+
+
+def test_history_page_renders_answered_progress_and_accessible_toggle(tmp_path):
+    output = run_frontend_script(
+        tmp_path,
+        """
+const view = { innerHTML: "" };
+global.window = {};
+global.document = {
+    getElementById: id => id === "view-history" ? view : null
+};
+global.fetch = async () => ({
+    ok: true,
+    json: async () => ({
+        streak: 3,
+        records: [{
+            date: "2026-10-16",
+            total: 5,
+            answered: 2,
+            correct: 2,
+            accuracy: 100,
+            completion_rate: 40,
+            is_completed: false
+        }]
+    })
+});
+(async () => {
+    if (typeof loadHistory !== "function") {
+        console.log(JSON.stringify({ missing: true }));
+        return;
+    }
+    await loadHistory();
+    console.log(JSON.stringify({ missing: false, html: view.innerHTML }));
+})().catch(error => { console.error(error); process.exit(1); });
+""",
+    )
+    result = json.loads(output)
+
+    assert result["missing"] is False
+    assert "连续打卡 3 天" in result["html"]
+    assert "已答 2/5" in result["html"]
+    assert "<button" in result["html"]
+
+
+def test_history_detail_uses_safe_text_and_cached_response(tmp_path):
+    output = run_frontend_script(
+        tmp_path,
+        """
+const box = {
+    innerHTML: "",
+    style: { display: "none" }
+};
+const arrow = { textContent: "▼" };
+const toggle = {
+    expanded: "false",
+    setAttribute: (name, value) => {
+        if (name === "aria-expanded") toggle.expanded = value;
+    }
+};
+global.window = {};
+global.document = {
+    getElementById: id => {
+        if (id === "history-2026-10-16") return box;
+        if (id === "history-arrow-2026-10-16") return arrow;
+        if (id === "history-toggle-2026-10-16") return toggle;
+        return null;
+    }
+};
+let fetchCount = 0;
+global.fetch = async () => {
+    fetchCount++;
+    return {
+        ok: true,
+        json: async () => ({
+            date: "2026-10-16",
+            questions: [{
+                id: 42,
+                module: "network",
+                stem: "历史安全展示",
+                type: "short_answer",
+                options: null,
+                user_answer: "<img src=x onerror=alert(1)>",
+                display_user_answer: "&lt;img src=x onerror=alert(1)&gt;",
+                is_correct: false,
+                correct_answer: "参考答案",
+                explanation: "解析"
+            }]
+        })
+    };
+};
+(async () => {
+    await loadDailyHistory("2026-10-16");
+    await loadDailyHistory("2026-10-16");
+    await loadDailyHistory("2026-10-16");
+    console.log(JSON.stringify({
+        html: box.innerHTML,
+        fetchCount,
+        arrow: arrow.textContent,
+        display: box.style.display,
+        expanded: toggle.expanded
+    }));
+})().catch(error => { console.error(error); process.exit(1); });
+""",
+    )
+    result = json.loads(output)
+
+    assert "<img src=x onerror=alert(1)>" not in result["html"]
+    assert "&lt;img src=x onerror=alert(1)&gt;" in result["html"]
+    assert result["fetchCount"] == 1
+    assert result["arrow"] == "▲"
+    assert result["display"] == "block"
+    assert result["expanded"] == "true"
