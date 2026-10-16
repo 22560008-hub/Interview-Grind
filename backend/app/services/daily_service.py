@@ -49,9 +49,9 @@ def get_daily_questions(
         new_pool = [q for q in all_questions if q.id not in answered_ids]
         rng.shuffle(new_pool)
 
-        # 按比例取：复习2-3道，薄弱1-2道，新题1道
+        # 按比例取：复习2道，薄弱1-2道，新题1道
         selected = []
-        selected.extend(review_pool[:3])  # 最多3道复习
+        selected.extend(review_pool[:2])  # 最多2道复习
         selected.extend(weak_pool[:2])  # 最多2道薄弱
         selected.extend(new_pool[:1])  # 1道新题
 
@@ -74,8 +74,6 @@ def get_daily_questions(
                 "type": q.type,
                 "stem": q.stem,
                 "options": q.options,
-                "answer": q.answer,
-                "explanation": q.explanation,
                 "mastery_level": progress.mastery_level if progress else 0,
             }
         )

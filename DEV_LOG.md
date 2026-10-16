@@ -72,7 +72,7 @@ backend/
 │       ├── stats.py
 │       └── daily.py
 ├── scripts/
-│   └── seed.py              # 题库种子数据（229道）
+│   └── seed.py              # 题库种子数据（226）
 ├── static/
 │   └── index.html           # 前端单页应用
 ├── venv/                    # Python 虚拟环境
@@ -215,6 +215,13 @@ python -c "from app.core.database import Base, engine; from app.models import qu
 
 # 查看 git 历史
 git log --oneline
+
+# 新建 git
+git add -A
+git commit -m "...."
+
+# 推送到 github
+git push
 ```
 
 **访问地址：**

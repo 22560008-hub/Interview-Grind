@@ -27,7 +27,9 @@ def test_questions_endpoint_filters_questions_and_adds_mastery_level(
     assert response.json()[0]["mastery_level"] == 0
 
 
-def test_answer_endpoint_returns_grade_and_persists_progress(client, db, question_factory):
+def test_answer_endpoint_returns_grade_and_persists_progress(
+    client, db, question_factory
+):
     question = question_factory(stem="接口答题", options={"A": "正确", "B": "错误"})
 
     response = client.post(
@@ -40,7 +42,9 @@ def test_answer_endpoint_returns_grade_and_persists_progress(client, db, questio
     assert progress.mastery_level == 1
 
 
-def test_review_endpoint_returns_due_question(client, question_factory, progress_factory):
+def test_review_endpoint_returns_due_question(
+    client, question_factory, progress_factory
+):
     question = question_factory(stem="接口复习题", options={"A": "正确"})
     progress_factory(
         question, mastery_level=1, next_review_at=datetime.now() - timedelta(minutes=1)
@@ -66,11 +70,9 @@ def test_daily_endpoint_respects_exclude_parameter(client, question_factory):
     assert not returned_ids.intersection({questions[0].id, questions[1].id})
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="题目响应目前提前返回 answer 与 explanation，尚未拆分出题和判题响应。",
-)
-def test_question_delivery_hides_answer_and_explanation_before_submission(client, question_factory):
+def test_question_delivery_hides_answer_and_explanation_before_submission(
+    client, question_factory
+):
     question_factory(stem="答案不应提前泄露", options={"A": "正确"})
 
     response = client.get("/api/questions?limit=1")

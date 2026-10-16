@@ -86,17 +86,11 @@ def test_daily_questions_include_current_mastery_level(
             "type": "choice",
             "stem": "带掌握度的每日题",
             "options": {"A": "正确"},
-            "answer": "A",
-            "explanation": "测试解析",
             "mastery_level": 2,
         }
     ]
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="当前实现最多先取 3 道到期题，5 题时会挤掉新题，不满足产品声明的 50/30/20 分配。",
-)
 def test_daily_five_question_plan_balances_due_weak_and_new_questions(
     db, question_factory, progress_factory
 ):

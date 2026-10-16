@@ -25,8 +25,6 @@ def get_review_questions(db: Session, limit: int = 10):
             "type": q.type,
             "stem": q.stem,
             "options": q.options,
-            "answer": q.answer,
-            "explanation": q.explanation,
             "mastery_level": p.mastery_level,
             "next_review_at": p.next_review_at.strftime("%Y-%m-%d %H:%M"),
         }

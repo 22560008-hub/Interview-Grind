@@ -27,8 +27,6 @@ def list_questions(
                 "type": q.type,
                 "stem": q.stem,
                 "options": q.options,
-                "answer": q.answer,
-                "explanation": q.explanation,
                 "mastery_level": progress.mastery_level if progress else 0,
             }
         )
