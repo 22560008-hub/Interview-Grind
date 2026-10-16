@@ -2,6 +2,8 @@ from datetime import datetime, timedelta
 
 import pytest
 
+from app.models.answer import AnswerRecord
+from app.models.daily import DailyPractice
 from app.models.progress import QuestionProgress
 
 
@@ -57,17 +59,148 @@ def test_review_endpoint_returns_due_question(
     assert response.json()["questions"][0]["id"] == question.id
 
 
-def test_daily_endpoint_respects_exclude_parameter(client, question_factory):
-    questions = [
+def test_daily_endpoint_is_persisted_and_extend_appends_five_questions(
+    client, question_factory
+):
+    for index in range(12):
         question_factory(stem=f"接口每日题 {index}", options={"A": "正确"})
-        for index in range(6)
-    ]
 
-    response = client.get(f"/api/daily?exclude={questions[0].id},{questions[1].id}")
+    first = client.get("/api/daily")
+    second = client.get("/api/daily")
+    first_ids = [q["id"] for q in first.json()["questions"]]
+
+    assert first.status_code == 200
+    assert len(first_ids) == 5
+    assert [q["id"] for q in second.json()["questions"]] == first_ids
+
+    extend = client.post("/api/daily/extend")
+    new_ids = [q["id"] for q in extend.json()["questions"]]
+
+    assert extend.status_code == 200
+    assert len(new_ids) == 5
+    assert not set(new_ids).intersection(first_ids)
+
+    after = client.get("/api/daily")
+    assert [q["id"] for q in after.json()["questions"]] == first_ids + new_ids
+
+
+def test_daily_answer_updates_score_and_completion(client, db, question_factory):
+    question = question_factory(
+        stem="每日成绩题", options={"A": "正确", "B": "错误"}
+    )
+    daily = client.get("/api/daily").json()
+
+    response = client.post(
+        "/api/answers",
+        json={
+            "question_id": question.id,
+            "user_answer": "A",
+            "daily_practice_id": daily["practice_id"],
+        },
+    )
 
     assert response.status_code == 200
-    returned_ids = {question["id"] for question in response.json()["questions"]}
-    assert not returned_ids.intersection({questions[0].id, questions[1].id})
+    refreshed = client.get("/api/daily").json()
+    assert refreshed["correct"] == 1
+    assert refreshed["is_completed"] is True
+    assert refreshed["questions"][0]["user_answer"] == "A"
+    assert refreshed["questions"][0]["is_correct"] is True
+    practice = db.get(DailyPractice, daily["practice_id"])
+    assert practice.completed_at is not None
+
+
+def test_non_daily_answer_does_not_complete_daily_question(
+    client, question_factory
+):
+    question = question_factory(
+        stem="普通答题不能串入每日记录", options={"A": "正确", "B": "错误"}
+    )
+    client.get("/api/daily")
+
+    response = client.post(
+        "/api/answers",
+        json={"question_id": question.id, "user_answer": "A"},
+    )
+
+    assert response.status_code == 200
+    refreshed = client.get("/api/daily").json()
+    assert refreshed["correct"] == 0
+    assert refreshed["is_completed"] is False
+    assert refreshed["questions"][0]["user_answer"] is None
+    assert refreshed["questions"][0]["is_correct"] is None
+
+
+def test_repeated_daily_submission_is_idempotent(client, db, question_factory):
+    question = question_factory(
+        stem="重复提交只记录第一次", options={"A": "正确", "B": "错误"}
+    )
+    practice_id = client.get("/api/daily").json()["practice_id"]
+
+    first = client.post(
+        "/api/answers",
+        json={
+            "question_id": question.id,
+            "user_answer": "B",
+            "daily_practice_id": practice_id,
+        },
+    )
+    second = client.post(
+        "/api/answers",
+        json={
+            "question_id": question.id,
+            "user_answer": "A",
+            "daily_practice_id": practice_id,
+        },
+    )
+
+    assert first.json()["is_correct"] is False
+    assert second.json()["is_correct"] is False
+    assert db.query(AnswerRecord).filter_by(question_id=question.id).count() == 1
+
+
+def test_daily_extend_returns_remaining_questions_when_fewer_than_five_exist(
+    client, question_factory
+):
+    for index in range(7):
+        question_factory(stem=f"不足五道的追加题 {index}", options={"A": "正确"})
+    initial_ids = {
+        question["id"] for question in client.get("/api/daily").json()["questions"]
+    }
+
+    response = client.post("/api/daily/extend")
+
+    assert response.status_code == 200
+    assert response.json()["count"] == 2
+    new_ids = {question["id"] for question in response.json()["questions"]}
+    assert len(new_ids) == 2
+    assert new_ids.isdisjoint(initial_ids)
+
+
+def test_daily_short_answer_provides_html_safe_display_text(
+    client, question_factory
+):
+    question = question_factory(
+        stem="每日简答题安全显示",
+        q_type="short",
+        answer="安全关键词",
+    )
+    practice_id = client.get("/api/daily").json()["practice_id"]
+    unsafe_answer = '<img src=x onerror="alert(1)">'
+
+    submitted = client.post(
+        "/api/answers",
+        json={
+            "question_id": question.id,
+            "user_answer": unsafe_answer,
+            "daily_practice_id": practice_id,
+        },
+    )
+    restored = client.get("/api/daily").json()["questions"][0]
+
+    expected = "&lt;img src=x onerror=&quot;alert(1)&quot;&gt;"
+    assert submitted.json()["display_user_answer"] == expected
+    assert restored["user_answer"] == unsafe_answer
+    assert restored["display_user_answer"] == expected
 
 
 def test_question_delivery_hides_answer_and_explanation_before_submission(

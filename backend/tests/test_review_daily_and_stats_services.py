@@ -42,19 +42,18 @@ def test_review_orders_due_questions_by_oldest_review_time(
     assert [question["id"] for question in result] == [oldest.id, latest.id]
 
 
-def test_daily_questions_exclude_seen_ids_and_do_not_repeat(db, question_factory):
-    questions = [
+def test_daily_questions_are_persisted_and_stable_for_the_day(db, question_factory):
+    for index in range(8):
         question_factory(stem=f"每日题 {index}", options={"A": "正确"})
-        for index in range(8)
-    ]
-    excluded_ids = [questions[0].id, questions[1].id]
 
-    result = get_daily_questions(db, count=5, exclude_ids=excluded_ids)
-    result_ids = [question["id"] for question in result]
+    first = get_daily_questions(db, count=5)
+    second = get_daily_questions(db, count=5)
+    first_ids = [question["id"] for question in first]
+    second_ids = [question["id"] for question in second]
 
-    assert len(result_ids) == 5
-    assert not set(result_ids).intersection(excluded_ids)
-    assert len(result_ids) == len(set(result_ids))
+    assert len(first_ids) == 5
+    assert len(first_ids) == len(set(first_ids))
+    assert second_ids == first_ids
 
 
 def test_daily_questions_returns_all_available_questions_when_pool_is_smaller_than_limit(
@@ -65,9 +64,14 @@ def test_daily_questions_returns_all_available_questions_when_pool_is_smaller_th
         for index in range(3)
     ]
 
-    result = get_daily_questions(db, count=5, exclude_ids=[questions[0].id])
+    result = get_daily_questions(db, count=5)
 
-    assert {question["id"] for question in result} == {questions[1].id, questions[2].id}
+    assert {question["id"] for question in result} == {q.id for q in questions}
+
+
+def test_empty_daily_question_pool_can_be_loaded_repeatedly(db):
+    assert get_daily_questions(db, count=5) == []
+    assert get_daily_questions(db, count=5) == []
 
 
 def test_daily_questions_include_current_mastery_level(
@@ -87,6 +91,11 @@ def test_daily_questions_include_current_mastery_level(
             "stem": "带掌握度的每日题",
             "options": {"A": "正确"},
             "mastery_level": 2,
+            "user_answer": None,
+            "display_user_answer": None,
+            "is_correct": None,
+            "correct_answer": None,
+            "explanation": None,
         }
     ]
 

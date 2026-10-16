@@ -1,16 +1,45 @@
 from sqlalchemy.orm import Session
+from html import escape
 
 from app.models.answer import AnswerRecord, WrongQuestion
+from app.models.daily import DailyPractice, DailyPracticeItem
 from app.models.question import Question
 from app.models.progress import QuestionProgress
 from datetime import datetime, timedelta
 
 
-def grade_answer(db: Session, question_id: int, user_answer: str) -> dict:
+def grade_answer(
+    db: Session,
+    question_id: int,
+    user_answer: str,
+    daily_practice_id: int | None = None,
+) -> dict:
     # 1. 根据 question_id 查出这道题
     question = db.get(Question, question_id)
     if question is None:
         return {"error": "题目不存在"}
+
+    daily_item = None
+    practice = None
+    if daily_practice_id is not None:
+        practice = db.get(DailyPractice, daily_practice_id)
+        daily_item = (
+            db.query(DailyPracticeItem)
+            .filter_by(
+                practice_id=daily_practice_id,
+                question_id=question_id,
+            )
+            .first()
+        )
+        if practice is None or daily_item is None:
+            raise ValueError("题目不属于这次每日练习")
+        if daily_item.user_answer is not None:
+            return {
+                "is_correct": daily_item.is_correct,
+                "correct_answer": question.answer,
+                "explanation": question.explanation,
+                "display_user_answer": escape(daily_item.user_answer),
+            }
 
     # 2. 判分：忽略大小写和首尾空格，比较用户答案和正确答案
     if question.type == "choice":
@@ -78,10 +107,31 @@ def grade_answer(db: Session, question_id: int, user_answer: str) -> dict:
         # 答错了，马上再复习
         progress.next_review_at = datetime.now()
 
+    if daily_item is not None:
+        daily_item.user_answer = user_answer
+        daily_item.is_correct = is_correct
+        daily_item.answered_at = datetime.now()
+        db.flush()
+
+        answered_count = (
+            db.query(DailyPracticeItem)
+            .filter_by(practice_id=practice.id)
+            .filter(DailyPracticeItem.user_answer.is_not(None))
+            .count()
+        )
+        practice.correct = (
+            db.query(DailyPracticeItem)
+            .filter_by(practice_id=practice.id, is_correct=True)
+            .count()
+        )
+        practice.is_completed = practice.total > 0 and answered_count >= practice.total
+        practice.completed_at = datetime.now() if practice.is_completed else None
+
     db.commit()
 
     return {
         "is_correct": is_correct,
         "correct_answer": question.answer,
         "explanation": question.explanation,
+        "display_user_answer": escape(user_answer),
     }

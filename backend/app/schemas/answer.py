@@ -6,6 +6,7 @@ class AnswerSubmit(BaseModel):
 
     question_id: int
     user_answer: str
+    daily_practice_id: int | None = None
 
 
 class GradeResult(BaseModel):
@@ -14,3 +15,4 @@ class GradeResult(BaseModel):
     is_correct: bool
     correct_answer: str
     explanation: str = ""
+    display_user_answer: str

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -13,4 +13,12 @@ def submit_answer(
     body: AnswerSubmit,
     db: Session = Depends(get_db),
 ):
-    return grade_answer(db, question_id=body.question_id, user_answer=body.user_answer)
+    try:
+        return grade_answer(
+            db,
+            question_id=body.question_id,
+            user_answer=body.user_answer,
+            daily_practice_id=body.daily_practice_id,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc

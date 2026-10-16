@@ -57,6 +57,7 @@
             border: 1px solid #ddd;
             border-radius: 4px;
             cursor: pointer;
+            background: white;
         }
 
         .option:hover {
@@ -250,39 +251,73 @@
             }
             document.getElementById('view-stats').innerHTML = html;
         }
-    async function loadDaily() {
-            const res = await fetch(API + '/api/daily');
-            const data = await res.json();
-            let html = `<h2>每日一练（${data.date}）</h2>`;
-            html += `<p>今日 ${data.count} 道题，开始吧！</p>`;
-            data.questions.forEach((q, i) => {
-                html += `<div class="card" id="daily-card-${i}">
-            <p>${i + 1}. [${q.module}] ${q.stem} ${masteryBadge(q.mastery_level)}</p>`;
-                if (q.options) {
-                    for (const [k, v] of Object.entries(q.options)) {
-                        html += `<div class="option" onclick="submitDailyAnswer(${i}, '${k}', this)">${k}. ${v}</div>`;
+
+        async function loadDaily() {
+                const res = await fetch(API + '/api/daily');
+                const data = await res.json();
+                let html = `<h2>每日一练（${data.date}）</h2>`;
+                let answeredCount = 0;
+                let correctCount = 0;
+                data.questions.forEach((q, i) => {
+                    html += `<div class="card" id="daily-card-${i}">
+        <p>${i + 1}. [${q.module}] ${q.stem} ${masteryBadge(q.mastery_level)}</p>`;
+                    if (q.user_answer !== null && q.user_answer !== undefined) {
+                        answeredCount++;
+                        if (q.is_correct) correctCount++;
+                        if (q.type === 'choice') {
+                            for (const [k, v] of Object.entries(q.options)) {
+                                let cls = 'option';
+                                if (k === q.correct_answer) cls += ' correct';
+                                else if (k === q.user_answer && !q.is_correct) cls += ' wrong';
+                                html += `<div class="${cls}">${k}. ${v}</div>`;
+                            }
+                        } else {
+                            if (q.is_correct) {
+                                html += `<div class="correct">`;
+                                html += `<p>你的答案：${q.display_user_answer}</p>`;
+                                html += `<p>正确答案：${q.correct_answer}</p>`;
+                                html += `<p>解析：${q.explanation}</p>`;
+                                html += `</div>`;
+                            } else {
+                                html += `<p style="color:red">你的答案：${q.display_user_answer}</p>`;
+                                html += `<div class="correct">`;
+                                html += `<p>正确答案：${q.correct_answer}</p>`;
+                                html += `<p>解析：${q.explanation}</p>`;
+                                html += `</div>`;
+                            }
+                        }
+                    } else {
+                        if (q.options) {
+                            for (const [k, v] of Object.entries(q.options)) {
+                                html += `<div class="option" onclick="submitDailyAnswer(${i}, '${k}', this)">${k}. ${v}</div>`;
+                            }
+                        } else {
+                            html += `<input type="text" id="daily-input-${i}" placeholder="输入你的答案">`;
+                            html += `<p><button class="action" onclick="submitDailyShort(${i})">提交</button></p>`;
+                        }
                     }
-                } else {
-                    html += `<input type="text" id="daily-input-${i}" placeholder="输入你的答案">`;
-                    html += `<p><button class="action" onclick="submitDailyShort(${i})">提交</button></p>`;
-                }
-                html += `</div>`;
-            });
-            html += `<div id="daily-score"></div>`;
-            document.getElementById('view-daily').innerHTML = html;
-            window.dailyQuestions = data.questions;
-            window.dailyAnswers = [];
-            window.dailyDoneIds = [];
-            data.questions.forEach(q => window.dailyDoneIds.push(q.id));
-            renderLoadMoreButton();
-        }
+                    html += `</div>`;
+                });
+                html += `<div id="daily-score"></div>`;
+                document.getElementById('view-daily').innerHTML = html;
+                window.dailyQuestions = data.questions;
+                window.dailyPracticeId = data.practice_id;
+                window.dailyAnswers = data.questions.map(q => q.is_correct);
+                window.dailyDoneIds = data.questions.map(q => q.id);
+                renderDailyScore();
+                renderLoadMoreButton();
+            }
 
         async function submitDailyAnswer(index, choice, el) {
             const q = window.dailyQuestions[index];
             const res = await fetch(API + '/api/answers', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ question_id: q.id, user_answer: choice })
+                body: JSON.stringify({
+                    question_id: q.id,
+                    user_answer: choice,
+                    daily_practice_id: window.dailyPracticeId
+                })
             });
             const result = await res.json();
             // 标记对错
@@ -299,19 +334,10 @@
                     }
                 });
             }
-            window.dailyDoneIds.push(q.id);
-            // 记录这道题的结果
             window.dailyAnswers[index] = result.is_correct;
-            // 全部答完后算分
-            const answered = window.dailyAnswers.filter(a => a !== undefined).length;
-            if (answered === window.dailyQuestions.length) {
-                const correct = window.dailyAnswers.filter(a => a).length;
-                document.getElementById('daily-score').innerHTML =
-                    `<div class="card" style="text-align:center">
-            <h2>今日得分：${correct} / ${window.dailyQuestions.length}</h2>
-        </div>`;
-            }
+            renderDailyScore();
         }
+
         function masteryBadge(level) {
                 if (level === 1) return '<span style="color:red;font-size:14px">薄弱</span>';
                 if (level === 2) return '<span style="color:orange;font-size:14px">一般</span>';
@@ -325,145 +351,172 @@
                 const res = await fetch(API + '/api/answers', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ question_id: q.id, user_answer: ans })
+                    body: JSON.stringify({
+                        question_id: q.id,
+                        user_answer: ans,
+                        daily_practice_id: window.dailyPracticeId
+                    })
                 });
                 const result = await res.json();
                 const card = document.getElementById('daily-card-' + index);
-                card.innerHTML = `<p>${index + 1}. [${q.module}] ${q.stem}</p>
-        <div class="${result.is_correct ? 'correct' : 'wrong'}">
-            <p>${result.is_correct ? '✓ 答对了！' : '✗ 答错了'}</p>
+                let inner = `<p>${index + 1}. [${q.module}] ${q.stem} ${masteryBadge(result.mastery_level || 0)}</p>`;
+                if (result.is_correct) {
+                    inner += `<div class="correct">
+            <p>你的答案：${result.display_user_answer}</p>
             <p>正确答案：${result.correct_answer}</p>
             <p>解析：${result.explanation}</p>
         </div>`;
-                window.dailyDoneIds.push(q.id);
+                } else {
+                    inner += `<p style="color:red">你的答案：${result.display_user_answer}</p>`;
+                    inner += `<div class="correct">
+            <p>正确答案：${result.correct_answer}</p>
+            <p>解析：${result.explanation}</p>
+        </div>`;
+                }
+                card.innerHTML = inner;
                 window.dailyAnswers[index] = result.is_correct;
-                const answered = window.dailyAnswers.filter(a => a !== undefined).length;
-                if (answered === window.dailyQuestions.length) {
-                    const correct = window.dailyAnswers.filter(a => a).length;
-                    document.getElementById('daily-score').innerHTML =
-                        `<div class="card" style="text-align:center">
-                <h2>今日得分：${correct} / ${window.dailyQuestions.length}</h2>
-            </div>`;
-                }
+                renderDailyScore();
             }
-            async function loadMoreDaily() {
-                    const res = await fetch(API + '/api/daily?exclude=' + window.dailyDoneIds.join(','));
-                    const data = await res.json();
-                    const container = document.getElementById('view-daily');
-                    let html = '';
-                    const startIndex = window.dailyQuestions.length;
-                    data.questions.forEach((q, i) => {
-                        const realIndex = startIndex + i;
-                        html += `<div class="card" id="daily-card-${realIndex}">
-            <p>${realIndex + 1}. [${q.module}] ${q.stem} ${masteryBadge(q.mastery_level)}</p>`;
-                        if (q.options) {
-                            for (const [k, v] of Object.entries(q.options)) {
-                                html += `<div class="option" onclick="submitDailyAnswer(${realIndex}, '${k}', this)">${k}. ${v}</div>`;
-                            }
-                        } else {
-                            html += `<input type="text" id="daily-input-${realIndex}" placeholder="输入你的答案">`;
-                            html += `<p><button class="action" onclick="submitDailyShort(${realIndex})">提交</button></p>`;
-                        }
-                        html += `</div>`;
-                        window.dailyQuestions.push(q);
-                    });
-                    container.insertAdjacentHTML('beforeend', html);
-                    renderLoadMoreButton();
-                }
-            function renderLoadMoreButton() {
-                    const container = document.getElementById('view-daily');
-                    let btn = document.getElementById('load-more-btn');
-                    if (btn) btn.remove();
-                    container.insertAdjacentHTML('beforeend',
-                        `<p id="load-more-btn" style="text-align:center;margin-top:20px"><button class="action" onclick="loadMoreDaily()">再来5题</button></p>`);
-                }
 
-            async function loadReview() {
-                const res = await fetch(API + '/api/review');
+        async function loadMoreDaily() {
+                document.getElementById('load-more-btn').querySelector('button').disabled = true;
+                const res = await fetch(API + '/api/daily/extend', { method: 'POST' });
                 const data = await res.json();
-                let html = `<h2>待复习（${data.count} 题）</h2>`;
                 if (data.count === 0) {
-                    html += `<p>太棒了，今天没有需要复习的题！</p>`;
+                    alert('没有更多题了');
+                    return;
                 }
+                const container = document.getElementById('view-daily');
+                let html = '';
+                const startIndex = window.dailyQuestions.length;
                 data.questions.forEach((q, i) => {
-                    let badge = '';
-                    if (q.mastery_level === 1) badge = '<span style="color:red">薄弱</span>';
-                    else if (q.mastery_level === 2) badge = '<span style="color:orange">一般</span>';
-                    html += `<div class="card">
-                    <p>${i + 1}. [${q.module}] ${q.stem} ${badge}</p>`;
+                    const realIndex = startIndex + i;
+                    html += `<div class="card" id="daily-card-${realIndex}">
+            <p>${realIndex + 1}. [${q.module}] ${q.stem} ${masteryBadge(q.mastery_level)}</p>`;
                     if (q.options) {
                         for (const [k, v] of Object.entries(q.options)) {
-                            html += `<div class="option" onclick="submitReviewAnswer(${i}, '${k}', this)">${k}. ${v}</div>`;
+                            html += `<div class="option" onclick="submitDailyAnswer(${realIndex}, '${k}', this)">${k}. ${v}</div>`;
                         }
                     } else {
-                        html += `<input type="text" id="review-input-${i}" placeholder="输入你的答案">`;
-                        html += `<p><button class="action" onclick="submitReviewShort(${i})">提交</button></p>`;
+                        html += `<input type="text" id="daily-input-${realIndex}" placeholder="输入你的答案">`;
+                        html += `<p><button class="action" onclick="submitDailyShort(${realIndex})">提交</button></p>`;
                     }
                     html += `</div>`;
+                    window.dailyQuestions.push(q);
+                    window.dailyDoneIds.push(q.id);
                 });
-                html += `<div id="review-score"></div>`;
-                document.getElementById('view-review').innerHTML = html;
-                window.reviewQuestions = data.questions;
-                window.reviewAnswers = [];
+                container.insertAdjacentHTML('beforeend', html);
+                renderDailyScore();
+                renderLoadMoreButton();
             }
 
-            async function submitReviewAnswer(index, choice, el) {
-                const q = window.reviewQuestions[index];
-                const res = await fetch(API + '/api/answers', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ question_id: q.id, user_answer: choice })
-                });
-                const result = await res.json();
-                const options = el.parentNode.querySelectorAll('.option');
-                options.forEach(o => o.style.pointerEvents = 'none');
-                if (result.is_correct) {
-                    el.classList.add('correct');
+        function renderLoadMoreButton() {
+                const container = document.getElementById('view-daily');
+                let btn = document.getElementById('load-more-btn');
+                if (btn) btn.remove();
+                container.insertAdjacentHTML('beforeend',
+                    `<p id="load-more-btn" style="text-align:center;margin-top:20px"><button class="action" onclick="loadMoreDaily()">再来5题</button></p>`);
+            }
+
+        function renderDailyScore() {
+                const container = document.getElementById('view-daily');
+                let score = document.getElementById('daily-score-box');
+                if (score) score.remove();
+                const answered = window.dailyAnswers.filter(a => a === true || a === false).length;
+                const total = window.dailyQuestions.length;
+                if (answered === total && total > 0) {
+                    const correct = window.dailyAnswers.filter(a => a === true).length;
+                    container.insertAdjacentHTML('beforeend',
+                        `<div id="daily-score-box" class="card" style="text-align:center"><h2>今日得分：${correct} / ${total}</h2></div>`);
+                }
+            }
+
+        async function loadReview() {
+            const res = await fetch(API + '/api/review');
+            const data = await res.json();
+            let html = `<h2>待复习（${data.count} 题）</h2>`;
+            if (data.count === 0) {
+                html += `<p>太棒了，今天没有需要复习的题！</p>`;
+            }
+            data.questions.forEach((q, i) => {
+                let badge = '';
+                if (q.mastery_level === 1) badge = '<span style="color:red">薄弱</span>';
+                else if (q.mastery_level === 2) badge = '<span style="color:orange">一般</span>';
+                html += `<div class="card">
+                <p>${i + 1}. [${q.module}] ${q.stem} ${badge}</p>`;
+                if (q.options) {
+                    for (const [k, v] of Object.entries(q.options)) {
+                        html += `<div class="option" onclick="submitReviewAnswer(${i}, '${k}', this)">${k}. ${v}</div>`;
+                    }
                 } else {
-                    el.classList.add('wrong');
-                    options.forEach(o => {
-                        if (o.textContent.startsWith(result.correct_answer + '.')) {
-                            o.classList.add('correct');
-                        }
-                    });
+                    html += `<input type="text" id="review-input-${i}" placeholder="输入你的答案">`;
+                    html += `<p><button class="action" onclick="submitReviewShort(${i})">提交</button></p>`;
                 }
-                window.reviewAnswers[index] = result.is_correct;
-                const answered = window.reviewAnswers.filter(a => a !== undefined).length;
-                if (answered === window.reviewQuestions.length) {
-                    const correct = window.reviewAnswers.filter(a => a).length;
-                    document.getElementById('review-score').innerHTML =
-                        `<div class="card" style="text-align:center">
-                        <h2>复习完成：${correct} / ${window.reviewQuestions.length}</h2>
-                    </div>`;
-                }
-            }
+                html += `</div>`;
+            });
+            html += `<div id="review-score"></div>`;
+            document.getElementById('view-review').innerHTML = html;
+            window.reviewQuestions = data.questions;
+            window.reviewAnswers = [];
+        }
 
-            async function submitReviewShort(index) {
-                const q = window.reviewQuestions[index];
-                const ans = document.getElementById('review-input-' + index).value;
-                const res = await fetch(API + '/api/answers', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ question_id: q.id, user_answer: ans })
+        async function submitReviewAnswer(index, choice, el) {
+            const q = window.reviewQuestions[index];
+            const res = await fetch(API + '/api/answers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question_id: q.id, user_answer: choice })
+            });
+            const result = await res.json();
+            const options = el.parentNode.querySelectorAll('.option');
+            options.forEach(o => o.style.pointerEvents = 'none');
+            if (result.is_correct) {
+                el.classList.add('correct');
+            } else {
+                el.classList.add('wrong');
+                options.forEach(o => {
+                    if (o.textContent.startsWith(result.correct_answer + '.')) {
+                        o.classList.add('correct');
+                    }
                 });
-                const result = await res.json();
-                const card = document.querySelectorAll('#view-review .card')[index];
-                card.innerHTML = `<p>${index + 1}. [${q.module}] ${q.stem}</p>
-                <div class="${result.is_correct ? 'correct' : 'wrong'}">
-                    <p>${result.is_correct ? '✓ 答对了！' : '✗ 答错了'}</p>
-                    <p>正确答案：${result.correct_answer}</p>
-                    <p>解析：${result.explanation}</p>
-                </div>`;
-                window.reviewAnswers[index] = result.is_correct;
-                const answered = window.reviewAnswers.filter(a => a !== undefined).length;
-                if (answered === window.reviewQuestions.length) {
-                    const correct = window.reviewAnswers.filter(a => a).length;
-                    document.getElementById('review-score').innerHTML =
-                        `<div class="card" style="text-align:center">
-                        <h2>复习完成：${correct} / ${window.reviewQuestions.length}</h2>
-                    </div>`;
-                }
             }
+            window.reviewAnswers[index] = result.is_correct;
+            const answered = window.reviewAnswers.filter(a => a !== undefined).length;
+            if (answered === window.reviewQuestions.length) {
+                const correct = window.reviewAnswers.filter(a => a).length;
+                document.getElementById('review-score').innerHTML =
+                    `<div class="card" style="text-align:center">
+                    <h2>复习完成：${correct} / ${window.reviewQuestions.length}</h2>
+                </div>`;
+            }
+        }
+
+        async function submitReviewShort(index) {
+            const q = window.reviewQuestions[index];
+            const ans = document.getElementById('review-input-' + index).value;
+            const res = await fetch(API + '/api/answers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question_id: q.id, user_answer: ans })
+            });
+            const result = await res.json();
+            const card = document.querySelectorAll('#view-review .card')[index];
+            card.innerHTML = `<p>${index + 1}. [${q.module}] ${q.stem}</p>
+            <div class="${result.is_correct ? 'correct' : 'wrong'}">
+                <p>${result.is_correct ? '✓ 答对了！' : '✗ 答错了'}</p>
+                <p>正确答案：${result.correct_answer}</p>
+                <p>解析：${result.explanation}</p>
+            </div>`;
+            window.reviewAnswers[index] = result.is_correct;
+            const answered = window.reviewAnswers.filter(a => a !== undefined).length;
+            if (answered === window.reviewQuestions.length) {
+                const correct = window.reviewAnswers.filter(a => a).length;
+                document.getElementById('review-score').innerHTML =
+                    `<div class="card" style="text-align:center">
+                    <h2>复习完成：${correct} / ${window.reviewQuestions.length}</h2>
+                </div>`;
+            }
+        }
     </script>
 </body>
 

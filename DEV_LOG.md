@@ -222,6 +222,9 @@ git commit -m "...."
 
 # 推送到 github
 git push
+
+# 测试所有接口点
+pytest tests/ -v
 ```
 
 **访问地址：**
