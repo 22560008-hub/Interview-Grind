@@ -218,7 +218,7 @@ git log --oneline
 
 # 新建 git
 git add -A
-git commit -m "...."
+git commit -m ""
 
 # 推送到 github
 git push
