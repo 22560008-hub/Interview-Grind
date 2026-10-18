@@ -33,6 +33,7 @@ def test_short_answer_preview_reports_coverage_without_persisting(
         "explanation": "三个机制共同保证可靠性。",
         "matched_points": ["序列号", "确认应答"],
         "missing_points": ["超时重传"],
+        "uncertain_points": [],
         "coverage": 67,
         "requires_self_rating": True,
     }

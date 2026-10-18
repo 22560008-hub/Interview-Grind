@@ -23,6 +23,7 @@ class ShortAnswerPreviewResult(BaseModel):
     explanation: str = ""
     matched_points: list[str]
     missing_points: list[str]
+    uncertain_points: list[str] = []
     coverage: int
     requires_self_rating: bool = True
 

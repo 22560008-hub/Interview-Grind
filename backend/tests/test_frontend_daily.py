@@ -435,3 +435,23 @@ global.fetch = async (url) => {
 
     assert result["answer"] is False
     assert "复习完成：0 / 1" in result["score"]
+
+
+def test_short_assessment_renders_uncertain_points(tmp_path):
+    output = run_frontend_script(
+        tmp_path,
+        """
+const html = renderShortAssessment({
+    display_user_answer: "用户答案",
+    matched_points: ["A"],
+    missing_points: [],
+    uncertain_points: ["B"],
+    coverage: 50,
+    correct_answer: "参考答案",
+    explanation: "解析"
+}, "quiz");
+console.log(html.includes("疑似覆盖") && html.includes("B") ? "ok" : "no");
+""",
+    )
+
+    assert output == "ok"

@@ -8,6 +8,7 @@ from app.models.answer import AnswerRecord, WrongQuestion
 from app.models.daily import DailyPractice, DailyPracticeItem
 from app.models.progress import QuestionProgress
 from app.models.question import Question
+from app.services.key_point_matcher import match_key_points
 
 
 def analyze_short_answer(question: Question, user_answer: str) -> dict:
@@ -15,19 +16,15 @@ def analyze_short_answer(question: Question, user_answer: str) -> dict:
         raise ValueError("选择题不支持简答题预判")
 
     key_points = question.key_points or []
-    normalized_answer = user_answer.casefold()
-    matched_points = [
-        point for point in key_points if point.casefold() in normalized_answer
-    ]
-    missing_points = [point for point in key_points if point not in matched_points]
-    coverage = round(len(matched_points) / len(key_points) * 100) if key_points else 0
+    match = match_key_points(key_points, user_answer)
     return {
         "display_user_answer": escape(user_answer),
         "correct_answer": question.answer,
         "explanation": question.explanation,
-        "matched_points": matched_points,
-        "missing_points": missing_points,
-        "coverage": coverage,
+        "matched_points": match.matched,
+        "missing_points": match.missing,
+        "uncertain_points": match.uncertain,
+        "coverage": match.coverage,
         "requires_self_rating": True,
     }
 

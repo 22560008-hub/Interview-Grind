@@ -217,11 +217,15 @@
             const missing = preview.missing_points.length
                 ? preview.missing_points.join('、')
                 : '无';
+            const uncertain = (preview.uncertain_points || []).length
+                ? `<p style="color:#8c8c8c">疑似覆盖（不计入覆盖率）：${preview.uncertain_points.join('、')}</p>`
+                : '';
             return `
                 <p>你的回答：${preview.display_user_answer}</p>
                 <p><strong>关键点覆盖率：${preview.coverage}%</strong></p>
                 <p style="color:green">已覆盖：${matched}</p>
                 <p style="color:orange">待补充：${missing}</p>
+                ${uncertain}
                 <div class="correct">
                     <p>参考答案：${preview.correct_answer}</p>
                     <p>解析：${preview.explanation}</p>
