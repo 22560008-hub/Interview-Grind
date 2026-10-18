@@ -67,7 +67,7 @@ interview-app/
 │   ├── app/                      # 分层代码（api / services / models）
 │   ├── scripts/
 │   │   ├── seed.py               # 题库种子数据（224 道）
-│   │   ├── export_app_data.py    # 导出 APK 用的题库 / 别名 / 进度 JSON
+│   │   └── export_app_data.py    # 导出 APK 用的题库 / 别名 JSON
 │   │   └── check_key_points.py   # 关键点匹配自检
 │   ├── static/index.html         # Web 单页应用
 │   └── tests/                    # pytest 测试
@@ -84,9 +84,9 @@ interview-app/
 ## Android 单机版（当前主推）
 
 ```bash
-# 1. 导出题库和当前学习进度（user_data.json 是个人数据，不会提交 Git）
+# 1. 导出题库和关键点别名
 cd backend
-python -m scripts.export_app_data --with-user-data
+python -m scripts.export_app_data
 
 # 2. 本地验证本地 API
 cd ../mobile
@@ -100,7 +100,19 @@ npx cap sync android
 npx cap open android
 ```
 
-构建细节见 [mobile/README.md](mobile/README.md)。当前机器没有 Android SDK，APK 需要在装有 Android Studio 的环境里生成。
+> 当前 APK 不打包个人学习数据，首次安装会从“没做过”的状态开始。
+> 从旧版本升级时，`local-api.js` 的 `USER_DATA_VERSION` 会清空一次旧记录。
+
+当前移动端界面：
+
+- 底部 5 个 Tab：答题 / 每日 / 复习 / 错题 / 我的
+- 每日一练环形进度 + 正确率
+- “我的”页总正确率环形图、掌握度分布、模块正确率
+- 打卡记录月历：已完成绿色、进行中黄色、今天描边，点日期看当天详情
+- 收藏夹和打卡日历收进“我的”
+- 模块配色：计网蓝、操作系统紫、MySQL 金、Redis 红
+
+构建环境与细节见 [mobile/README.md](mobile/README.md)。当前使用 Android SDK Platform 36 + JDK 21 构建，`build.gradle` 已配置阿里云 Maven 镜像。
 
 分层调用链：
 
@@ -300,7 +312,7 @@ cd mobile
 npm run smoke
 ```
 
-覆盖本地题库、简答预判、答题、统计、收藏、每日一练、错题、复习和关键点匹配。
+覆盖本地题库、简答预判、答题、统计、收藏、每日一练、错题、复习和关键点匹配。另有 390 宽 Chrome 检查，覆盖底部导航、答题、每日环形进度、我的统计、收藏夹、打卡日历和旧数据重置。
 
 ---
 

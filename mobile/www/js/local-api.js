@@ -365,70 +365,31 @@
     });
   }
 
-  async function importUserDataOnce() {
-    const imported = await dbGet("meta", "user_data_imported");
-    if (imported) return;
+  const USER_DATA_VERSION = "clean-2026-10-18";
 
-    let userData;
-    try {
-      const response = await nativeFetch("data/user_data.json");
-      if (!response.ok) return;
-      userData = await response.json();
-    } catch (error) {
-      console.warn("没有可导入的本地学习数据", error);
-      return;
-    }
+  async function resetUserDataIfNeeded() {
+    const current = await dbGet("meta", "user_data_version");
+    if (current && current.value === USER_DATA_VERSION) return;
 
     const db = await openDb();
     const tx = db.transaction(
       ["records", "progress", "wrong", "favorites", "daily", "dailyItems", "meta"],
       "readwrite"
     );
-    const records = tx.objectStore("records");
-    for (const item of userData.answers || []) {
-      if (!item.questionId) continue;
-      records.add({
-        questionId: item.questionId,
-        userAnswer: item.userAnswer,
-        isCorrect: item.isCorrect,
-        createdAt: item.createdAt || localIso(),
-      });
+    for (const storeName of [
+      "records",
+      "progress",
+      "wrong",
+      "favorites",
+      "daily",
+      "dailyItems",
+    ]) {
+      tx.objectStore(storeName).clear();
     }
-    for (const item of userData.progress || []) {
-      if (item.questionId) tx.objectStore("progress").put(item);
-    }
-    for (const item of userData.wrong || []) {
-      if (item.questionId) tx.objectStore("wrong").put(item);
-    }
-    for (const item of userData.favorites || []) {
-      if (item.questionId) tx.objectStore("favorites").put(item);
-    }
-    for (const practice of userData.dailyPractices || []) {
-      const questionIds = (practice.items || [])
-        .map((item) => item.questionId)
-        .filter(Boolean);
-      tx.objectStore("daily").put({
-        date: practice.date,
-        questionIds,
-        total: practice.total,
-        correct: practice.correct,
-        isCompleted: practice.isCompleted,
-        startedAt: practice.startedAt,
-        completedAt: practice.completedAt,
-      });
-      for (const item of practice.items || []) {
-        if (!item.questionId) continue;
-        tx.objectStore("dailyItems").put({
-          key: `${practice.date}|${item.questionId}`,
-          date: practice.date,
-          questionId: item.questionId,
-          position: item.position,
-          userAnswer: item.userAnswer,
-          isCorrect: item.isCorrect,
-          answeredAt: item.answeredAt,
-        });
-      }
-    }
+    tx.objectStore("meta").put({
+      key: "user_data_version",
+      value: USER_DATA_VERSION,
+    });
     tx.objectStore("meta").put({ key: "user_data_imported", value: true });
     await new Promise((resolve, reject) => {
       tx.oncomplete = resolve;
@@ -439,12 +400,12 @@
   async function init() {
     await openDb();
     await seedQuestions();
+    await resetUserDataIfNeeded();
     [questionList, aliases] = await Promise.all([
       dbGetAll("questions"),
       loadJson("data/key_point_aliases.json"),
     ]);
     questionById = new Map(questionList.map((question) => [question.id, question]));
-    await importUserDataOnce();
   }
 
   function ensureReady() {

@@ -4,176 +4,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>后端八股刷题助手</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            max-width: 700px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-
-        .tabs {
-            margin-bottom: 20px;
-        }
-
-        .tabs button {
-            padding: 8px 16px;
-            margin-right: 8px;
-            cursor: pointer;
-        }
-
-        #module-bar button {
-            padding: 6px 12px;
-            margin-right: 6px;
-            margin-bottom: 6px;
-            cursor: pointer;
-            border: 1px solid #ddd;
-            background: white;
-            border-radius: 4px;
-        }
-        #module-bar button.active {
-            background: #1890ff;
-            color: white;
-            border-color: #1890ff;
-        }
-
-        .tabs button.active {
-            background: #1890ff;
-            color: white;
-            border: none;
-        }
-
-        .card {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 16px;
-        }
-
-        .option {
-            display: block;
-            padding: 10px;
-            margin: 8px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            cursor: pointer;
-            background: white;
-        }
-
-        .option:hover {
-            background: #f0f0f0;
-        }
-
-        .correct {
-            background: #d4edda;
-        }
-
-        .wrong {
-            background: #f8d7da;
-        }
-
-        button.action {
-            padding: 10px 24px;
-            background: #1890ff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-right: 8px;
-        }
-
-        .history-toggle {
-            width: 100%;
-            padding: 0;
-            border: 0;
-            background: transparent;
-            cursor: pointer;
-            text-align: left;
-            font: inherit;
-        }
-
-        .history-toggle:focus-visible {
-            outline: 2px solid #1890ff;
-            outline-offset: 4px;
-        }
-
-        @media (max-width: 600px) {
-            body {
-                max-width: none;
-                margin: 0;
-                padding: 12px 12px 84px;
-            }
-
-            h1 {
-                font-size: 22px;
-                margin: 8px 0 12px;
-            }
-
-            .tabs {
-                display: flex;
-                gap: 4px;
-                overflow-x: auto;
-                padding-bottom: 6px;
-                white-space: nowrap;
-                -webkit-overflow-scrolling: touch;
-            }
-
-            .tabs button {
-                flex: 0 0 auto;
-                padding: 8px 12px;
-                font-size: 14px;
-            }
-
-            .card {
-                padding: 14px;
-                border-radius: 10px;
-            }
-
-            .option {
-                padding: 12px;
-            }
-
-            input[type="text"] {
-                width: 100%;
-                box-sizing: border-box;
-            }
-        }
-    </style>
+    <meta name="theme-color" content="#f4f6fb">
+    <title>面试八股</title>
+        <link rel="stylesheet" href="css/app.css">
 </head>
 
 <body>
-    <h1>八股刷题小助手</h1>
-    <div class="tabs">
-        <button onclick="showTab('quiz')" id="tab-quiz">答题</button>
-        <button onclick="showTab('daily')" id="tab-daily">每日一练</button>
-        <button onclick="showTab('review')" id="tab-review">复习</button>
-        <button onclick="showTab('wrong')" id="tab-wrong">错题本</button>
-        <button onclick="showTab('favorites')" id="tab-favorites">收藏</button>
-        <button onclick="showTab('stats')" id="tab-stats">统计</button>
-        <button onclick="showTab('history')" id="tab-history">历史</button>
-    </div>
+    <div class="app-shell">
+        <header class="app-header">
+            <div class="brand">
+                <div class="brand-mark">八</div>
+                <div>
+                    <p class="brand-kicker">INTERVIEW GRIND</p>
+                    <h1>面试八股</h1>
+                </div>
+            </div>
+            <div class="header-pill" id="header-streak">🔥 连续 0 天</div>
+        </header>
 
-    <div id="view-quiz">
-        <div id="module-bar" style="margin-bottom: 16px;">
-            <button onclick="setModule('', this)">全部</button>
-            <button onclick="setModule('network', this)">计算机网络</button>
-            <button onclick="setModule('os', this)">操作系统</button>
-            <button onclick="setModule('mysql', this)">MySQL</button>
-            <button onclick="setModule('redis', this)">Redis</button>
-        </div>
-        <div class="card" id="question-card">
-            <p>点"下一题"开始刷题</p>
-            <button class="action" onclick="loadQuestion()">下一题</button>
-        </div>
-    </div>
+        <main id="app-main">
+            <section id="view-quiz" class="view active">
+                <div class="page-head">
+                    <p class="eyebrow">PRACTICE</p>
+                    <h2>今天刷哪一题？</h2>
+                    <p>选一个模块，保持手感。</p>
+                </div>
+                <div id="module-bar" class="chips">
+                    <button class="chip active" onclick="setModule('', this)">全部</button>
+                    <button class="chip" onclick="setModule('network', this)">网络</button>
+                    <button class="chip" onclick="setModule('os', this)">操作系统</button>
+                    <button class="chip" onclick="setModule('mysql', this)">MySQL</button>
+                    <button class="chip" onclick="setModule('redis', this)">Redis</button>
+                </div>
+                <div class="card question-card" id="question-card">
+                    <div class="empty-state">
+                        <div class="empty-icon">🎯</div>
+                        <h3>准备好开始了吗？</h3>
+                        <p>随机抽一道题，看看今天的状态。</p>
+                        <button class="action" onclick="loadQuestion()">开始刷题</button>
+                    </div>
+                </div>
+            </section>
 
-    <div id="view-wrong" style="display:none"></div>
-    <div id="view-favorites" style="display:none"></div>
-    <div id="view-stats" style="display:none"></div>
-    <div id="view-daily" style="display:none"></div>
-    <div id="view-review" style="display:none"></div>
-    <div id="view-history" style="display:none"></div>
+            <section id="view-daily" class="view"></section>
+            <section id="view-review" class="view"></section>
+            <section id="view-wrong" class="view"></section>
+            <section id="view-stats" class="view"></section>
+            <section id="view-favorites" class="view"></section>
+            <section id="view-history" class="view"></section>
+        </main>
+
+        <nav class="bottom-nav" aria-label="主导航">
+            <button class="nav-item active" data-tab="quiz" onclick="showTab('quiz')">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>
+                <span>答题</span>
+            </button>
+            <button class="nav-item" data-tab="daily" onclick="showTab('daily')">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+                <span>每日</span>
+            </button>
+            <button class="nav-item" data-tab="review" onclick="showTab('review')">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v6h-6"/></svg>
+                <span>复习</span>
+            </button>
+            <button class="nav-item" data-tab="wrong" onclick="showTab('wrong')">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v18H6.5A2.5 2.5 0 0 1 4 18.5z"/><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20"/></svg>
+                <span>错题</span>
+            </button>
+            <button class="nav-item" data-tab="profile" onclick="showTab('stats')">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+                <span>我的</span>
+            </button>
+        </nav>
+    </div>
     <script src="js/local-api.js"></script>
     <script>
         // 同源相对路径：页面由后端直接托管，换端口、换域名、手机访问都不用改代码
@@ -191,18 +94,43 @@
         }
 
         function showTab(name) {
-                for (const t of ['quiz', 'daily', 'review', 'wrong', 'favorites', 'stats', 'history']) {
-                document.getElementById('view-' + t).style.display = 'none';
-                document.getElementById('tab-' + t).classList.remove('active');
-            }
-            document.getElementById('view-' + name).style.display = 'block';
-            document.getElementById('tab-' + name).classList.add('active');
+            const navMap = {
+                quiz: 'quiz',
+                daily: 'daily',
+                review: 'review',
+                wrong: 'wrong',
+                favorites: 'profile',
+                stats: 'profile',
+                history: 'profile'
+            };
+            document.querySelectorAll('.view').forEach(view => view.classList.remove('active'));
+            const target = document.getElementById('view-' + name);
+            if (target) target.classList.add('active');
+            document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === navMap[name]);
+            });
             if (name === 'wrong') loadWrong();
             if (name === 'review') loadReview();
             if (name === 'favorites') loadFavorites();
             if (name === 'stats') loadStats();
             if (name === 'daily') loadDaily();
             if (name === 'history') loadHistory();
+            window.scrollTo(0, 0);
+        }
+
+        const MODULE_LABELS = {
+            network: '计网',
+            os: '操作系统',
+            mysql: 'MySQL',
+            redis: 'Redis'
+        };
+
+        function moduleTag(module) {
+            return `<span class="tag tag-${module}">${MODULE_LABELS[module] || module}</span>`;
+        }
+
+        function typeTag(type) {
+            return `<span class="tag tag-default">${type === 'choice' ? '选择题' : '简答题'}</span>`;
         }
 
         async function loadQuestion() {
@@ -220,7 +148,10 @@
 
         function renderQuestion() {
             const q = currentQuestion;
-            let html = `<h3>[${q.module}] ${q.stem} ${masteryBadge(q.mastery_level)}</h3>`;
+            let html = `
+                <div class="question-meta">${moduleTag(q.module)}${typeTag(q.type)}${masteryBadge(q.mastery_level)}</div>
+                <h3 class="question-stem">${q.stem}</h3>
+            `;
             if (q.options) {
                 for (const [k, v] of Object.entries(q.options)) {
                     html += `<div class="option" onclick="submitAnswer('${k}')">${k}. ${v}</div>`;
@@ -320,7 +251,7 @@
             const color = result.is_correct ? 'correct' : 'wrong';
             return `
                 <p>${context.title || `[${context.question.module}] ${context.question.stem}`}</p>
-                <div class="${color}">
+                <div class="result-panel ${color}">
                     <p><strong>已标记为${label}</strong></p>
                     <p>你的回答：${result.display_user_answer}</p>
                     <p>参考答案：${result.correct_answer}</p>
@@ -381,7 +312,7 @@
         function showResult(result) {
             const color = result.is_correct ? 'correct' : 'wrong';
             document.getElementById('question-card').innerHTML = `
-                <div class="${color}">
+                <div class="result-panel ${color}">
                     <h3>${result.is_correct ? '✓ 答对了！' : '✗ 答错了'}</h3>
                     <p>正确答案：${result.correct_answer}</p>
                     <p>解析：${result.explanation}</p>
@@ -399,9 +330,27 @@
         async function loadWrong() {
             const res = await fetch(API + '/api/wrong-questions');
             const data = await res.json();
-            let html = `<h2>错题本（共 ${data.length} 题）</h2>`;
+            let html = `
+                <div class="page-head">
+                    <p class="eyebrow">MISTAKES</p>
+                    <h2>错题本</h2>
+                    <p>共 ${data.length} 道待攻克，答对三次就会变成熟练。</p>
+                </div>`;
+            if (!data.length) {
+                html += `<div class="card empty-state">
+                    <div class="empty-icon">🌱</div>
+                    <h3>还没有错题</h3>
+                    <p>继续刷题，错题会自动收集到这里。</p>
+                </div>`;
+            }
             for (const w of data) {
-                html += `<div class="card"><p>[${w.module}] ${w.stem}</p><p>正确答案：${w.answer}（错了 ${w.wrong_count} 次）</p><p>${w.explanation}</p><button class="action" onclick="removeWrong(${w.question_id})">已掌握，移出</button></div>`;
+                html += `<div class="card list-card">
+                    <div class="card-top">${moduleTag(w.module)}<span class="tag tag-default">错 ${w.wrong_count} 次</span></div>
+                    <p class="list-stem">${w.stem}</p>
+                    <div class="answer-box"><strong>答案</strong>：${w.answer}</div>
+                    <p class="explain">${w.explanation}</p>
+                    <button class="action success" onclick="removeWrong('${w.question_id}')">已掌握，移出</button>
+                </div>`;
             }
             document.getElementById('view-wrong').innerHTML = html;
         }
@@ -414,9 +363,27 @@
         async function loadFavorites() {
             const res = await fetch(API + '/api/favorites');
             const data = await res.json();
-            let html = `<h2>收藏（共 ${data.length} 题）</h2>`;
+            let html = `<button class="back-btn" onclick="showTab('stats')">← 返回我的</button>
+                <div class="page-head">
+                    <p class="eyebrow">FAVORITES</p>
+                    <h2>收藏夹</h2>
+                    <p>共 ${data.length} 道题，随时回来复习。</p>
+                </div>`;
+            if (!data.length) {
+                html += `<div class="card empty-state">
+                    <div class="empty-icon">⭐</div>
+                    <h3>还没有收藏</h3>
+                    <p>答题时点“收藏本题”，好题就会留在这里。</p>
+                </div>`;
+            }
             for (const f of data) {
-                html += `<div class="card"><p>[${f.module}] ${f.stem}</p><p>答案：${f.answer}</p><p>${f.explanation}</p><button class="action" onclick="removeFavorite(${f.question_id})">取消收藏</button></div>`;
+                html += `<div class="card list-card">
+                    <div class="card-top">${moduleTag(f.module)}</div>
+                    <p class="list-stem">${f.stem}</p>
+                    <div class="answer-box"><strong>答案</strong>：${f.answer}</div>
+                    <p class="explain">${f.explanation}</p>
+                    <button class="action danger" onclick="removeFavorite('${f.question_id}')">取消收藏</button>
+                </div>`;
             }
             document.getElementById('view-favorites').innerHTML = html;
         }
@@ -427,171 +394,380 @@
         }
 
         async function loadStats() {
-            const res = await fetch(API + '/api/stats');
-            const s = await res.json();
-            let html = `<h2>学习统计</h2>`;
-            html += `<div class="card"><p>总答题：${s.total} 题</p><p>答对：${s.correct} 题</p><p>总正确率：${s.accuracy}%</p></div>`;
-            html += '<h3>掌握度</h3>';
-            html += `<div class="card">
-            <p><span style="color:red">薄弱</span>：${s.mastery['薄弱']} 道</p>
-            <p><span style="color:orange">一般</span>：${s.mastery['一般']} 道</p>
-            <p><span style="color:green">熟练</span>：${s.mastery['熟练']} 道</p>
-        </div>`;
-            html += '<h3>各模块</h3>';
-            for (const m of s.by_module) {
-                html += `<div class="card"><p>${m.module}：${m.total} 题，正确率 ${m.accuracy}%</p></div>`;
-            }
+            const view = document.getElementById('view-stats');
+            view.innerHTML = '<p class="loading">正在整理你的学习数据...</p>';
+            try {
+                const [statsRes, favoritesRes, historyRes] = await Promise.all([
+                    fetch(API + '/api/stats'),
+                    fetch(API + '/api/favorites'),
+                    fetch(API + '/api/daily/history')
+                ]);
+                if (!statsRes.ok) throw new Error('stats failed');
+                const s = await statsRes.json();
+                const favorites = favoritesRes.ok ? await favoritesRes.json() : [];
+                const history = historyRes.ok ? await historyRes.json() : { streak: 0 };
+                const modules = Array.isArray(s.by_module) ? s.by_module : [];
 
-            document.getElementById('view-stats').innerHTML = html;
+                const masteryItems = [
+                    { label: '薄弱', color: '#ef4444' },
+                    { label: '一般', color: '#f59e0b' },
+                    { label: '熟练', color: '#10b981' }
+                ];
+                const masteryTotal = masteryItems.reduce(
+                    (sum, item) => sum + (s.mastery[item.label] || 0),
+                    0
+                );
+                const masteryRows = masteryItems.map(item => {
+                    const count = s.mastery[item.label] || 0;
+                    const pct = masteryTotal ? Math.round((count / masteryTotal) * 100) : 0;
+                    return `<div class="mastery-row">
+                        <span class="dot" style="background:${item.color}"></span>
+                        <div class="mastery-main">
+                            <div class="row-head"><span>${item.label}</span><span>${count} 道</span></div>
+                            <div class="bar"><i style="width:${pct}%;background:${item.color}"></i></div>
+                        </div>
+                    </div>`;
+                }).join('');
+
+                const moduleInfo = {
+                    network: { label: '计算机网络', color: '#0ea5e9' },
+                    os: { label: '操作系统', color: '#8b5cf6' },
+                    mysql: { label: 'MySQL', color: '#f59e0b' },
+                    redis: { label: 'Redis', color: '#f43f5e' }
+                };
+                const moduleCards = modules.map(m => {
+                    const info = moduleInfo[m.module] || { label: m.module, color: '#6366f1' };
+                    return `<div class="module-card">
+                        <div class="module-card-head">
+                            <span class="module-name">${info.label}</span>
+                            <span class="module-acc">${m.accuracy}%</span>
+                        </div>
+                        <div class="bar"><i style="width:${m.accuracy}%;background:${info.color}"></i></div>
+                        <p>${m.correct}/${m.total} 题</p>
+                    </div>`;
+                }).join('');
+
+                view.innerHTML = `
+                    <div class="page-head">
+                        <p class="eyebrow">PROFILE</p>
+                        <h2>我的学习</h2>
+                        <p>把每一次答题，变成看得见的进步。</p>
+                    </div>
+                    <div class="profile-hero">
+                        <div class="ring ring-light" style="--p:${s.accuracy}">
+                            <div class="ring-text"><strong>${s.accuracy}%</strong><span>总正确率</span></div>
+                        </div>
+                        <div class="profile-numbers">
+                            <div><strong>${s.total}</strong><span>累计答题</span></div>
+                            <div><strong>${s.correct}</strong><span>答对</span></div>
+                            <div><strong>${history.streak || 0}</strong><span>连续打卡</span></div>
+                        </div>
+                    </div>
+                    <div class="quick-grid">
+                        <button class="quick-card" onclick="showTab('favorites')">
+                            <span class="quick-icon">⭐</span>
+                            <div><strong>收藏夹</strong><small>${favorites.length} 道收藏</small></div>
+                            <span class="chev">›</span>
+                        </button>
+                        <button class="quick-card" onclick="showTab('history')">
+                            <span class="quick-icon">📅</span>
+                            <div><strong>打卡日历</strong><small>连续 ${history.streak || 0} 天</small></div>
+                            <span class="chev">›</span>
+                        </button>
+                    </div>
+                    <div class="section-title"><h3>掌握度</h3><span>${masteryTotal} 道有记录</span></div>
+                    <div class="card mastery-card">${masteryRows}</div>
+                    <div class="section-title"><h3>各模块正确率</h3><span>共 ${s.total} 次作答</span></div>
+                    <div class="module-grid">${moduleCards || '<p class="loading">还没有模块数据</p>'}</div>
+                `;
+            } catch (error) {
+                view.innerHTML = '<p class="error">学习数据加载失败，请稍后重试</p>';
+            }
+        }
+
+        let calendarMonth = null;
+        let calendarRecords = [];
+        let calendarStreak = 0;
+        let calendarSelectedDate = null;
+
+        function pad2(value) {
+            return String(value).padStart(2, '0');
+        }
+
+        function calendarToday() {
+            const now = new Date();
+            return `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
         }
 
         async function loadHistory() {
             const view = document.getElementById('view-history');
-            view.innerHTML = '<p>正在加载练习历史...</p>';
+            view.innerHTML = '<p class="loading">正在加载打卡日历...</p>';
             try {
-                const res = await fetch(API + '/api/daily/history');
-                if (!res.ok) throw new Error('加载历史记录失败');
+                const res = await fetch(API + '/api/daily/history?days=365');
+                if (!res.ok) throw new Error('加载打卡记录失败');
                 const data = await res.json();
-                let html = `<h2>练习历史（连续打卡 ${data.streak} 天）</h2>`;
-                if (data.records.length === 0) {
-                    html += '<p>还没有练习记录</p>';
-                } else {
-                    for (const record of data.records) {
-                        const status = record.is_completed
-                            ? '<span style="color:green">已完成</span>'
-                            : '<span style="color:orange">未完成</span>';
-                        html += `<div class="card">
-                            <button class="history-toggle" id="history-toggle-${record.date}" type="button"
-                                aria-expanded="false"
-                                aria-controls="history-${record.date}"
-                                onclick="loadDailyHistory('${record.date}')">
-                                ${record.date}　已答 ${record.answered}/${record.total}　
-                                已答正确率 ${record.accuracy}%　完成率 ${record.completion_rate}%　
-                                ${status}　<span id="history-arrow-${record.date}">▼</span>
-                            </button>
-                            <div id="history-${record.date}" style="display:none"></div>
-                        </div>`;
-                    }
-                }
-                view.innerHTML = html;
+                calendarRecords = Array.isArray(data.records) ? data.records : [];
+                calendarStreak = data.streak || 0;
+
+                const now = new Date();
+                calendarMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                const monthPrefix = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}`;
+                const today = calendarToday();
+                const todayRecord = calendarRecords.find(record => record.date === today);
+                const monthRecord = calendarRecords.find(
+                    record => record.date.startsWith(monthPrefix) && (record.answered > 0 || record.is_completed)
+                );
+                calendarSelectedDate = todayRecord ? today : (monthRecord ? monthRecord.date : null);
+                renderCalendar();
             } catch (error) {
-                view.innerHTML = '<p style="color:red">历史记录加载失败，请稍后重试</p>';
+                view.innerHTML = '<p class="error">打卡记录加载失败，请稍后重试</p>';
             }
         }
 
-        async function loadDailyHistory(day) {
-            const box = document.getElementById('history-' + day);
-            const arrow = document.getElementById('history-arrow-' + day);
-            const toggle = document.getElementById('history-toggle-' + day);
-            if (box.style.display === 'block') {
-                box.style.display = 'none';
-                if (arrow) arrow.textContent = '▼';
-                if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        function changeCalendarMonth(delta) {
+            if (!calendarMonth) return;
+            calendarMonth = new Date(
+                calendarMonth.getFullYear(),
+                calendarMonth.getMonth() + delta,
+                1
+            );
+            const prefix = `${calendarMonth.getFullYear()}-${pad2(calendarMonth.getMonth() + 1)}`;
+            const monthRecord = calendarRecords.find(
+                record => record.date.startsWith(prefix) && (record.answered > 0 || record.is_completed)
+            );
+            calendarSelectedDate = monthRecord ? monthRecord.date : null;
+            renderCalendar();
+        }
+
+        function selectCalendarDay(day) {
+            calendarSelectedDate = day;
+            document.querySelectorAll('.calendar-cell.selected').forEach(cell => {
+                cell.classList.remove('selected');
+            });
+            const target = Array.from(document.querySelectorAll('.calendar-cell')).find(
+                cell => cell.dataset.date === day
+            );
+            if (target) target.classList.add('selected');
+            renderCalendarDetail();
+        }
+
+        function renderCalendar() {
+            if (!calendarMonth) return;
+            const view = document.getElementById('view-history');
+            const year = calendarMonth.getFullYear();
+            const monthIndex = calendarMonth.getMonth();
+            const monthPrefix = `${year}-${pad2(monthIndex + 1)}`;
+            const today = calendarToday();
+            const recordsByDate = new Map(calendarRecords.map(record => [record.date, record]));
+            const firstDay = new Date(year, monthIndex, 1);
+            const offset = (firstDay.getDay() + 6) % 7;
+            const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+            const monthRecords = calendarRecords.filter(record => record.date.startsWith(monthPrefix));
+            const activeRecords = monthRecords.filter(
+                record => record.answered > 0 || record.is_completed
+            );
+            const completedDays = activeRecords.filter(record => record.is_completed).length;
+            const answeredSum = activeRecords.reduce((sum, record) => sum + (record.answered || 0), 0);
+            const totalSum = activeRecords.reduce((sum, record) => sum + (record.total || 0), 0);
+            const completionRate = totalSum ? Math.round((answeredSum / totalSum) * 100) : 0;
+
+            const cells = [];
+            for (let i = 0; i < offset; i += 1) {
+                cells.push('<div class="calendar-cell is-empty"></div>');
+            }
+            for (let day = 1; day <= daysInMonth; day += 1) {
+                const dateText = `${monthPrefix}-${pad2(day)}`;
+                const record = recordsByDate.get(dateText);
+                const started = record && ((record.answered || 0) > 0 || record.is_completed);
+                const classes = ['calendar-cell'];
+                if (record && record.is_completed) classes.push('completed');
+                else if (started) classes.push('partial');
+                if (dateText === today) classes.push('today');
+                if (dateText === calendarSelectedDate) classes.push('selected');
+                const mark = record && record.is_completed
+                    ? '<span class="calendar-check">✓</span>'
+                    : started
+                        ? '<span class="calendar-dot"></span>'
+                        : '';
+                cells.push(
+                    `<button type="button" class="${classes.join(' ')}" data-date="${dateText}" onclick="selectCalendarDay('${dateText}')">
+                        <span class="calendar-day">${day}</span>${mark}
+                    </button>`
+                );
+            }
+
+            view.innerHTML = `
+                <button class="back-btn" onclick="showTab('stats')">← 返回我的</button>
+                <div class="page-head">
+                    <p class="eyebrow">CHECK-IN</p>
+                    <h2>打卡日历</h2>
+                    <p>连续打卡 <strong>${calendarStreak}</strong> 天，保持节奏。</p>
+                </div>
+                <div class="card calendar-card">
+                    <div class="calendar-head">
+                        <button class="calendar-nav" type="button" onclick="changeCalendarMonth(-1)" aria-label="上个月">‹</button>
+                        <div class="calendar-title">
+                            <strong>${year}年${monthIndex + 1}月</strong>
+                            <span>${activeRecords.length} 天有练习</span>
+                        </div>
+                        <button class="calendar-nav" type="button" onclick="changeCalendarMonth(1)" aria-label="下个月">›</button>
+                    </div>
+                    <div class="calendar-summary">
+                        <div><strong>${activeRecords.length}</strong><span>本月打卡</span></div>
+                        <div><strong>${completedDays}</strong><span>完成天数</span></div>
+                        <div><strong>${completionRate}%</strong><span>完成率</span></div>
+                    </div>
+                    <div class="calendar-weekdays">
+                        ${['一', '二', '三', '四', '五', '六', '日'].map(day => `<span>${day}</span>`).join('')}
+                    </div>
+                    <div class="calendar-grid">${cells.join('')}</div>
+                    <div class="calendar-legend">
+                        <span><i class="legend-dot completed"></i>已完成</span>
+                        <span><i class="legend-dot partial"></i>进行中</span>
+                        <span><i class="legend-dot today"></i>今天</span>
+                    </div>
+                    <div id="calendar-detail" class="calendar-detail"></div>
+                </div>`;
+            renderCalendarDetail();
+        }
+
+        async function renderCalendarDetail() {
+            const box = document.getElementById('calendar-detail');
+            if (!box) return;
+            const day = calendarSelectedDate;
+            if (!day) {
+                box.innerHTML = '<div class="calendar-empty">这个月还没有打卡记录，去每日一练开始第一天吧。</div>';
+                return;
+            }
+            const record = calendarRecords.find(item => item.date === day);
+            if (!record) {
+                box.innerHTML = `<div class="calendar-empty">${day} 没有练习记录。</div>`;
+                return;
+            }
+            if (!record.answered) {
+                box.innerHTML = `<div class="calendar-empty">${day} 的题目已经生成，但还没有作答。<br><button class="action" onclick="showTab('daily')">去完成</button></div>`;
                 return;
             }
 
-            if (dailyHistoryCache.has(day)) {
-                box.innerHTML = dailyHistoryCache.get(day);
-                box.style.display = 'block';
-                if (arrow) arrow.textContent = '▲';
-                if (toggle) toggle.setAttribute('aria-expanded', 'true');
-                return;
-            }
-
-            box.innerHTML = '<p>正在加载详情...</p>';
-            box.style.display = 'block';
-            if (arrow) arrow.textContent = '▲';
-            if (toggle) toggle.setAttribute('aria-expanded', 'true');
+            box.innerHTML = '<p class="loading">正在加载这天的答题详情...</p>';
             try {
                 const res = await fetch(API + '/api/daily/history/' + encodeURIComponent(day));
-                if (!res.ok) throw new Error('加载历史详情失败');
+                if (!res.ok) throw new Error('加载详情失败');
                 const data = await res.json();
-                let html = '';
-                data.questions.forEach((q, i) => {
-                    html += `<p style="margin-top:10px">${i + 1}. [${q.module}] ${q.stem}</p>`;
-                    if (q.user_answer !== null && q.user_answer !== undefined) {
-                        const answerStatus = q.is_correct
-                            ? '<span style="color:green">答对</span>'
-                            : '<span style="color:red">答错</span>';
-                        html += `<p>${answerStatus}</p>`;
-                        if (q.type === 'choice') {
-                            for (const [k, v] of Object.entries(q.options)) {
-                                let cls = '';
-                                if (k === q.correct_answer) cls = 'correct';
-                                else if (k === q.user_answer && !q.is_correct) cls = 'wrong';
-                                html += `<div class="option ${cls}" style="cursor:default">${k}. ${v}</div>`;
-                            }
-                        } else {
-                            html += `<p style="color:red">你的答案：${q.display_user_answer}</p>`;
-                            html += `<div class="correct"><p>正确答案：${q.correct_answer}</p><p>解析：${q.explanation}</p></div>`;
-                        }
-                    } else {
-                        html += `<p style="color:#999">未作答</p>`;
-                    }
-                });
-                dailyHistoryCache.set(day, html);
-                box.innerHTML = html;
+                const questions = Array.isArray(data.questions) ? data.questions : [];
+                const answered = questions.filter(
+                    q => q.user_answer !== null && q.user_answer !== undefined
+                ).length;
+                const correct = questions.filter(q => q.is_correct === true).length;
+                const rows = questions.map((q, i) => {
+                    const status = q.user_answer === null || q.user_answer === undefined
+                        ? '—'
+                        : q.is_correct
+                            ? '✓'
+                            : '✗';
+                    const cls = q.user_answer === null || q.user_answer === undefined
+                        ? 'pending'
+                        : q.is_correct
+                            ? 'ok'
+                            : 'bad';
+                    return `<div class="calendar-question">
+                        <span class="calendar-q-index">${i + 1}</span>
+                        <span class="calendar-q-stem">${q.stem}</span>
+                        <span class="calendar-q-status ${cls}">${status}</span>
+                    </div>`;
+                }).join('');
+                box.innerHTML = `<div class="calendar-detail-head">
+                    <strong>${day}</strong><span>${correct}/${answered} 正确</span>
+                </div>
+                <div class="calendar-detail-list">${rows}</div>`;
             } catch (error) {
-                box.innerHTML = '<p style="color:red">详情加载失败，请收起后重试</p>';
+                box.innerHTML = '<p class="error">这天的答题详情加载失败</p>';
             }
         }
 
         async function loadDaily() {
-                const res = await fetch(API + '/api/daily');
-                const data = await res.json();
-                let html = `<h2>每日一练（${data.date}）</h2>`;
-                let answeredCount = 0;
-                let correctCount = 0;
-                data.questions.forEach((q, i) => {
-                    html += `<div class="card" id="daily-card-${i}">
-        <p>${i + 1}. [${q.module}] ${q.stem} ${masteryBadge(q.mastery_level)}</p>`;
-                    if (q.user_answer !== null && q.user_answer !== undefined) {
-                        answeredCount++;
-                        if (q.is_correct) correctCount++;
-                        if (q.type === 'choice') {
-                            for (const [k, v] of Object.entries(q.options)) {
-                                let cls = 'option';
-                                if (k === q.correct_answer) cls += ' correct';
-                                else if (k === q.user_answer && !q.is_correct) cls += ' wrong';
-                                html += `<div class="${cls}">${k}. ${v}</div>`;
-                            }
-                        } else {
-                            if (q.is_correct) {
-                                html += `<div class="correct">`;
-                                html += `<p>你的答案：${q.display_user_answer}</p>`;
-                                html += `<p>正确答案：${q.correct_answer}</p>`;
-                                html += `<p>解析：${q.explanation}</p>`;
-                                html += `</div>`;
-                            } else {
-                                html += `<p style="color:red">你的答案：${q.display_user_answer}</p>`;
-                                html += `<div class="correct">`;
-                                html += `<p>正确答案：${q.correct_answer}</p>`;
-                                html += `<p>解析：${q.explanation}</p>`;
-                                html += `</div>`;
-                            }
+            const res = await fetch(API + '/api/daily');
+            const data = await res.json();
+            const questions = Array.isArray(data.questions) ? data.questions : [];
+            const total = questions.length;
+            const answeredCount = questions.filter(
+                q => q.user_answer !== null && q.user_answer !== undefined
+            ).length;
+            const correctCount = questions.filter(q => q.is_correct === true).length;
+            const pct = total ? Math.round((answeredCount / total) * 100) : 0;
+            const accuracy = answeredCount
+                ? Math.round((correctCount / answeredCount) * 100)
+                : 0;
+
+            let html = `
+                <div class="page-head">
+                    <p class="eyebrow">DAILY</p>
+                    <h2>每日一练</h2>
+                    <p>${data.date} · 每天一点，积少成多。</p>
+                </div>
+                <div class="daily-hero">
+                    <div class="ring" id="daily-ring" style="--p:${pct}">
+                        <div class="ring-text">
+                            <strong id="daily-ring-count">${answeredCount}/${total}</strong>
+                            <span id="daily-ring-pct">${pct}%</span>
+                        </div>
+                    </div>
+                    <div class="daily-hero-copy">
+                        <p class="eyebrow">TODAY · 每日一练</p>
+                        <h2 id="daily-hero-title">${pct === 100 ? '今天完成啦 🎉' : '今天，拿下这套题'}</h2>
+                        <p class="daily-hero-sub" id="daily-hero-sub">${
+                            answeredCount
+                                ? `已答 ${answeredCount} 题 · 正确率 ${accuracy}%`
+                                : `共 ${total} 题 · 从第一题开始吧`
+                        }</p>
+                    </div>
+                </div>`;
+
+            questions.forEach((q, i) => {
+                html += `<div class="card question-card" id="daily-card-${i}">
+                    <div class="question-meta">
+                        <span class="q-index">${i + 1}</span>
+                        ${moduleTag(q.module)}${typeTag(q.type)}${masteryBadge(q.mastery_level)}
+                    </div>
+                    <p class="question-stem">${q.stem}</p>`;
+
+                if (q.user_answer !== null && q.user_answer !== undefined) {
+                    if (q.type === 'choice') {
+                        for (const [k, v] of Object.entries(q.options)) {
+                            let cls = 'option';
+                            if (k === q.correct_answer) cls += ' correct';
+                            else if (k === q.user_answer && !q.is_correct) cls += ' wrong';
+                            html += `<div class="${cls}">${k}. ${v}</div>`;
                         }
                     } else {
-                        if (q.options) {
-                            for (const [k, v] of Object.entries(q.options)) {
-                                html += `<div class="option" onclick="submitDailyAnswer(${i}, '${k}', this)">${k}. ${v}</div>`;
-                            }
-                        } else {
-                            html += `<input type="text" id="daily-input-${i}" placeholder="输入你的答案">`;
-                            html += `<p><button class="action" onclick="submitDailyShort(${i})">提交</button></p>`;
-                        }
+                        const cls = q.is_correct ? 'correct' : 'wrong';
+                        html += `<div class="result-panel ${cls}">
+                            <p>你的答案：${q.display_user_answer}</p>
+                            <p>参考答案：${q.correct_answer}</p>
+                            <p>解析：${q.explanation}</p>
+                        </div>`;
                     }
-                    html += `</div>`;
-                });
-                html += `<div id="daily-score"></div>`;
-                document.getElementById('view-daily').innerHTML = html;
-                window.dailyQuestions = data.questions;
-                window.dailyPracticeId = data.practice_id;
-                window.dailyDate = data.date;
-                window.dailyAnswers = data.questions.map(q => q.is_correct);
-                window.dailyDoneIds = data.questions.map(q => q.id);
-                renderDailyScore();
-                renderLoadMoreButton();
-            }
+                } else if (q.options) {
+                    for (const [k, v] of Object.entries(q.options)) {
+                        html += `<div class="option" onclick="submitDailyAnswer(${i}, '${k}', this)">${k}. ${v}</div>`;
+                    }
+                } else {
+                    html += `<input type="text" id="daily-input-${i}" placeholder="输入你的答案">`;
+                    html += `<p><button class="action" onclick="submitDailyShort(${i})">提交</button></p>`;
+                }
+                html += `</div>`;
+            });
+
+            html += `<div id="daily-score"></div>`;
+            document.getElementById('view-daily').innerHTML = html;
+            window.dailyQuestions = questions;
+            window.dailyPracticeId = data.practice_id;
+            window.dailyDate = data.date;
+            window.dailyAnswers = questions.map(q => q.is_correct);
+            window.dailyDoneIds = questions.map(q => q.id);
+            renderDailyScore();
+            renderLoadMoreButton();
+        }
 
         async function submitDailyAnswer(index, choice, el) {
             const q = window.dailyQuestions[index];
@@ -625,11 +801,11 @@
         }
 
         function masteryBadge(level) {
-                if (level === 1) return '<span style="color:red;font-size:14px">薄弱</span>';
-                if (level === 2) return '<span style="color:orange;font-size:14px">一般</span>';
-                if (level === 3) return '<span style="color:green;font-size:14px">熟练</span>';
-                return '';
-            }
+            if (level === 1) return '<span class="tag tag-weak">薄弱</span>';
+            if (level === 2) return '<span class="tag tag-mid">一般</span>';
+            if (level === 3) return '<span class="tag tag-strong">熟练</span>';
+            return '';
+        }
 
         async function submitDailyShort(index) {
                 const q = window.dailyQuestions[index];
@@ -661,6 +837,7 @@
                 if (window.dailyDate) dailyHistoryCache.delete(window.dailyDate);
                 if (data.count === 0) {
                     alert('没有更多题了');
+                    button.disabled = false;
                     return;
                 }
                 const container = document.getElementById('view-daily');
@@ -668,8 +845,12 @@
                 const startIndex = window.dailyQuestions.length;
                 data.questions.forEach((q, i) => {
                     const realIndex = startIndex + i;
-                    html += `<div class="card" id="daily-card-${realIndex}">
-            <p>${realIndex + 1}. [${q.module}] ${q.stem} ${masteryBadge(q.mastery_level)}</p>`;
+                    html += `<div class="card question-card" id="daily-card-${realIndex}">
+                        <div class="question-meta">
+                            <span class="q-index">${realIndex + 1}</span>
+                            ${moduleTag(q.module)}${typeTag(q.type)}${masteryBadge(q.mastery_level)}
+                        </div>
+                        <p class="question-stem">${q.stem}</p>`;
                     if (q.options) {
                         for (const [k, v] of Object.entries(q.options)) {
                             html += `<div class="option" onclick="submitDailyAnswer(${realIndex}, '${k}', this)">${k}. ${v}</div>`;
@@ -681,6 +862,7 @@
                     html += `</div>`;
                     window.dailyQuestions.push(q);
                     window.dailyDoneIds.push(q.id);
+                    window.dailyAnswers.push(q.is_correct);
                 });
                 container.insertAdjacentHTML('beforeend', html);
                 renderDailyScore();
@@ -695,32 +877,79 @@
                     `<p id="load-more-btn" style="text-align:center;margin-top:20px"><button class="action" onclick="loadMoreDaily()">再来5题</button></p>`);
             }
 
-        function renderDailyScore() {
-                const container = document.getElementById('view-daily');
-                let score = document.getElementById('daily-score-box');
-                if (score) score.remove();
-                const answered = window.dailyAnswers.filter(a => a === true || a === false).length;
-                const total = window.dailyQuestions.length;
-                if (answered === total && total > 0) {
-                    const correct = window.dailyAnswers.filter(a => a === true).length;
-                    container.insertAdjacentHTML('beforeend',
-                        `<div id="daily-score-box" class="card" style="text-align:center"><h2>今日得分：${correct} / ${total}</h2></div>`);
-                }
+        function renderDailyProgress() {
+            const ring = document.getElementById('daily-ring');
+            if (!ring) return;
+            const total = window.dailyQuestions.length;
+            const answered = window.dailyAnswers.filter(
+                a => a === true || a === false
+            ).length;
+            const correct = window.dailyAnswers.filter(a => a === true).length;
+            const pct = total ? Math.round((answered / total) * 100) : 0;
+            const accuracy = answered ? Math.round((correct / answered) * 100) : 0;
+
+            ring.style.setProperty('--p', pct);
+            const count = document.getElementById('daily-ring-count');
+            const pctEl = document.getElementById('daily-ring-pct');
+            const sub = document.getElementById('daily-hero-sub');
+            const title = document.getElementById('daily-hero-title');
+            if (count) count.textContent = `${answered}/${total}`;
+            if (pctEl) pctEl.textContent = `${pct}%`;
+            if (title) {
+                title.textContent = pct === 100 ? '今天完成啦 🎉' : '今天，拿下这套题';
             }
+            if (sub) {
+                sub.textContent = answered
+                    ? `已答 ${answered} 题 · 正确率 ${accuracy}%`
+                    : `共 ${total} 题 · 从第一题开始吧`;
+            }
+        }
+
+        function renderDailyScore() {
+            renderDailyProgress();
+            const container = document.getElementById('view-daily');
+            let score = document.getElementById('daily-score-box');
+            if (score) score.remove();
+            const answered = window.dailyAnswers.filter(
+                a => a === true || a === false
+            ).length;
+            const total = window.dailyQuestions.length;
+            if (answered === total && total > 0) {
+                const correct = window.dailyAnswers.filter(a => a === true).length;
+                const accuracy = Math.round((correct / total) * 100);
+                container.insertAdjacentHTML(
+                    'beforeend',
+                    `<div id="daily-score-box" class="daily-score-card">
+                        <h2>🎉 今日完成</h2>
+                        <p>答对 ${correct} / ${total} 题 · 正确率 ${accuracy}%</p>
+                    </div>`
+                );
+                refreshHeader();
+            }
+        }
 
         async function loadReview() {
             const res = await fetch(API + '/api/review');
             const data = await res.json();
-            let html = `<h2>待复习（${data.count} 题）</h2>`;
+            let html = `<div class="page-head">
+                <p class="eyebrow">REVIEW</p>
+                <h2>待复习</h2>
+                <p>共 ${data.count} 题，按到期时间排序。</p>
+            </div>`;
             if (data.count === 0) {
-                html += `<p>太棒了，今天没有需要复习的题！</p>`;
+                html += `<div class="card empty-state">
+                    <div class="empty-icon">🎉</div>
+                    <h3>今天没有待复习</h3>
+                    <p>去答几道新题，或者等明天再来。</p>
+                </div>`;
             }
             data.questions.forEach((q, i) => {
-                let badge = '';
-                if (q.mastery_level === 1) badge = '<span style="color:red">薄弱</span>';
-                else if (q.mastery_level === 2) badge = '<span style="color:orange">一般</span>';
-                html += `<div class="card">
-                <p>${i + 1}. [${q.module}] ${q.stem} ${badge}</p>`;
+                html += `<div class="card question-card">
+                    <div class="question-meta">
+                        <span class="q-index">${i + 1}</span>
+                        ${moduleTag(q.module)}${typeTag(q.type)}${masteryBadge(q.mastery_level)}
+                    </div>
+                    <p class="question-stem">${q.stem}</p>`;
                 if (q.options) {
                     for (const [k, v] of Object.entries(q.options)) {
                         html += `<div class="option" onclick="submitReviewAnswer(${i}, '${k}', this)">${k}. ${v}</div>`;
@@ -758,14 +987,7 @@
                 });
             }
             window.reviewAnswers[index] = result.is_correct;
-            const answered = window.reviewAnswers.filter(a => a !== undefined).length;
-            if (answered === window.reviewQuestions.length) {
-                const correct = window.reviewAnswers.filter(a => a).length;
-                document.getElementById('review-score').innerHTML =
-                    `<div class="card" style="text-align:center">
-                    <h2>复习完成：${correct} / ${window.reviewQuestions.length}</h2>
-                </div>`;
-            }
+            renderReviewScore();
         }
 
         async function submitReviewShort(index) {
@@ -785,14 +1007,34 @@
 
         function renderReviewScore() {
             const answered = window.reviewAnswers.filter(a => a !== undefined).length;
-            if (answered === window.reviewQuestions.length) {
+            if (answered === window.reviewQuestions.length && window.reviewQuestions.length) {
                 const correct = window.reviewAnswers.filter(a => a).length;
-                document.getElementById('review-score').innerHTML =
-                    `<div class="card" style="text-align:center">
-                    <h2>复习完成：${correct} / ${window.reviewQuestions.length}</h2>
-                </div>`;
+                const box = document.getElementById('review-score');
+                if (box) {
+                    box.innerHTML = `<div class="daily-score-card">
+                        <h2>🎉 复习完成</h2>
+                        <p>答对 ${correct} / ${window.reviewQuestions.length} 题</p>
+                    </div>`;
+                }
             }
         }
+
+        async function refreshHeader() {
+            try {
+                const res = await fetch(API + '/api/daily/history');
+                if (!res.ok) return;
+                const data = await res.json();
+                const el = document.getElementById('header-streak');
+                if (el) el.textContent = `🔥 连续 ${data.streak || 0} 天`;
+            } catch (error) {
+                // 顶部打卡信息失败不影响主流程
+            }
+        }
+
+        const initialTab = window.location.hash.replace('#', '');
+        const validTabs = ['quiz', 'daily', 'review', 'wrong', 'favorites', 'stats', 'history'];
+        showTab(validTabs.includes(initialTab) ? initialTab : 'quiz');
+        refreshHeader();
     </script>
 </body>
 

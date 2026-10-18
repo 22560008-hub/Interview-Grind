@@ -17,7 +17,7 @@
 - **学习统计**：展示总答题量、总正确率、各模块正确率和掌握度分布
 - **前端应用**：现有答题、每日一练、复习、错题本、收藏、统计、历史 7 个标签页
 - **工程基础**：FastAPI 自动接口文档、分层业务结构、独立测试数据库；当前 97 个后端测试全部通过
-- **Android 单机版（进行中）**：Capacitor 包装现有 Web UI，题库和学习数据本地化，不需要服务器 / 域名 / 登录
+- **Android 单机版（进行中）**：Capacitor 包装，题库和学习数据本地化，不需要服务器 / 域名 / 登录；底部 5 Tab、每日环形进度、打卡日历
 
 ---
 
@@ -63,13 +63,28 @@
 ### 五、Android 单机版（单用户）
 
 - 暂停多用户 / 登录 / 服务端方向，回到单用户版本
-- 新增 `backend/scripts/export_app_data.py`：导出 224 道题、关键点别名，以及当前 211 条答题 / 90 条错题 / 100 条进度
+- 新增 `backend/scripts/export_app_data.py`：导出 224 道题、关键点别名；用户进度导出保留为可选备份
 - 题目 id 使用稳定 `code`，避免以后调整 seed 顺序导致学习记录错位
-- 新增 `mobile/` Capacitor 8 工程：复用 Web UI，加移动端 viewport 和横向滚动 tab
+- 新增 `mobile/` Capacitor 8 工程；后续界面改为底部 5 Tab
 - 新增 `mobile/www/js/local-api.js`：拦截 `/api/*`，用 IndexedDB 实现题目、判分、关键点匹配、错题、收藏、统计、复习、每日一练、历史
-- `user_data.json` 是个人数据，已加入 `.gitignore`；构建 APK 前本地导出即可
+- `user_data.json` 是个人数据，已加入 `.gitignore`；旧版曾用它导入学习记录
+- 当前状态：APK 不打包学习数据，`USER_DATA_VERSION` 会在升级时清空一次旧记录；练习历史已改为打卡日历
 - 新增 Node + fake-indexeddb 冒烟测试，本地题库、预判、答题、统计、收藏、每日一练、错题、复习和匹配器全部通过
-- 当前机器没有 Android SDK/ADB，`npx cap sync` 已通过，但 APK 需要安装 Android Studio 后生成
+- 本机已安装 Android SDK Platform 36 + JDK 21，`assembleDebug` 成功，APK 已生成
+
+### 六、移动端界面重做与空数据启动
+
+- 顶部 7 个标签改为底部 5 个 Tab：答题 / 每日 / 复习 / 错题 / 我的；收藏夹和打卡日历收进“我的”
+- 每日一练增加环形进度：完成题数、百分比、正确率实时更新
+- “我的”页增加总正确率环形图、累计答题 / 答对 / 连续打卡、掌握度彩色进度条、各模块正确率卡片
+- 打卡历史改为月历：已完成绿色 ✓、进行中黄色圆点、今天紫色描边；支持左右切月，点日期查看当天逐题对错
+- 配色按模块区分：计网蓝、操作系统紫、MySQL 金、Redis 红；答题结果、错题、收藏、历史统一卡片风格
+- 修复错题 / 收藏删除按钮：`question_id` 是字符串 `code`，原模板未加引号，点击会触发 JS 错误；已改为 `removeWrong('network-0041')` 形式
+- APK 不再打包 `user_data.json`；新增 `USER_DATA_VERSION = "clean-2026-10-18"`，首次安装或旧版升级时清空一次答题 / 错题 / 收藏 / 进度 / 每日练习，之后正常使用不再重复清空
+- 后端 `interview.db` 保留原有 211 条记录，仅作为 Web 版和调试参考；APK 不读取后端数据库
+- 构建环境：Android SDK Platform 36 + JDK 21（JBR）+ Gradle 8.14.3；`mobile/android/build.gradle` 增加阿里云 Maven 镜像，解决 Google Maven / Maven Central 的 TLS 握手失败
+- 验证：后端 97 个测试通过；`npm run smoke` 通过；390 宽 Chrome/Puppeteer 覆盖答题、每日环形、复习、错题、我的统计、收藏、历史日历；模拟旧数据升级后 `total=0`、每日一练 `0/5`
+- 生成 debug APK 约 4.2 MB，已用 `apksigner` 验证签名；APK 内确认不含 `user_data.json`
 
 ---
 

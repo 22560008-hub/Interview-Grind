@@ -1,8 +1,10 @@
 node_modules/
 android/.gradle/
+android/.idea/
 android/build/
 android/app/build/
 android/local.properties
+*.iml
 *.apk
 *.aab
 
@@ -11,3 +13,6 @@ www/data/user_data.json
 
 # Capacitor 构建时从 www 复制，构建前重新 sync 即可
 android/app/src/main/assets/public/
+
+# 本地 UI 预览截图
+ui-*.png
