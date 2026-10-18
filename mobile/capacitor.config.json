@@ -1,0 +1,8 @@
+{
+  "appId": "com.interviewgrind.app",
+  "appName": "面试八股",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}

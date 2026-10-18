@@ -63,30 +63,44 @@
 interview-app/
 ├── README.md                     # 项目说明（本文件）
 ├── DEV_LOG.md                    # 开发日志：架构说明、踩坑记录、路线图
-└── backend/
-    ├── app/
-    │   ├── main.py               # FastAPI 入口：建表、CORS、路由与静态文件挂载
-    │   ├── core/                 # 基础设施
-    │   │   ├── config.py         # 配置项（应用名、数据库地址）
-    │   │   ├── constants.py      # 模块 / 题型统一枚举
-    │   │   ├── database.py       # 数据库连接 / 会话 / Base / 旧库升级
-    │   │   └── key_point_aliases.py  # 关键点术语口径（强别名 / 弱别名）
-    │   ├── models/               # ORM 数据模型（7 张表）
-    │   ├── schemas/              # Pydantic 请求 / 响应模型
-    │   ├── services/             # 业务逻辑层（抽题、判分、统计、复习……）
-    │   │   └── key_point_matcher.py  # 关键点归一化、别名、否定与疑似匹配
-    │   └── api/                  # 路由层（题目、作答、错题、收藏、统计、每日一练、复习）
-    ├── scripts/
-    │   ├── seed.py               # 题库种子数据（224 道，幂等同步）
-    │   ├── legacy_questions.py   # 旧题学习记录合并（一次性迁移）
-    │   └── check_key_points.py   # 关键点匹配自检 / 调试工具
-    ├── static/
-    │   └── index.html            # 前端单页应用
-    ├── tests/                    # pytest 测试
-    ├── .env.example              # 环境变量示例
-    ├── requirements.txt          # 运行依赖
-    └── requirements-dev.txt      # 开发 / 测试依赖
+├── backend/                      # FastAPI + SQLite + Web 版
+│   ├── app/                      # 分层代码（api / services / models）
+│   ├── scripts/
+│   │   ├── seed.py               # 题库种子数据（224 道）
+│   │   ├── export_app_data.py    # 导出 APK 用的题库 / 别名 / 进度 JSON
+│   │   └── check_key_points.py   # 关键点匹配自检
+│   ├── static/index.html         # Web 单页应用
+│   └── tests/                    # pytest 测试
+└── mobile/                       # Android 单机版（Capacitor）
+    ├── www/                      # Web UI + local-api.js + 题库 JSON
+    ├── android/                  # Capacitor 生成的 Android 工程
+    ├── scripts/                  # 本地 API 冒烟测试
+    └── README.md                 # 单机版构建说明
 ```
+
+> `mobile/` 是 Android 单机版：没有服务器、域名和登录，数据存在 IndexedDB。
+> `backend/` 保留为题库内容源、Web 版和调试工具；APK 运行时不依赖它。
+
+## Android 单机版（当前主推）
+
+```bash
+# 1. 导出题库和当前学习进度（user_data.json 是个人数据，不会提交 Git）
+cd backend
+python -m scripts.export_app_data --with-user-data
+
+# 2. 本地验证本地 API
+cd ../mobile
+npm install
+npm run smoke
+
+# 3. 同步到 Android 工程
+npx cap sync android
+
+# 4. 用 Android Studio 打开并打 APK
+npx cap open android
+```
+
+构建细节见 [mobile/README.md](mobile/README.md)。当前机器没有 Android SDK，APK 需要在装有 Android Studio 的环境里生成。
 
 分层调用链：
 
@@ -278,6 +292,15 @@ pytest
 其中题库生命周期相关的测试覆盖：全字段同步、删除题目的软停用与恢复、按 `code` 保留学习进度、旧题记录合并、停用题不进入抽题 / 复习 / 每日一练 / 统计 / 错题本 / 收藏。
 
 关键点匹配相关的测试覆盖：全半角 / 空格 / 中文数字归一化、同义词与缩写、英文单词边界、否定句、顿号小句边界、疑似覆盖，以及 40 道简答题参考答案的关键点回归。当前测试全部通过。
+
+Android 单机版另有独立冒烟测试：
+
+```bash
+cd mobile
+npm run smoke
+```
+
+覆盖本地题库、简答预判、答题、统计、收藏、每日一练、错题、复习和关键点匹配。
 
 ---
 

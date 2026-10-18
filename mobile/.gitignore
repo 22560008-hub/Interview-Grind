@@ -1,0 +1,13 @@
+node_modules/
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+*.apk
+*.aab
+
+# 个人学习数据，不提交；构建前本地导出即可
+www/data/user_data.json
+
+# Capacitor 构建时从 www 复制，构建前重新 sync 即可
+android/app/src/main/assets/public/

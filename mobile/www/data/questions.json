@@ -1,0 +1,4090 @@
+[
+  {
+    "id": "os-0006",
+    "code": "os-0006",
+    "module": "os",
+    "chapter": "进程与线程",
+    "type": "short_answer",
+    "stem": "产生死锁的四个必要条件是什么？",
+    "options": null,
+    "answer": "互斥、持有并等待、不可剥夺、循环等待。四者同时成立才可能死锁。",
+    "key_points": [
+      "互斥",
+      "持有并等待",
+      "不可剥夺",
+      "循环等待"
+    ],
+    "explanation": "互斥、持有并等待、不可剥夺、循环等待。四者同时成立才可能死锁。",
+    "difficulty": 1
+  },
+  {
+    "id": "network-0007",
+    "code": "network-0007",
+    "module": "network",
+    "chapter": "网络模型",
+    "type": "choice",
+    "stem": "TCP/IP 四层模型从上到下的正确顺序是？",
+    "options": {
+      "A": "应用层、传输层、网络层、网络接口层",
+      "B": "应用层、网络层、传输层、网络接口层",
+      "C": "传输层、应用层、网络层、物理层",
+      "D": "网络层、传输层、应用层、网络接口层"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "TCP/IP 四层依次为应用层、传输层、网络层和网络接口层。",
+    "difficulty": 1
+  },
+  {
+    "id": "network-0008",
+    "code": "network-0008",
+    "module": "network",
+    "chapter": "网络模型",
+    "type": "choice",
+    "stem": "在 TCP/IP 模型中，负责端到端进程通信的是哪一层？",
+    "options": {
+      "A": "应用层",
+      "B": "传输层",
+      "C": "网络层",
+      "D": "网络接口层"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "TCP、UDP 位于传输层，通过端口标识应用进程。",
+    "difficulty": 1
+  },
+  {
+    "id": "network-0009",
+    "code": "network-0009",
+    "module": "network",
+    "chapter": "网络模型",
+    "type": "choice",
+    "stem": "路由器转发 IP 数据报时主要工作在哪一层？",
+    "options": {
+      "A": "应用层",
+      "B": "传输层",
+      "C": "网络层",
+      "D": "会话层"
+    },
+    "answer": "C",
+    "key_points": null,
+    "explanation": "路由器依据 IP 地址和路由表在网络层转发数据报。",
+    "difficulty": 1
+  },
+  {
+    "id": "network-0010",
+    "code": "network-0010",
+    "module": "network",
+    "chapter": "网络模型",
+    "type": "choice",
+    "stem": "数据在发送端经过协议栈时通常发生什么？",
+    "options": {
+      "A": "逐层去除首部",
+      "B": "逐层封装首部",
+      "C": "只添加 IP 首部",
+      "D": "只添加以太网首部"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "发送时自上而下封装，接收时自下而上解封装。",
+    "difficulty": 1
+  },
+  {
+    "id": "network-0011",
+    "code": "network-0011",
+    "module": "network",
+    "chapter": "网络模型",
+    "type": "short_answer",
+    "stem": "简述 MAC 地址与 IP 地址在通信中的分工。",
+    "options": null,
+    "answer": "IP 地址用于跨网络的逻辑寻址和路由；MAC 地址用于同一链路上的帧交付，每经过一个路由器，链路层首部中的源、目的 MAC 通常都会改变。",
+    "key_points": [
+      "IP 地址",
+      "逻辑寻址",
+      "路由",
+      "MAC 地址",
+      "帧交付"
+    ],
+    "explanation": "IP 解决端到端路由，MAC 解决一跳内交付。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0012",
+    "code": "network-0012",
+    "module": "network",
+    "chapter": "网络模型",
+    "type": "choice",
+    "stem": "端口号的主要作用是什么？",
+    "options": {
+      "A": "标识主机",
+      "B": "标识网络设备",
+      "C": "标识主机上的应用进程",
+      "D": "标识网卡厂商"
+    },
+    "answer": "C",
+    "key_points": null,
+    "explanation": "IP 定位主机，端口定位主机上的具体进程或服务。",
+    "difficulty": 1
+  },
+  {
+    "id": "network-0013",
+    "code": "network-0013",
+    "module": "network",
+    "chapter": "访问网页",
+    "type": "short_answer",
+    "stem": "从浏览器输入 URL 到页面显示，按顺序列出主要网络步骤。",
+    "options": null,
+    "answer": "解析 URL；查询 DNS 得到服务器 IP；通过 ARP 等获得下一跳 MAC；建立 TCP 连接（HTTPS 还要进行 TLS 握手）；发送 HTTP 请求；服务器响应；浏览器解析并渲染页面。",
+    "key_points": [
+      "DNS",
+      "ARP",
+      "TCP",
+      "TLS",
+      "HTTP",
+      "渲染"
+    ],
+    "explanation": "回答应覆盖 DNS、链路寻址、传输层连接、应用层请求响应和浏览器渲染。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0014",
+    "code": "network-0014",
+    "module": "network",
+    "chapter": "访问网页",
+    "type": "choice",
+    "stem": "DNS 最主要的功能是？",
+    "options": {
+      "A": "将域名解析为 IP 地址",
+      "B": "给主机自动分配 IP",
+      "C": "加密 HTTP 报文",
+      "D": "检测网络时延"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "DNS 提供域名到 IP 等资源记录的查询。",
+    "difficulty": 1
+  },
+  {
+    "id": "network-0015",
+    "code": "network-0015",
+    "module": "network",
+    "chapter": "访问网页",
+    "type": "choice",
+    "stem": "本机不知道同一网段目标的 MAC 地址时通常使用什么协议？",
+    "options": {
+      "A": "DNS",
+      "B": "ARP",
+      "C": "ICMP",
+      "D": "DHCP"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "IPv4 中 ARP 通过广播请求查询目标 IPv4 地址对应的 MAC。",
+    "difficulty": 1
+  },
+  {
+    "id": "network-0016",
+    "code": "network-0016",
+    "module": "network",
+    "chapter": "访问网页",
+    "type": "choice",
+    "stem": "目标 IP 与主机不在同一子网时，以太网帧的目的 MAC 通常是谁？",
+    "options": {
+      "A": "目标服务器",
+      "B": "DNS 服务器",
+      "C": "默认网关",
+      "D": "本机网卡"
+    },
+    "answer": "C",
+    "key_points": null,
+    "explanation": "跨网段报文先交给默认网关，因此首跳帧的目的 MAC 是网关接口的 MAC。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0017",
+    "code": "network-0017",
+    "module": "network",
+    "chapter": "访问网页",
+    "type": "short_answer",
+    "stem": "DNS 查询中递归查询与迭代查询有什么区别？",
+    "options": null,
+    "answer": "递归查询要求被查询服务器给出最终答案或错误；迭代查询允许服务器返回下一步应查询的 DNS 服务器地址。客户端到本地 DNS 常用递归，本地 DNS 向根、顶级域、权威服务器常用迭代。",
+    "key_points": [
+      "递归查询",
+      "最终答案",
+      "迭代查询",
+      "下一步"
+    ],
+    "explanation": "递归查询要求被查询服务器给出最终答案或错误；迭代查询允许服务器返回下一步应查询的 DNS 服务器地址。客户端到本地 DNS 常用递归，本地 DNS 向根、顶级域、权威服务器常用迭代。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0018",
+    "code": "network-0018",
+    "module": "network",
+    "chapter": "Linux网络",
+    "type": "choice",
+    "stem": "Linux 接收网卡数据包时，硬中断处理程序通常应当怎样工作？",
+    "options": {
+      "A": "完成全部协议栈处理",
+      "B": "尽快完成必要工作并把后续处理交给软中断/NAPI",
+      "C": "直接执行用户进程代码",
+      "D": "把数据写入磁盘"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "硬中断应尽量短，较重的数据包处理通常延后到软中断或 NAPI。",
+    "difficulty": 3
+  },
+  {
+    "id": "network-0019",
+    "code": "network-0019",
+    "module": "network",
+    "chapter": "Linux网络",
+    "type": "choice",
+    "stem": "应用程序通过 socket 读取网络数据时，数据通常从哪里复制到哪里？",
+    "options": {
+      "A": "用户空间到内核空间",
+      "B": "内核 socket 接收缓冲区到用户空间",
+      "C": "磁盘到网卡",
+      "D": "CPU 寄存器到磁盘"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "协议栈把数据放入 socket 接收缓冲区，read/recv 再复制给用户空间。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0020",
+    "code": "network-0020",
+    "module": "network",
+    "chapter": "Linux网络",
+    "type": "short_answer",
+    "stem": "简述 Linux 发送网络包的主要路径。",
+    "options": null,
+    "answer": "应用调用 send/write 将数据复制到内核 socket 发送缓冲区；传输层和网络层添加首部并路由；邻居子系统确定下一跳链路地址；驱动把 skb 放入网卡发送队列；网卡 DMA 读取并发送。",
+    "key_points": [
+      "socket",
+      "传输层",
+      "网络层",
+      "路由",
+      "发送队列",
+      "DMA"
+    ],
+    "explanation": "应用调用 send/write 将数据复制到内核 socket 发送缓冲区；传输层和网络层添加首部并路由；邻居子系统确定下一跳链路地址；驱动把 skb 放入网卡发送队列；网卡 DMA 读取并发送。",
+    "difficulty": 3
+  },
+  {
+    "id": "network-0021",
+    "code": "network-0021",
+    "module": "network",
+    "chapter": "Linux网络",
+    "type": "choice",
+    "stem": "网卡使用 DMA 的主要价值是什么？",
+    "options": {
+      "A": "替代 IP 路由",
+      "B": "让设备可直接与内存交换数据，减少 CPU 搬运",
+      "C": "保证 TCP 不丢包",
+      "D": "完成域名解析"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "DMA 降低 CPU 在设备与内存之间搬运数据的负担。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0022",
+    "code": "network-0022",
+    "module": "network",
+    "chapter": "Linux网络",
+    "type": "choice",
+    "stem": "socket 在网络编程中的典型作用是？",
+    "options": {
+      "A": "只表示网卡",
+      "B": "作为应用与内核网络协议栈交互的接口",
+      "C": "替代路由表",
+      "D": "保存 DNS 区域文件"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "socket 是进程使用网络协议栈的编程接口和内核对象。",
+    "difficulty": 1
+  },
+  {
+    "id": "network-0023",
+    "code": "network-0023",
+    "module": "network",
+    "chapter": "HTTP",
+    "type": "choice",
+    "stem": "HTTP/1.1 默认连接方式通常是？",
+    "options": {
+      "A": "每个请求都必须新建连接",
+      "B": "持久连接",
+      "C": "只使用 UDP",
+      "D": "只能半双工"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "HTTP/1.1 默认启用持久连接，可在同一 TCP 连接上发送多个请求。",
+    "difficulty": 1
+  },
+  {
+    "id": "network-0024",
+    "code": "network-0024",
+    "module": "network",
+    "chapter": "HTTP",
+    "type": "choice",
+    "stem": "HTTP GET 与 POST 的语义差异中，较准确的是？",
+    "options": {
+      "A": "GET 通常用于获取资源，POST 通常用于提交处理",
+      "B": "POST 一定比 GET 安全",
+      "C": "GET 不能携带参数",
+      "D": "POST 一定是幂等的"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "方法语义比报文能否带 body 更关键；是否加密由 HTTPS 决定。",
+    "difficulty": 1
+  },
+  {
+    "id": "network-0025",
+    "code": "network-0025",
+    "module": "network",
+    "chapter": "HTTP",
+    "type": "choice",
+    "stem": "下列哪个 HTTP 状态码表示永久重定向？",
+    "options": {
+      "A": "200",
+      "B": "301",
+      "C": "404",
+      "D": "500"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "301 表示 Moved Permanently；302/307/308也与重定向有关但语义不同。",
+    "difficulty": 1
+  },
+  {
+    "id": "network-0026",
+    "code": "network-0026",
+    "module": "network",
+    "chapter": "HTTP",
+    "type": "choice",
+    "stem": "HTTP 缓存协商中，服务器可用哪个状态码表示资源未修改？",
+    "options": {
+      "A": "101",
+      "B": "204",
+      "C": "304",
+      "D": "416"
+    },
+    "answer": "C",
+    "key_points": null,
+    "explanation": "条件请求命中协商缓存时常返回 304，不重复传输响应体。",
+    "difficulty": 1
+  },
+  {
+    "id": "network-0027",
+    "code": "network-0027",
+    "module": "network",
+    "chapter": "HTTP",
+    "type": "choice",
+    "stem": "Cookie 与 Session 的典型区别是什么？",
+    "options": {
+      "A": "二者都只存服务器",
+      "B": "Cookie 通常存客户端，Session 状态通常存服务器",
+      "C": "Cookie 只能用于 HTTPS",
+      "D": "Session 不需要标识符"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "常见做法是浏览器保存会话标识 Cookie，服务端依据标识查找 Session。",
+    "difficulty": 1
+  },
+  {
+    "id": "network-0028",
+    "code": "network-0028",
+    "module": "network",
+    "chapter": "HTTP",
+    "type": "choice",
+    "stem": "HTTP/1.1 队头阻塞通常指什么？",
+    "options": {
+      "A": "同一连接中前面的响应未完成会阻碍后续响应",
+      "B": "路由器不能转发 UDP",
+      "C": "DNS 缓存失效",
+      "D": "TLS 证书过期"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "HTTP/1.1 管线化仍要求响应按序返回，前序响应慢会阻塞后续响应。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0029",
+    "code": "network-0029",
+    "module": "network",
+    "chapter": "HTTP",
+    "type": "choice",
+    "stem": "HTTP/2 多路复用的基础单位是什么？",
+    "options": {
+      "A": "进程",
+      "B": "帧和流",
+      "C": "IP 分片",
+      "D": "文件描述符"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "HTTP/2 将消息拆成二进制帧，在一条连接的多个流间交错传输。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0030",
+    "code": "network-0030",
+    "module": "network",
+    "chapter": "HTTP",
+    "type": "choice",
+    "stem": "HTTP/2 是否彻底消除了所有队头阻塞？",
+    "options": {
+      "A": "是",
+      "B": "否，TCP 层丢包仍可能阻塞整条连接",
+      "C": "否，因为它只能使用 UDP",
+      "D": "是，但仅限明文"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "HTTP/2 解决应用层请求的队头阻塞，但共享 TCP 连接仍受 TCP 有序交付影响。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0031",
+    "code": "network-0031",
+    "module": "network",
+    "chapter": "HTTP",
+    "type": "choice",
+    "stem": "HTTP/3 主要基于哪个传输协议？",
+    "options": {
+      "A": "TCP",
+      "B": "SCTP",
+      "C": "QUIC（基于 UDP）",
+      "D": "ICMP"
+    },
+    "answer": "C",
+    "key_points": null,
+    "explanation": "HTTP/3 使用 QUIC，在用户态实现可靠传输、多路复用和 TLS 1.3。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0032",
+    "code": "network-0032",
+    "module": "network",
+    "chapter": "HTTP",
+    "type": "short_answer",
+    "stem": "RPC 与 HTTP 是什么关系，为什么内部服务常使用 RPC？",
+    "options": null,
+    "answer": "RPC 是远程调用的抽象，可运行在 TCP、HTTP/2 等传输之上；内部服务常选 RPC 以获得明确的接口定义、代码生成、高效序列化、服务治理和较低协议开销。HTTP 则通用性和生态兼容性更好。",
+    "key_points": [
+      "远程调用",
+      "HTTP/2",
+      "接口定义",
+      "代码生成",
+      "序列化",
+      "服务治理"
+    ],
+    "explanation": "RPC 是远程调用的抽象，可运行在 TCP、HTTP/2 等传输之上；内部服务常选 RPC 以获得明确的接口定义、代码生成、高效序列化、服务治理和较低协议开销。HTTP 则通用性和生态兼容性更好。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0033",
+    "code": "network-0033",
+    "module": "network",
+    "chapter": "HTTP",
+    "type": "short_answer",
+    "stem": "WebSocket 相比普通 HTTP 请求响应模式解决了什么问题？",
+    "options": null,
+    "answer": "WebSocket 在一次 HTTP Upgrade 握手后建立持久、全双工连接，服务端可主动推送消息，适合聊天、实时通知等双向低延迟场景。",
+    "key_points": [
+      "HTTP Upgrade",
+      "持久连接",
+      "全双工",
+      "服务端推送",
+      "低延迟"
+    ],
+    "explanation": "WebSocket 在一次 HTTP Upgrade 握手后建立持久、全双工连接，服务端可主动推送消息，适合聊天、实时通知等双向低延迟场景。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0034",
+    "code": "network-0034",
+    "module": "network",
+    "chapter": "HTTP",
+    "type": "choice",
+    "stem": "优化 HTTP/1.1 性能时，下列哪项通常有效？",
+    "options": {
+      "A": "禁止缓存",
+      "B": "启用持久连接、缓存与内容压缩",
+      "C": "每个资源强制串行新建 TCP",
+      "D": "关闭 CDN"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "复用连接、减少传输量和就近分发都能降低延迟。",
+    "difficulty": 1
+  },
+  {
+    "id": "network-0035",
+    "code": "network-0035",
+    "module": "network",
+    "chapter": "HTTPS",
+    "type": "choice",
+    "stem": "HTTPS 提供机密性、完整性和身份认证主要依靠什么？",
+    "options": {
+      "A": "ARP",
+      "B": "TLS",
+      "C": "ICMP",
+      "D": "NAT"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "HTTPS 是运行在 TLS 安全通道之上的 HTTP。",
+    "difficulty": 1
+  },
+  {
+    "id": "network-0036",
+    "code": "network-0036",
+    "module": "network",
+    "chapter": "HTTPS",
+    "type": "choice",
+    "stem": "TLS 中使用非对称密码的典型目的是什么？",
+    "options": {
+      "A": "加密所有大流量数据",
+      "B": "身份认证和安全协商密钥",
+      "C": "替代哈希",
+      "D": "压缩响应体"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "非对称密码适合认证和密钥交换，后续大数据通常使用高效的对称加密。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0037",
+    "code": "network-0037",
+    "module": "network",
+    "chapter": "HTTPS",
+    "type": "choice",
+    "stem": "浏览器验证服务器证书时最关键的信任起点通常是什么？",
+    "options": {
+      "A": "本机 hosts 文件",
+      "B": "受信任根 CA 证书",
+      "C": "服务器 MAC 地址",
+      "D": "HTTP Cookie"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "浏览器/系统预置信任根，通过证书链验证站点证书。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0038",
+    "code": "network-0038",
+    "module": "network",
+    "chapter": "HTTPS",
+    "type": "choice",
+    "stem": "相较静态 RSA 密钥交换，ECDHE 的重要安全优势是什么？",
+    "options": {
+      "A": "不需要证书",
+      "B": "提供前向保密",
+      "C": "不使用对称加密",
+      "D": "不会发生丢包"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "ECDHE 使用临时密钥，即使服务器长期私钥日后泄露，历史会话通常仍不能被解密。",
+    "difficulty": 3
+  },
+  {
+    "id": "network-0039",
+    "code": "network-0039",
+    "module": "network",
+    "chapter": "HTTPS",
+    "type": "short_answer",
+    "stem": "简述 TLS 1.3 握手为何通常比 TLS 1.2 更快。",
+    "options": null,
+    "answer": "TLS 1.3 精简了算法和握手流程，首次连接通常 1-RTT 即可完成密钥协商；恢复会话还可使用 0-RTT（但需防重放）。",
+    "key_points": [
+      "精简",
+      "1-RTT",
+      "密钥协商",
+      "会话恢复",
+      "0-RTT",
+      "重放"
+    ],
+    "explanation": "TLS 1.3 精简了算法和握手流程，首次连接通常 1-RTT 即可完成密钥协商；恢复会话还可使用 0-RTT（但需防重放）。",
+    "difficulty": 3
+  },
+  {
+    "id": "network-0040",
+    "code": "network-0040",
+    "module": "network",
+    "chapter": "HTTPS",
+    "type": "choice",
+    "stem": "数字签名主要保证什么？",
+    "options": {
+      "A": "数据压缩",
+      "B": "发送方身份与内容未被篡改",
+      "C": "隐藏 IP 地址",
+      "D": "提高带宽"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "验证者用公钥验证签名，从而确认签名者持有私钥且摘要未被修改。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0041",
+    "code": "network-0041",
+    "module": "network",
+    "chapter": "TCP",
+    "type": "choice",
+    "stem": "TCP 建立连接使用三次握手的核心原因之一是？",
+    "options": {
+      "A": "交换 HTTP Cookie",
+      "B": "确认双方收发能力并同步初始序列号",
+      "C": "分配 MAC 地址",
+      "D": "避免所有丢包"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "三次交互能确认双向通信能力并同步序列号，避免旧连接请求造成错误连接。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0042",
+    "code": "network-0042",
+    "module": "network",
+    "chapter": "TCP",
+    "type": "choice",
+    "stem": "TCP 常见四次挥手的原因是？",
+    "options": {
+      "A": "TCP 是全双工，两个方向需分别关闭",
+      "B": "必须等待 DNS",
+      "C": "IP 要释放地址",
+      "D": "网卡一次只能发一个 FIN"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "收到对方 FIN 只表示对方不再发送，本端可能仍有数据要发送，因此 ACK 与 FIN 常分开发。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0043",
+    "code": "network-0043",
+    "module": "network",
+    "chapter": "TCP",
+    "type": "choice",
+    "stem": "主动关闭方保持 TIME_WAIT 的主要作用不包括哪一项？",
+    "options": {
+      "A": "保证最后 ACK 丢失时可重传",
+      "B": "让旧连接报文在网络中消逝",
+      "C": "永久占用端口",
+      "D": "避免相同四元组的新连接受旧报文影响"
+    },
+    "answer": "C",
+    "key_points": null,
+    "explanation": "TIME_WAIT 是有限时间状态，通常持续 2MSL，并非永久占用端口。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0044",
+    "code": "network-0044",
+    "module": "network",
+    "chapter": "TCP",
+    "type": "choice",
+    "stem": "TCP 快速重传通常由什么触发？",
+    "options": {
+      "A": "收到三个重复 ACK",
+      "B": "收到一个 SYN",
+      "C": "窗口变为零",
+      "D": "应用关闭文件"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "发送端收到三个重复 ACK 后可在超时前重传疑似丢失报文段。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0045",
+    "code": "network-0045",
+    "module": "network",
+    "chapter": "TCP",
+    "type": "choice",
+    "stem": "TCP 流量控制主要依赖哪个窗口？",
+    "options": {
+      "A": "接收窗口 rwnd",
+      "B": "拥塞窗口 cwnd",
+      "C": "路由窗口",
+      "D": "DNS 窗口"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "接收端通告 rwnd，限制发送端未确认数据量，防止接收缓冲区溢出。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0046",
+    "code": "network-0046",
+    "module": "network",
+    "chapter": "TCP",
+    "type": "choice",
+    "stem": "TCP 拥塞控制中的慢启动会怎样调整拥塞窗口？",
+    "options": {
+      "A": "每个 RTT 大致指数增长，直到阈值或拥塞",
+      "B": "始终保持为 1",
+      "C": "每个 RTT 减半",
+      "D": "由接收端固定"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "慢启动阶段每收到 ACK 增长 cwnd，整体上每 RTT 约翻倍。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0047",
+    "code": "network-0047",
+    "module": "network",
+    "chapter": "TCP",
+    "type": "choice",
+    "stem": "TCP 为什么被称为面向字节流？",
+    "options": {
+      "A": "应用写入边界不会作为消息边界保留",
+      "B": "每次只能发送一个字节",
+      "C": "不需要序列号",
+      "D": "只能传文本"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "TCP 提供连续有序字节流，应用必须自行设计消息长度或分隔规则。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0048",
+    "code": "network-0048",
+    "module": "network",
+    "chapter": "TCP",
+    "type": "choice",
+    "stem": "TCP 初始序列号应随连接变化，主要是为了？",
+    "options": {
+      "A": "压缩首部",
+      "B": "降低旧报文被新连接误收的风险并增强安全性",
+      "C": "省略 ACK",
+      "D": "允许广播"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "随机化或变化的 ISN 可避免不同连接序列空间轻易重叠。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0049",
+    "code": "network-0049",
+    "module": "network",
+    "chapter": "TCP",
+    "type": "choice",
+    "stem": "半连接队列中主要保存什么？",
+    "options": {
+      "A": "完成三次握手等待 accept 的连接",
+      "B": "收到 SYN、尚未完成握手的连接",
+      "C": "已关闭连接",
+      "D": "UDP 会话"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "SYN 队列保存握手未完成的请求；全连接队列保存握手完成等待 accept 的连接。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0050",
+    "code": "network-0050",
+    "module": "network",
+    "chapter": "TCP",
+    "type": "choice",
+    "stem": "服务端应用暂时没有调用 accept，三次握手还能完成吗？",
+    "options": {
+      "A": "一定不能",
+      "B": "可以，只要监听 socket 和全连接队列可用",
+      "C": "只能完成两次",
+      "D": "会自动改用 UDP"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "握手由内核完成；accept 从已完成连接队列取走连接。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0051",
+    "code": "network-0051",
+    "module": "network",
+    "chapter": "TCP",
+    "type": "choice",
+    "stem": "TCP Keepalive 与 HTTP Keep-Alive 的区别是？",
+    "options": {
+      "A": "完全相同",
+      "B": "前者探测空闲 TCP 对端，后者复用 HTTP 连接",
+      "C": "前者属于 HTTP，后者属于 IP",
+      "D": "二者都只用于加密"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "两者层次与目标不同：TCP 保活探测连接，HTTP 持久连接减少重复建连。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0052",
+    "code": "network-0052",
+    "module": "network",
+    "chapter": "TCP",
+    "type": "short_answer",
+    "stem": "为什么仅使用 TCP 也不能保证业务数据绝对不丢？",
+    "options": null,
+    "answer": "TCP 只保证数据可靠送达对端内核接收缓冲区。若对端应用尚未持久化就崩溃、业务处理失败或确认语义设计不当，业务数据仍可能丢失，因此应用层还需确认、重试、幂等和持久化。",
+    "key_points": [
+      "接收缓冲区",
+      "持久化",
+      "业务处理",
+      "应用层确认",
+      "重试",
+      "幂等"
+    ],
+    "explanation": "TCP 只保证数据可靠送达对端内核接收缓冲区。若对端应用尚未持久化就崩溃、业务处理失败或确认语义设计不当，业务数据仍可能丢失，因此应用层还需确认、重试、幂等和持久化。",
+    "difficulty": 3
+  },
+  {
+    "id": "network-0053",
+    "code": "network-0053",
+    "module": "network",
+    "chapter": "TCP",
+    "type": "short_answer",
+    "stem": "主机断电与仅进程崩溃时，已有 TCP 连接的表现有何不同？",
+    "options": null,
+    "answer": "进程崩溃时操作系统通常会关闭 socket 并发送 FIN 或 RST；主机突然断电无法发送关闭报文，对端只能在发送重传超时、保活探测或应用超时后发现。",
+    "key_points": [
+      "FIN",
+      "RST",
+      "断电",
+      "重传超时",
+      "保活",
+      "应用超时"
+    ],
+    "explanation": "进程崩溃时操作系统通常会关闭 socket 并发送 FIN 或 RST；主机突然断电无法发送关闭报文，对端只能在发送重传超时、保活探测或应用超时后发现。",
+    "difficulty": 3
+  },
+  {
+    "id": "network-0054",
+    "code": "network-0054",
+    "module": "network",
+    "chapter": "TCP",
+    "type": "choice",
+    "stem": "拔掉网线后，本机内核中的 TCP 连接是否会立刻消失？",
+    "options": {
+      "A": "一定立即消失",
+      "B": "通常不会，连接状态仍在，恢复后可能继续通信",
+      "C": "自动改为 UDP",
+      "D": "立即进入 LISTEN"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "TCP 连接是内核状态；链路中断不等于立刻关闭，最终结果取决于中断时长、重传和超时。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0055",
+    "code": "network-0055",
+    "module": "network",
+    "chapter": "TCP",
+    "type": "choice",
+    "stem": "TCP 和 UDP 能否绑定相同的本地端口号？",
+    "options": {
+      "A": "不能，端口全局唯一",
+      "B": "可以，因为它们属于不同传输层协议命名空间",
+      "C": "仅 Windows 可以",
+      "D": "仅客户端可以"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "连接标识包含传输协议，因此 TCP 80 与 UDP 80 可以同时存在。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0056",
+    "code": "network-0056",
+    "module": "network",
+    "chapter": "TCP",
+    "type": "choice",
+    "stem": "TCP 四次挥手在什么情况下可能表现为三个报文？",
+    "options": {
+      "A": "被动方把 ACK 与 FIN 合并发送",
+      "B": "主动方不发 FIN",
+      "C": "省略最后 ACK",
+      "D": "使用 IPv6 时"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "若被动方收到 FIN 后也立即关闭，可将对 FIN 的 ACK 与自己的 FIN 合并。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0057",
+    "code": "network-0057",
+    "module": "network",
+    "chapter": "TCP",
+    "type": "choice",
+    "stem": "发送窗口的实际上限通常取什么？",
+    "options": {
+      "A": "max(rwnd, cwnd)",
+      "B": "min(rwnd, cwnd)",
+      "C": "仅 MSS",
+      "D": "固定 65535 字节"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "发送端同时受接收方流量控制窗口和网络拥塞窗口约束。",
+    "difficulty": 3
+  },
+  {
+    "id": "network-0058",
+    "code": "network-0058",
+    "module": "network",
+    "chapter": "UDP",
+    "type": "choice",
+    "stem": "UDP 的主要特点是？",
+    "options": {
+      "A": "面向连接且可靠",
+      "B": "无连接、面向报文、协议开销小",
+      "C": "保证有序到达",
+      "D": "自带拥塞控制"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "UDP 保留应用报文边界，但不保证到达、顺序和去重。",
+    "difficulty": 1
+  },
+  {
+    "id": "network-0059",
+    "code": "network-0059",
+    "module": "network",
+    "chapter": "UDP",
+    "type": "short_answer",
+    "stem": "若要基于 UDP 实现可靠传输，通常需要补充哪些机制？",
+    "options": null,
+    "answer": "需要按需求增加连接管理、序列号、确认与重传、超时估计、乱序重排、流量控制和拥塞控制；QUIC 是典型实例。",
+    "key_points": [
+      "序列号",
+      "确认",
+      "重传",
+      "乱序重排",
+      "流量控制",
+      "拥塞控制"
+    ],
+    "explanation": "需要按需求增加连接管理、序列号、确认与重传、超时估计、乱序重排、流量控制和拥塞控制；QUIC 是典型实例。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0060",
+    "code": "network-0060",
+    "module": "network",
+    "chapter": "UDP",
+    "type": "choice",
+    "stem": "音视频实时传输常选择 UDP 的重要原因是？",
+    "options": {
+      "A": "绝不丢包",
+      "B": "可由应用控制时延、重传和拥塞策略，避免 TCP 队头阻塞",
+      "C": "不需要 IP",
+      "D": "天然加密"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "实时业务通常更看重时延，允许应用按媒体特性决定是否重传。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0061",
+    "code": "network-0061",
+    "module": "network",
+    "chapter": "IP与ICMP",
+    "type": "choice",
+    "stem": "IPv4 子网掩码的作用是？",
+    "options": {
+      "A": "区分 IP 地址中的网络号和主机号",
+      "B": "加密 IP 包",
+      "C": "指定 TCP 端口",
+      "D": "保存域名"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "掩码与 IP 按位与可得到网络地址。",
+    "difficulty": 1
+  },
+  {
+    "id": "network-0062",
+    "code": "network-0062",
+    "module": "network",
+    "chapter": "IP与ICMP",
+    "type": "choice",
+    "stem": "路由器选择下一跳时通常依据什么原则？",
+    "options": {
+      "A": "最短 MAC 地址",
+      "B": "最长前缀匹配",
+      "C": "最小端口号",
+      "D": "最大 TTL"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "多条路由均匹配时，选择网络前缀最长、最具体的路由。",
+    "difficulty": 2
+  },
+  {
+    "id": "network-0063",
+    "code": "network-0063",
+    "module": "network",
+    "chapter": "IP与ICMP",
+    "type": "choice",
+    "stem": "ping 主要使用哪类协议报文？",
+    "options": {
+      "A": "TCP SYN",
+      "B": "UDP 数据报",
+      "C": "ICMP Echo Request/Reply",
+      "D": "ARP Reply"
+    },
+    "answer": "C",
+    "key_points": null,
+    "explanation": "ping 通过 ICMP 回显请求和回显应答测试可达性与往返时延。",
+    "difficulty": 1
+  },
+  {
+    "id": "network-0064",
+    "code": "network-0064",
+    "module": "network",
+    "chapter": "IP与ICMP",
+    "type": "choice",
+    "stem": "主机断开外部网络后，为什么通常仍能 ping 通 127.0.0.1？",
+    "options": {
+      "A": "由公网路由器转发",
+      "B": "回环地址由本机协议栈处理，不经过物理网卡",
+      "C": "DNS 缓存代替网络",
+      "D": "ARP 自动应答"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "127.0.0.0/8 是 IPv4 回环网段，报文在本机网络栈内返回。",
+    "difficulty": 1
+  },
+  {
+    "id": "network-0065",
+    "code": "network-0065",
+    "module": "network",
+    "chapter": "IP与ICMP",
+    "type": "choice",
+    "stem": "NAT 最常见的作用是？",
+    "options": {
+      "A": "把域名转换为 IP",
+      "B": "在私网地址与公网地址/端口之间转换",
+      "C": "给 TCP 加密",
+      "D": "检测磁盘故障"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "NAT/PAT 让多个私网主机共享公网地址，也改变端到端可达性。",
+    "difficulty": 1
+  },
+  {
+    "id": "network-0066",
+    "code": "network-0066",
+    "module": "network",
+    "chapter": "IP与ICMP",
+    "type": "short_answer",
+    "stem": "说明 MTU、IP 分片与 TCP MSS 的关系。",
+    "options": null,
+    "answer": "MTU 是链路层一次可承载的最大网络层报文大小；IPv4 数据报超过路径 MTU 可能分片。TCP 在握手中协商 MSS，限制 TCP 负载大小，通常用于避免 IP 分片。",
+    "key_points": [
+      "MTU",
+      "IP 分片",
+      "MSS",
+      "TCP 负载",
+      "避免分片"
+    ],
+    "explanation": "MTU 是链路层一次可承载的最大网络层报文大小；IPv4 数据报超过路径 MTU 可能分片。TCP 在握手中协商 MSS，限制 TCP 负载大小，通常用于避免 IP 分片。",
+    "difficulty": 3
+  },
+  {
+    "id": "os-0067",
+    "code": "os-0067",
+    "module": "os",
+    "chapter": "硬件结构",
+    "type": "choice",
+    "stem": "CPU 执行指令的基本周期通常包括？",
+    "options": {
+      "A": "取指、译码、执行",
+      "B": "编译、链接、运行",
+      "C": "请求、响应、关闭",
+      "D": "寻址、分片、路由"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "CPU 从程序计数器指向的位置取指，译码后由执行单元完成操作。",
+    "difficulty": 1
+  },
+  {
+    "id": "os-0068",
+    "code": "os-0068",
+    "module": "os",
+    "chapter": "硬件结构",
+    "type": "choice",
+    "stem": "CPU Cache 通常利用程序的哪些局部性？",
+    "options": {
+      "A": "时间局部性和空间局部性",
+      "B": "只有网络局部性",
+      "C": "只有磁盘局部性",
+      "D": "不需要局部性"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "近期访问过的数据可能再次访问，相邻数据也往往被连续访问。",
+    "difficulty": 1
+  },
+  {
+    "id": "os-0069",
+    "code": "os-0069",
+    "module": "os",
+    "chapter": "硬件结构",
+    "type": "choice",
+    "stem": "伪共享（false sharing）是指？",
+    "options": {
+      "A": "多线程共享同一变量",
+      "B": "多核修改同一缓存行中的不同变量，导致缓存行频繁失效",
+      "C": "两个进程映射同一文件",
+      "D": "虚拟地址重复"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "即使线程修改不同变量，若它们同属一个缓存行，也会触发一致性流量。",
+    "difficulty": 3
+  },
+  {
+    "id": "os-0070",
+    "code": "os-0070",
+    "module": "os",
+    "chapter": "硬件结构",
+    "type": "choice",
+    "stem": "中断与异常的典型区别是？",
+    "options": {
+      "A": "中断通常由外部设备异步产生，异常由当前指令同步触发",
+      "B": "二者完全相同",
+      "C": "异常只能由网卡产生",
+      "D": "中断一定是错误"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "时钟、网卡等产生硬件中断；除零、缺页、系统调用等与当前指令有关。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0071",
+    "code": "os-0071",
+    "module": "os",
+    "chapter": "硬件结构",
+    "type": "choice",
+    "stem": "用户态程序访问需要特权的操作时，通常通过什么进入内核？",
+    "options": {
+      "A": "系统调用",
+      "B": "普通函数跳转",
+      "C": "DNS 查询",
+      "D": "缓存失效"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "系统调用是用户程序请求内核服务的受控入口。",
+    "difficulty": 1
+  },
+  {
+    "id": "os-0072",
+    "code": "os-0072",
+    "module": "os",
+    "chapter": "硬件结构",
+    "type": "choice",
+    "stem": "大端字节序如何存放多字节数值？",
+    "options": {
+      "A": "低位字节放低地址",
+      "B": "高位字节放低地址",
+      "C": "随机存放",
+      "D": "只存高位字节"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "大端模式先放数值的高位字节，网络字节序也是大端。",
+    "difficulty": 1
+  },
+  {
+    "id": "os-0073",
+    "code": "os-0073",
+    "module": "os",
+    "chapter": "硬件结构",
+    "type": "short_answer",
+    "stem": "为什么 CPU 中需要多级缓存？",
+    "options": null,
+    "answer": "CPU 速度远高于主存。多级缓存用容量小、速度快的 L1/L2 和较大、较慢的 L3 在成本、容量和延迟之间折中，并利用局部性减少平均访存时间。",
+    "key_points": [
+      "CPU",
+      "主存",
+      "L1",
+      "L2",
+      "L3",
+      "局部性"
+    ],
+    "explanation": "CPU 速度远高于主存。多级缓存用容量小、速度快的 L1/L2 和较大、较慢的 L3 在成本、容量和延迟之间折中，并利用局部性减少平均访存时间。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0074",
+    "code": "os-0074",
+    "module": "os",
+    "chapter": "硬件结构",
+    "type": "choice",
+    "stem": "线程数远超 CPU 核数时，过多的 CPU 密集型线程常导致？",
+    "options": {
+      "A": "上下文切换开销增大",
+      "B": "物理内存自动增大",
+      "C": "磁盘不再寻道",
+      "D": "所有线程并行执行"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "可运行线程过多会频繁调度并污染缓存。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0075",
+    "code": "os-0075",
+    "module": "os",
+    "chapter": "内存管理",
+    "type": "choice",
+    "stem": "虚拟内存的核心作用是？",
+    "options": {
+      "A": "让每个进程拥有独立虚拟地址空间并支持按需映射",
+      "B": "增加 CPU 核数",
+      "C": "取消磁盘",
+      "D": "保证永不缺页"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "虚拟内存提供隔离、保护和灵活映射，可配合换页扩展可用空间。",
+    "difficulty": 1
+  },
+  {
+    "id": "os-0076",
+    "code": "os-0076",
+    "module": "os",
+    "chapter": "内存管理",
+    "type": "choice",
+    "stem": "页表的主要作用是？",
+    "options": {
+      "A": "映射虚拟页到物理页框",
+      "B": "映射文件名到目录",
+      "C": "保存线程优先级",
+      "D": "保存网络路由"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "MMU 根据页表完成虚拟地址到物理地址的转换。",
+    "difficulty": 1
+  },
+  {
+    "id": "os-0077",
+    "code": "os-0077",
+    "module": "os",
+    "chapter": "内存管理",
+    "type": "choice",
+    "stem": "TLB 是什么？",
+    "options": {
+      "A": "页表项的高速缓存",
+      "B": "磁盘调度队列",
+      "C": "文件描述符表",
+      "D": "线程控制块"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "TLB 缓存近期使用的地址转换，避免每次访存都遍历多级页表。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0078",
+    "code": "os-0078",
+    "module": "os",
+    "chapter": "内存管理",
+    "type": "choice",
+    "stem": "访问的虚拟页尚未驻留内存时，会触发？",
+    "options": {
+      "A": "缺页异常",
+      "B": "死锁",
+      "C": "网络中断",
+      "D": "文件截断"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "内核处理缺页，建立映射或将页从磁盘读入内存。",
+    "difficulty": 1
+  },
+  {
+    "id": "os-0079",
+    "code": "os-0079",
+    "module": "os",
+    "chapter": "内存管理",
+    "type": "choice",
+    "stem": "Copy-on-Write 的做法是？",
+    "options": {
+      "A": "创建时立即复制所有页",
+      "B": "先共享只读页，发生写入时再复制",
+      "C": "禁止任何写入",
+      "D": "把所有页存入网络"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "fork 后父子进程可共享物理页，某方写入才触发私有副本。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0080",
+    "code": "os-0080",
+    "module": "os",
+    "chapter": "内存管理",
+    "type": "choice",
+    "stem": "mmap 的典型能力是？",
+    "options": {
+      "A": "将文件或匿名内存映射到进程虚拟地址空间",
+      "B": "只创建线程",
+      "C": "只分配内核栈",
+      "D": "修改 CPU 频率"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "mmap 允许程序通过内存访问操作文件，也可用于共享内存。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0081",
+    "code": "os-0081",
+    "module": "os",
+    "chapter": "内存管理",
+    "type": "choice",
+    "stem": "页面置换中 LRU 想要淘汰哪个页？",
+    "options": {
+      "A": "最早装入的页",
+      "B": "最近最少使用的页",
+      "C": "编号最大的页",
+      "D": "随机页"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "LRU 利用时间局部性，淘汰最长时间未访问页。",
+    "difficulty": 1
+  },
+  {
+    "id": "os-0082",
+    "code": "os-0082",
+    "module": "os",
+    "chapter": "内存管理",
+    "type": "choice",
+    "stem": "哪种页面置换算法可能出现 Belady 异常？",
+    "options": {
+      "A": "FIFO",
+      "B": "LRU",
+      "C": "OPT",
+      "D": "栈算法都不会"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "FIFO 中增加页框数有时反而使缺页次数增加。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0083",
+    "code": "os-0083",
+    "module": "os",
+    "chapter": "内存管理",
+    "type": "choice",
+    "stem": "内存抖动（thrashing）的表现是？",
+    "options": {
+      "A": "进程频繁缺页和换入换出，实际执行时间很少",
+      "B": "CPU 永不切换",
+      "C": "磁盘空间自动增加",
+      "D": "网络丢包"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "工作集超过可用物理内存时，系统可能把大量时间花在换页上。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0084",
+    "code": "os-0084",
+    "module": "os",
+    "chapter": "内存管理",
+    "type": "short_answer",
+    "stem": "分页与分段的主要区别是什么？",
+    "options": null,
+    "answer": "分页把地址空间分为固定大小页，主要便于内存管理；分段按代码、数据等逻辑单元划分，长度可变。分页有内部碎片，分段容易产生外部碎片。",
+    "key_points": [
+      "固定大小",
+      "逻辑单元",
+      "内部碎片",
+      "外部碎片"
+    ],
+    "explanation": "分页把地址空间分为固定大小页，主要便于内存管理；分段按代码、数据等逻辑单元划分，长度可变。分页有内部碎片，分段容易产生外部碎片。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0085",
+    "code": "os-0085",
+    "module": "os",
+    "chapter": "内存管理",
+    "type": "short_answer",
+    "stem": "系统内存紧张时，Linux 可能采取哪些措施？",
+    "options": null,
+    "answer": "回收页缓存和可回收内核对象，将匿名页换出到 swap，进行内存压缩（若配置）；若仍无法满足分配，可触发 OOM Killer 终止进程。",
+    "key_points": [
+      "页缓存",
+      "swap",
+      "内存压缩",
+      "OOM Killer"
+    ],
+    "explanation": "回收页缓存和可回收内核对象，将匿名页换出到 swap，进行内存压缩（若配置）；若仍无法满足分配，可触发 OOM Killer 终止进程。",
+    "difficulty": 3
+  },
+  {
+    "id": "os-0086",
+    "code": "os-0086",
+    "module": "os",
+    "chapter": "内存管理",
+    "type": "choice",
+    "stem": "多级页表相比单级巨大页表的优点是？",
+    "options": {
+      "A": "只需为实际使用的地址范围分配下级页表",
+      "B": "取消地址转换",
+      "C": "不需要 TLB",
+      "D": "保证零缺页"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "层次化让稀疏虚拟地址空间不必为所有虚拟页预分配页表项。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0087",
+    "code": "os-0087",
+    "module": "os",
+    "chapter": "进程与线程",
+    "type": "choice",
+    "stem": "进程与线程的典型关系是？",
+    "options": {
+      "A": "进程是资源拥有单位，线程是 CPU 调度的基本单位",
+      "B": "线程间不共享任何资源",
+      "C": "进程没有地址空间",
+      "D": "一个进程只能有一个线程"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "同进程线程共享地址空间和打开文件，但有各自栈和寄存器上下文。",
+    "difficulty": 1
+  },
+  {
+    "id": "os-0088",
+    "code": "os-0088",
+    "module": "os",
+    "chapter": "进程与线程",
+    "type": "choice",
+    "stem": "下列哪项通常不是进程间通信机制？",
+    "options": {
+      "A": "管道",
+      "B": "共享内存",
+      "C": "消息队列",
+      "D": "CPU L1 指令缓存"
+    },
+    "answer": "D",
+    "key_points": null,
+    "explanation": "常见 IPC 包括管道、消息队列、共享内存、信号、socket 等。",
+    "difficulty": 1
+  },
+  {
+    "id": "os-0089",
+    "code": "os-0089",
+    "module": "os",
+    "chapter": "进程与线程",
+    "type": "choice",
+    "stem": "共享内存 IPC 通常还需要什么？",
+    "options": {
+      "A": "同步机制",
+      "B": "DNS",
+      "C": "NAT",
+      "D": "磁盘分区"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "共享内存访问快，但多方并发读写需用信号量、互斥锁等同步。",
+    "difficulty": 1
+  },
+  {
+    "id": "os-0090",
+    "code": "os-0090",
+    "module": "os",
+    "chapter": "进程与线程",
+    "type": "choice",
+    "stem": "互斥锁与自旋锁的适用场景是？",
+    "options": {
+      "A": "自旋锁适合预期极短的临界区，互斥锁可在等待时睡眠",
+      "B": "二者都必然忙等",
+      "C": "互斥锁只用于单线程",
+      "D": "自旋锁适合长时间 I/O"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "自旋避免切换但消耗 CPU，临界区较长时应使等待者阻塞。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0091",
+    "code": "os-0091",
+    "module": "os",
+    "chapter": "进程与线程",
+    "type": "choice",
+    "stem": "信号量的 P/V 操作应当具备什么性质？",
+    "options": {
+      "A": "原子性",
+      "B": "可随意中断",
+      "C": "非确定文本性",
+      "D": "必须经过网络"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "信号量计数更新和阻塞/唤醒必须是原子的，才能正确同步。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0092",
+    "code": "os-0092",
+    "module": "os",
+    "chapter": "进程与线程",
+    "type": "short_answer",
+    "stem": "预防死锁有哪些常见思路？",
+    "options": null,
+    "answer": "通过破坏至少一个必要条件，例如统一锁获取顺序破坏循环等待，一次申请全部资源破坏持有并等待，或引入超时和回滚。",
+    "key_points": [
+      "破坏必要条件",
+      "统一锁顺序",
+      "一次申请",
+      "超时",
+      "回滚"
+    ],
+    "explanation": "通过破坏至少一个必要条件，例如统一锁获取顺序破坏循环等待，一次申请全部资源破坏持有并等待，或引入超时和回滚。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0093",
+    "code": "os-0093",
+    "module": "os",
+    "chapter": "进程与线程",
+    "type": "choice",
+    "stem": "悲观锁与乐观锁的核心区别是？",
+    "options": {
+      "A": "悲观锁先阻止并发修改，乐观锁提交时检查冲突",
+      "B": "乐观锁一定阻塞",
+      "C": "悲观锁不保护数据",
+      "D": "二者与并发无关"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "乐观并发控制常用版本号或 CAS，冲突时重试。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0094",
+    "code": "os-0094",
+    "module": "os",
+    "chapter": "进程与线程",
+    "type": "choice",
+    "stem": "同一进程的某线程发生非法内存访问且未处理时，常见结果是？",
+    "options": {
+      "A": "只销毁该线程且永不影响其他线程",
+      "B": "进程收到致命信号并可能整体终止",
+      "C": "内核必然崩溃",
+      "D": "自动修复地址"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "同进程线程共享地址空间，未处理的致命异常通常使整个进程终止。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0095",
+    "code": "os-0095",
+    "module": "os",
+    "chapter": "进程与线程",
+    "type": "short_answer",
+    "stem": "进程上下文切换通常需保存和恢复什么？",
+    "options": null,
+    "answer": "CPU 寄存器、程序计数器、栈指针、调度状态，并切换地址空间相关信息；还可能引起 TLB 和 CPU 缓存局部性变差。",
+    "key_points": [
+      "寄存器",
+      "程序计数器",
+      "栈指针",
+      "调度状态",
+      "地址空间",
+      "TLB"
+    ],
+    "explanation": "CPU 寄存器、程序计数器、栈指针、调度状态，并切换地址空间相关信息；还可能引起 TLB 和 CPU 缓存局部性变差。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0096",
+    "code": "os-0096",
+    "module": "os",
+    "chapter": "调度算法",
+    "type": "choice",
+    "stem": "先来先服务（FCFS）调度的典型问题是？",
+    "options": {
+      "A": "护航效应，短任务被长任务拖延",
+      "B": "永远抢占",
+      "C": "无法调度长任务",
+      "D": "不需要队列"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "一个长作业在队首时，后面大量短作业的周转时间增大。",
+    "difficulty": 1
+  },
+  {
+    "id": "os-0097",
+    "code": "os-0097",
+    "module": "os",
+    "chapter": "调度算法",
+    "type": "choice",
+    "stem": "时间片轮转调度主要面向什么目标？",
+    "options": {
+      "A": "交互系统的响应性和公平性",
+      "B": "最少磁盘寻道",
+      "C": "减少页表",
+      "D": "避免所有中断"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "就绪任务轮流获得时间片，时间片太小会增大切换开销。",
+    "difficulty": 1
+  },
+  {
+    "id": "os-0098",
+    "code": "os-0098",
+    "module": "os",
+    "chapter": "调度算法",
+    "type": "choice",
+    "stem": "最短作业优先的主要风险是？",
+    "options": {
+      "A": "长作业可能饥饿",
+      "B": "短作业无法执行",
+      "C": "无法使用 CPU",
+      "D": "一定导致死锁"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "短作业持续到来时，长作业可长期得不到 CPU。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0099",
+    "code": "os-0099",
+    "module": "os",
+    "chapter": "调度算法",
+    "type": "choice",
+    "stem": "优先级调度中的老化（aging）用于？",
+    "options": {
+      "A": "逐渐提高长时间等待任务的优先级",
+      "B": "降低所有任务优先级",
+      "C": "增加页大小",
+      "D": "清空文件缓存"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "aging 通过提升等待者优先级来缓解饥饿。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0100",
+    "code": "os-0100",
+    "module": "os",
+    "chapter": "调度算法",
+    "type": "choice",
+    "stem": "磁盘 SCAN 调度为什么叫“电梯算法”？",
+    "options": {
+      "A": "磁头沿一个方向处理请求，到边界后反向",
+      "B": "只处理最外磁道",
+      "C": "随机选择请求",
+      "D": "只按到达顺序"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "SCAN 使磁头往返扫描，减少相比 FCFS 的平均寻道移动。",
+    "difficulty": 1
+  },
+  {
+    "id": "os-0101",
+    "code": "os-0101",
+    "module": "os",
+    "chapter": "调度算法",
+    "type": "short_answer",
+    "stem": "评价 CPU 调度算法时常看哪些指标？",
+    "options": null,
+    "answer": "CPU 利用率、吞吐量、周转时间、等待时间、响应时间、公平性与截止期违约情况。",
+    "key_points": [
+      "CPU 利用率",
+      "吞吐量",
+      "周转时间",
+      "等待时间",
+      "响应时间",
+      "公平性"
+    ],
+    "explanation": "CPU 利用率、吞吐量、周转时间、等待时间、响应时间、公平性与截止期违约情况。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0102",
+    "code": "os-0102",
+    "module": "os",
+    "chapter": "文件系统",
+    "type": "choice",
+    "stem": "inode 通常保存什么？",
+    "options": {
+      "A": "文件元数据和数据块索引，不直接保存文件名",
+      "B": "只保存文件名",
+      "C": "只保存密码",
+      "D": "保存 DNS 记录"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "目录项建立文件名到 inode 的映射，inode 保存权限、大小和数据块位置等。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0103",
+    "code": "os-0103",
+    "module": "os",
+    "chapter": "文件系统",
+    "type": "choice",
+    "stem": "硬链接与符号链接的区别是？",
+    "options": {
+      "A": "硬链接指向同一 inode，符号链接保存目标路径",
+      "B": "二者完全相同",
+      "C": "符号链接不能跨文件系统",
+      "D": "硬链接可以指向不存在的路径"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "软链接可跨文件系统但目标删除后会悬空；硬链接是同一 inode 的新目录项。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0104",
+    "code": "os-0104",
+    "module": "os",
+    "chapter": "文件系统",
+    "type": "choice",
+    "stem": "进程中的文件描述符本质上是？",
+    "options": {
+      "A": "指向内核打开文件表项的小整数索引",
+      "B": "文件完整内容",
+      "C": "物理磁道号",
+      "D": "网络端口"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "每个进程有描述符表，表项引用内核的打开文件对象。",
+    "difficulty": 1
+  },
+  {
+    "id": "os-0105",
+    "code": "os-0105",
+    "module": "os",
+    "chapter": "文件系统",
+    "type": "choice",
+    "stem": "写文件的 write 返回成功后，数据是否必然已落到持久介质？",
+    "options": {
+      "A": "是",
+      "B": "否，可能仍在页缓存，需 fsync 等请求持久化",
+      "C": "只有小文件是",
+      "D": "只有文本文件是"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "普通写入多先进页缓存，应用需根据持久性需求使用 fsync/fdatasync。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0106",
+    "code": "os-0106",
+    "module": "os",
+    "chapter": "文件系统",
+    "type": "choice",
+    "stem": "日志型文件系统的主要目标是？",
+    "options": {
+      "A": "利用预写日志帮助崩溃后快速恢复一致状态",
+      "B": "保证用户数据永不丢失",
+      "C": "取消内存",
+      "D": "加速 DNS"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "日志通常优先保护元数据一致性，具体数据保证取决于日志模式和同步时机。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0107",
+    "code": "os-0107",
+    "module": "os",
+    "chapter": "文件系统",
+    "type": "short_answer",
+    "stem": "页缓存在文件 I/O 中有什么作用？",
+    "options": null,
+    "answer": "缓存文件数据页，读命中时避免访问慢设备；写操作可先合并在内存中，后台再回写，提高性能但引入掉电丢失未持久数据的风险。",
+    "key_points": [
+      "缓存文件",
+      "读命中",
+      "合并写",
+      "后台回写",
+      "掉电丢失"
+    ],
+    "explanation": "缓存文件数据页，读命中时避免访问慢设备；写操作可先合并在内存中，后台再回写，提高性能但引入掉电丢失未持久数据的风险。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0108",
+    "code": "os-0108",
+    "module": "os",
+    "chapter": "设备管理",
+    "type": "choice",
+    "stem": "键盘敲入字符时，操作系统首先通常通过什么获知？",
+    "options": {
+      "A": "设备中断",
+      "B": "DNS 响应",
+      "C": "缺页异常",
+      "D": "TCP ACK"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "键盘控制器产生中断，驱动读取扫描码并交给输入子系统。",
+    "difficulty": 1
+  },
+  {
+    "id": "os-0109",
+    "code": "os-0109",
+    "module": "os",
+    "chapter": "设备管理",
+    "type": "choice",
+    "stem": "设备驱动程序的主要作用是？",
+    "options": {
+      "A": "屏蔽具体硬件差异，向内核提供统一接口",
+      "B": "编译用户程序",
+      "C": "保存用户密码",
+      "D": "实现 HTTP"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "驱动将通用 I/O 请求转换为设备特定操作。",
+    "difficulty": 1
+  },
+  {
+    "id": "os-0110",
+    "code": "os-0110",
+    "module": "os",
+    "chapter": "设备管理",
+    "type": "choice",
+    "stem": "为什么高速设备常配合 DMA？",
+    "options": {
+      "A": "减少 CPU 逐字节搬运数据的负担",
+      "B": "取消设备中断",
+      "C": "保证文件不丢",
+      "D": "增加线程数"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "CPU 设置传输后，DMA 控制器在设备与内存间搬运数据。",
+    "difficulty": 1
+  },
+  {
+    "id": "os-0111",
+    "code": "os-0111",
+    "module": "os",
+    "chapter": "网络系统",
+    "type": "choice",
+    "stem": "传统 read+write 发送文件相比 sendfile 通常多了什么？",
+    "options": {
+      "A": "内核空间与用户空间之间的数据复制和系统调用",
+      "B": "IP 地址",
+      "C": "TCP 握手",
+      "D": "文件名"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "sendfile 可让文件数据在内核中传递给 socket，避免经过用户缓冲区。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0112",
+    "code": "os-0112",
+    "module": "os",
+    "chapter": "网络系统",
+    "type": "short_answer",
+    "stem": "“零拷贝”是否意味着一次内存/DMA 拷贝都没有？",
+    "options": null,
+    "answer": "不是。这个词通常指减少或消除数据在用户空间与内核空间之间的 CPU 拷贝；设备与内存之间仍可有 DMA 传输。",
+    "key_points": [
+      "用户空间",
+      "内核空间",
+      "CPU 拷贝",
+      "DMA"
+    ],
+    "explanation": "不是。这个词通常指减少或消除数据在用户空间与内核空间之间的 CPU 拷贝；设备与内存之间仍可有 DMA 传输。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0113",
+    "code": "os-0113",
+    "module": "os",
+    "chapter": "网络系统",
+    "type": "choice",
+    "stem": "select 的典型局限是？",
+    "options": {
+      "A": "每次需复制和线性扫描 fd 集合，且常有 fd 数量限制",
+      "B": "只能监听一个 fd",
+      "C": "不能监听 socket",
+      "D": "必须一个 fd 一个进程"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "select 随监听 fd 数增加而线性扫描，可扩展性有限。",
+    "difficulty": 2
+  },
+  {
+    "id": "os-0114",
+    "code": "os-0114",
+    "module": "os",
+    "chapter": "网络系统",
+    "type": "choice",
+    "stem": "epoll 的边缘触发（ET）模式下，应用通常应当？",
+    "options": {
+      "A": "使用非阻塞 I/O，一直读/写到 EAGAIN",
+      "B": "只读一个字节",
+      "C": "每次关闭 fd",
+      "D": "改用 DNS"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "ET 只在状态变化时通知，未排空缓冲区可能不再收到事件。",
+    "difficulty": 3
+  },
+  {
+    "id": "os-0115",
+    "code": "os-0115",
+    "module": "os",
+    "chapter": "网络系统",
+    "type": "choice",
+    "stem": "Reactor 与 Proactor 的核心区别是？",
+    "options": {
+      "A": "Reactor 通知 I/O 已就绪，应用完成 I/O；Proactor 通知异步 I/O 已完成",
+      "B": "二者完全相同",
+      "C": "Reactor 只用于磁盘",
+      "D": "Proactor 不支持并发"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "Reactor 是就绪事件模型，Proactor 是完成事件模型。",
+    "difficulty": 3
+  },
+  {
+    "id": "os-0116",
+    "code": "os-0116",
+    "module": "os",
+    "chapter": "网络系统",
+    "type": "choice",
+    "stem": "一致性哈希相比普通取模的主要优点是？",
+    "options": {
+      "A": "节点增减时只需迁移部分键",
+      "B": "绝不需要哈希",
+      "C": "保证键完全均匀",
+      "D": "取消网络分区"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "哈希环使拓扑变化的影响局部化，虚拟节点可改善均匀性。",
+    "difficulty": 2
+  },
+  {
+    "id": "mysql-0117",
+    "code": "mysql-0117",
+    "module": "mysql",
+    "chapter": "查询执行",
+    "type": "choice",
+    "stem": "MySQL 执行 SELECT 时，连接器之后的典型主要阶段是？",
+    "options": {
+      "A": "解析、预处理、优化、执行",
+      "B": "编译内核、重启、执行",
+      "C": "DNS、ARP、TCP、HTTP",
+      "D": "备份、恢复、执行"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "Server 层完成语法/语义处理、生成执行计划，再调用存储引擎读写。",
+    "difficulty": 1
+  },
+  {
+    "id": "mysql-0118",
+    "code": "mysql-0118",
+    "module": "mysql",
+    "chapter": "查询执行",
+    "type": "choice",
+    "stem": "MySQL 优化器的主要任务是？",
+    "options": {
+      "A": "选择访问路径、索引和连接顺序",
+      "B": "保存用户密码",
+      "C": "刷新 Redis",
+      "D": "只检查 SQL 拼写"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "优化器根据统计信息与成本估算选择执行计划。",
+    "difficulty": 1
+  },
+  {
+    "id": "mysql-0119",
+    "code": "mysql-0119",
+    "module": "mysql",
+    "chapter": "查询执行",
+    "type": "choice",
+    "stem": "explain 的 type 字段中，通常哪个比 ALL 更好？",
+    "options": {
+      "A": "ref",
+      "B": "ALL",
+      "C": "二者必然一样",
+      "D": "NULL 一定最差"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "ALL 通常表示全表扫描，ref 表示通过非唯一索引等值查找。",
+    "difficulty": 2
+  },
+  {
+    "id": "mysql-0120",
+    "code": "mysql-0120",
+    "module": "mysql",
+    "chapter": "查询执行",
+    "type": "choice",
+    "stem": "MySQL 8.0 的查询缓存（Query Cache）情况是？",
+    "options": {
+      "A": "默认强制启用",
+      "B": "已移除",
+      "C": "只缓存写语句",
+      "D": "位于 InnoDB Buffer Pool 内"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "旧查询缓存在表更新时大量失效，MySQL 8.0 已移除该功能。",
+    "difficulty": 2
+  },
+  {
+    "id": "mysql-0121",
+    "code": "mysql-0121",
+    "module": "mysql",
+    "chapter": "查询执行",
+    "type": "short_answer",
+    "stem": "为什么同一条 SQL 在数据分布改变后可能选择不同索引？",
+    "options": null,
+    "answer": "优化器根据统计信息估算扫描行数、回表、排序和 I/O 成本。数据分布或统计信息变化后，成本估算与最优计划也可能改变。",
+    "key_points": [
+      "统计信息",
+      "扫描行数",
+      "回表",
+      "I/O 成本",
+      "数据分布",
+      "执行计划"
+    ],
+    "explanation": "优化器根据统计信息估算扫描行数、回表、排序和 I/O 成本。数据分布或统计信息变化后，成本估算与最优计划也可能改变。",
+    "difficulty": 2
+  },
+  {
+    "id": "mysql-0122",
+    "code": "mysql-0122",
+    "module": "mysql",
+    "chapter": "行记录",
+    "type": "choice",
+    "stem": "InnoDB 的页是什么？",
+    "options": {
+      "A": "磁盘与内存之间管理数据的基本单位",
+      "B": "每行的别名",
+      "C": "SQL 语句的一页",
+      "D": "TCP 分段"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "InnoDB 常以 16 KiB 页为单位读写和管理索数据。",
+    "difficulty": 1
+  },
+  {
+    "id": "mysql-0123",
+    "code": "mysql-0123",
+    "module": "mysql",
+    "chapter": "行记录",
+    "type": "choice",
+    "stem": "InnoDB 行格式中的 NULL 值列表主要用于？",
+    "options": {
+      "A": "用位图标记可空列是否为 NULL",
+      "B": "存储所有列名",
+      "C": "保存索引顺序",
+      "D": "记录锁等待"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "NULL 字段不需在记录真实数据区再存放内容。",
+    "difficulty": 2
+  },
+  {
+    "id": "mysql-0124",
+    "code": "mysql-0124",
+    "module": "mysql",
+    "chapter": "行记录",
+    "type": "choice",
+    "stem": "varchar 字段的可变长特性主要体现为？",
+    "options": {
+      "A": "记录实际长度并按需存储",
+      "B": "总是占满声明长度",
+      "C": "只能存数字",
+      "D": "不受字符集影响"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "varchar 保存可变长度信息，最大可存字符数还受字符集与行大小限制。",
+    "difficulty": 2
+  },
+  {
+    "id": "mysql-0125",
+    "code": "mysql-0125",
+    "module": "mysql",
+    "chapter": "行记录",
+    "type": "choice",
+    "stem": "当一行太大时，InnoDB 如何处理长列？",
+    "options": {
+      "A": "可将部分长列数据放到溢出页",
+      "B": "必然删除整行",
+      "C": "改存 Redis",
+      "D": "自动改为图数据库"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "COMPACT/DYNAMIC 等行格式对长列的页内保留和页外存储策略有所不同。",
+    "difficulty": 3
+  },
+  {
+    "id": "mysql-0126",
+    "code": "mysql-0126",
+    "module": "mysql",
+    "chapter": "行记录",
+    "type": "short_answer",
+    "stem": "一条 InnoDB 记录除业务列外，常见隐藏信息有哪些？",
+    "options": null,
+    "answer": "包括事务 ID（DB_TRX_ID）、回滚指针（DB_ROLL_PTR）；若表没有合适主键，还可有 InnoDB 生成的隐藏行 ID。",
+    "key_points": [
+      "DB_TRX_ID",
+      "DB_ROLL_PTR",
+      "隐藏行 ID"
+    ],
+    "explanation": "包括事务 ID（DB_TRX_ID）、回滚指针（DB_ROLL_PTR）；若表没有合适主键，还可有 InnoDB 生成的隐藏行 ID。",
+    "difficulty": 3
+  },
+  {
+    "id": "mysql-0127",
+    "code": "mysql-0127",
+    "module": "mysql",
+    "chapter": "索引",
+    "type": "choice",
+    "stem": "InnoDB 主键索引的叶子节点存放？",
+    "options": {
+      "A": "完整行记录",
+      "B": "只有行的物理偏移",
+      "C": "只有二级索引键",
+      "D": "SQL 语句"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "InnoDB 是聚簇索引组织表，主键 B+ 树叶子保存整行。",
+    "difficulty": 1
+  },
+  {
+    "id": "mysql-0128",
+    "code": "mysql-0128",
+    "module": "mysql",
+    "chapter": "索引",
+    "type": "choice",
+    "stem": "InnoDB 二级索引叶子节点通常存放？",
+    "options": {
+      "A": "二级索引键和主键值",
+      "B": "完整行且不含主键",
+      "C": "磁盘扇区号",
+      "D": "事务日志"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "通过二级索引找到主键后，若需其他列再查主键树，即回表。",
+    "difficulty": 1
+  },
+  {
+    "id": "mysql-0129",
+    "code": "mysql-0129",
+    "module": "mysql",
+    "chapter": "索引",
+    "type": "choice",
+    "stem": "覆盖索引的含义是？",
+    "options": {
+      "A": "查询所需列都能从索引中取得，无需回表",
+      "B": "索引占满整个磁盘",
+      "C": "覆盖原有数据",
+      "D": "只适用于 count(*)"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "EXPLAIN 中常见 Using index 表示可能使用了覆盖索引。",
+    "difficulty": 1
+  },
+  {
+    "id": "mysql-0130",
+    "code": "mysql-0130",
+    "module": "mysql",
+    "chapter": "索引",
+    "type": "choice",
+    "stem": "联合索引 (a,b,c) 的最左前缀原则意味着？",
+    "options": {
+      "A": "有效查找范围通常需从最左列 a 开始",
+      "B": "必须从 c 开始",
+      "C": "任意列组合完全等价",
+      "D": "联合索引不能排序"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "B+ 树先按 a，再按 b、c 排序，跳过左侧列通常无法直接定位连续范围。",
+    "difficulty": 2
+  },
+  {
+    "id": "mysql-0131",
+    "code": "mysql-0131",
+    "module": "mysql",
+    "chapter": "索引",
+    "type": "choice",
+    "stem": "联合索引 (a,b,c) 中，查询 a=1 AND b>5 AND c=9 时的一般情况是？",
+    "options": {
+      "A": "a、b 可用于索引定位范围，c 通常不再缩小扫描区间",
+      "B": "只用 c",
+      "C": "一定全表扫描",
+      "D": "b 不能使用索引"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "范围条件之后的列通常不能继续确定 B+ 树扫描边界，但可能用 ICP 过滤。",
+    "difficulty": 3
+  },
+  {
+    "id": "mysql-0132",
+    "code": "mysql-0132",
+    "module": "mysql",
+    "chapter": "索引",
+    "type": "choice",
+    "stem": "索引下推（ICP）的作用是？",
+    "options": {
+      "A": "将部分索引列条件下推到存储引擎过滤，减少回表",
+      "B": "将 SQL 发到 Redis",
+      "C": "强制使用主键",
+      "D": "关闭 Buffer Pool"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "ICP 能在扫描二级索引时先判断可用条件。",
+    "difficulty": 2
+  },
+  {
+    "id": "mysql-0133",
+    "code": "mysql-0133",
+    "module": "mysql",
+    "chapter": "索引",
+    "type": "choice",
+    "stem": "对索引列使用函数常导致索引难以用于定位，根本原因是？",
+    "options": {
+      "A": "索引按原始列值排序，函数结果未必保持可检索顺序",
+      "B": "MySQL 不支持函数",
+      "C": "函数一定返回 NULL",
+      "D": "索引只能存字符"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "可考虑改写谓词、使用生成列或适用的函数索引。",
+    "difficulty": 2
+  },
+  {
+    "id": "mysql-0134",
+    "code": "mysql-0134",
+    "module": "mysql",
+    "chapter": "索引",
+    "type": "choice",
+    "stem": "LIKE '%abc' 通常为什么难以利用普通 B+ 树前缀定位？",
+    "options": {
+      "A": "左侧是不定长通配，无法确定连续起始范围",
+      "B": "LIKE 不是 SQL",
+      "C": "百分号代表数字",
+      "D": "只因为表太小"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "'abc%' 能利用前缀排序，'%abc' 则不能直接定位起点。",
+    "difficulty": 1
+  },
+  {
+    "id": "mysql-0135",
+    "code": "mysql-0135",
+    "module": "mysql",
+    "chapter": "索引",
+    "type": "choice",
+    "stem": "为什么 InnoDB 常建议使用较短且递增的主键？",
+    "options": {
+      "A": "减小二级索引体积，且顺序插入减少随机分裂",
+      "B": "可禁止事务",
+      "C": "让所有查询 O(1)",
+      "D": "使表不需要页"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "主键值存在所有二级索引叶子中，随机长主键会增大体积与页分裂。",
+    "difficulty": 2
+  },
+  {
+    "id": "mysql-0136",
+    "code": "mysql-0136",
+    "module": "mysql",
+    "chapter": "索引",
+    "type": "choice",
+    "stem": "B+ 树相比普通二叉搜索树更适合磁盘索引，主要因为？",
+    "options": {
+      "A": "扇出高、树高低，一个页可容纳很多键",
+      "B": "不需要比较",
+      "C": "永远只有两层",
+      "D": "只支持等值查询"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "节点与页匹配可减少 I/O，叶子有序链接也适合范围扫描。",
+    "difficulty": 2
+  },
+  {
+    "id": "mysql-0137",
+    "code": "mysql-0137",
+    "module": "mysql",
+    "chapter": "索引",
+    "type": "choice",
+    "stem": "B+ 树叶子页之间的双向链表主要有利于？",
+    "options": {
+      "A": "范围查询和顺序扫描",
+      "B": "密码验证",
+      "C": "死锁检测",
+      "D": "网络重传"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "定位起始键后可沿叶子页顺序读取。",
+    "difficulty": 1
+  },
+  {
+    "id": "mysql-0138",
+    "code": "mysql-0138",
+    "module": "mysql",
+    "chapter": "索引",
+    "type": "choice",
+    "stem": "关于“单表不要超过 2000 万行”，更准确的说法是？",
+    "options": {
+      "A": "它是经验性参考而非 InnoDB 硬限制，需结合行大小、索引、内存和负载评估",
+      "B": "超过一行就无法启动",
+      "C": "任何硬件都必须分表",
+      "D": "行数与性能永远无关"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "B+ 树层高、缓存命中和查询模式才是具体决策依据。",
+    "difficulty": 2
+  },
+  {
+    "id": "mysql-0139",
+    "code": "mysql-0139",
+    "module": "mysql",
+    "chapter": "索引",
+    "type": "choice",
+    "stem": "count(*)、count(1) 和 count(主键) 在 InnoDB 中的一般结论是？",
+    "options": {
+      "A": "count(*) 经过优化，通常不比 count(1) 差；count(列) 还需考虑 NULL",
+      "B": "count(*) 会读取每行所有大字段",
+      "C": "count(1) 永远 O(1)",
+      "D": "count(列) 统计 NULL"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "count(expr) 不统计 expr 为 NULL 的行，InnoDB 对 count(*) 不保存全局精确计数。",
+    "difficulty": 2
+  },
+  {
+    "id": "mysql-0140",
+    "code": "mysql-0140",
+    "module": "mysql",
+    "chapter": "索引",
+    "type": "choice",
+    "stem": "LIMIT 1000000, 20 常见的性能问题是？",
+    "options": {
+      "A": "需扫描并丢弃大量前置记录",
+      "B": "只读 20 行所以总是很快",
+      "C": "不支持索引",
+      "D": "会自动分表"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "可用上一页最后键做游标/延迟关联，避免深分页扫描大量无用行。",
+    "difficulty": 2
+  },
+  {
+    "id": "mysql-0141",
+    "code": "mysql-0141",
+    "module": "mysql",
+    "chapter": "索引",
+    "type": "short_answer",
+    "stem": "什么是回表，如何减少回表？",
+    "options": null,
+    "answer": "从二级索引得到主键后，再查聚簇主键索引取其他列称为回表。可设计覆盖索引、提高筛选性、只查需要的列来减少。",
+    "key_points": [
+      "二级索引",
+      "主键",
+      "聚簇索引",
+      "覆盖索引",
+      "筛选性"
+    ],
+    "explanation": "从二级索引得到主键后，再查聚簇主键索引取其他列称为回表。可设计覆盖索引、提高筛选性、只查需要的列来减少。",
+    "difficulty": 2
+  },
+  {
+    "id": "mysql-0142",
+    "code": "mysql-0142",
+    "module": "mysql",
+    "chapter": "索引",
+    "type": "short_answer",
+    "stem": "建立索引时应如何考虑区分度？",
+    "options": null,
+    "answer": "高区分度列通常能缩小扫描范围；但联合索引顺序还要结合等值/范围条件、排序、分组、覆盖需求和实际查询频率，不能只按区分度排序。",
+    "key_points": [
+      "区分度",
+      "扫描范围",
+      "联合索引",
+      "范围条件",
+      "排序",
+      "查询频率"
+    ],
+    "explanation": "高区分度列通常能缩小扫描范围；但联合索引顺序还要结合等值/范围条件、排序、分组、覆盖需求和实际查询频率，不能只按区分度排序。",
+    "difficulty": 3
+  },
+  {
+    "id": "mysql-0143",
+    "code": "mysql-0143",
+    "module": "mysql",
+    "chapter": "事务与MVCC",
+    "type": "choice",
+    "stem": "ACID 中的 I 表示？",
+    "options": {
+      "A": "隔离性",
+      "B": "一致性",
+      "C": "持久性",
+      "D": "原子性"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "ACID 是 Atomicity、Consistency、Isolation、Durability。",
+    "difficulty": 1
+  },
+  {
+    "id": "mysql-0144",
+    "code": "mysql-0144",
+    "module": "mysql",
+    "chapter": "事务与MVCC",
+    "type": "choice",
+    "stem": "InnoDB 默认事务隔离级别通常是？",
+    "options": {
+      "A": "读未提交",
+      "B": "读已提交",
+      "C": "可重复读",
+      "D": "串行化"
+    },
+    "answer": "C",
+    "key_points": null,
+    "explanation": "MySQL InnoDB 默认通常为 Repeatable Read。",
+    "difficulty": 1
+  },
+  {
+    "id": "mysql-0145",
+    "code": "mysql-0145",
+    "module": "mysql",
+    "chapter": "事务与MVCC",
+    "type": "choice",
+    "stem": "读已提交（RC）与可重复读（RR）下 Read View 的常见差异是？",
+    "options": {
+      "A": "RC 每条快照读语句通常生成新 Read View，RR 在事务的首次快照读后复用",
+      "B": "RR 每行一个 Read View",
+      "C": "RC 不支持 MVCC",
+      "D": "二者永远完全一样"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "这导致 RC 可看到语句间新提交数据，RR 的快照读视图更稳定。",
+    "difficulty": 3
+  },
+  {
+    "id": "mysql-0146",
+    "code": "mysql-0146",
+    "module": "mysql",
+    "chapter": "事务与MVCC",
+    "type": "choice",
+    "stem": "MVCC 的版本链主要由什么支持？",
+    "options": {
+      "A": "记录中的事务 ID、回滚指针和 undo log",
+      "B": "binlog 文件名",
+      "C": "TCP 序列号",
+      "D": "Redis 过期字典"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "回滚指针串起 undo 中的历史版本，Read View 决定哪个版本可见。",
+    "difficulty": 3
+  },
+  {
+    "id": "mysql-0147",
+    "code": "mysql-0147",
+    "module": "mysql",
+    "chapter": "事务与MVCC",
+    "type": "choice",
+    "stem": "快照读与当前读的区别是？",
+    "options": {
+      "A": "快照读基于 MVCC 历史版本，当前读读最新版本并常加锁",
+      "B": "快照读一定加写锁",
+      "C": "当前读只读历史数据",
+      "D": "二者完全相同"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "普通 SELECT 通常是快照读，SELECT ... FOR UPDATE、UPDATE、DELETE 等是当前读。",
+    "difficulty": 2
+  },
+  {
+    "id": "mysql-0148",
+    "code": "mysql-0148",
+    "module": "mysql",
+    "chapter": "事务与MVCC",
+    "type": "choice",
+    "stem": "RR 是否在所有情况下都绝对消除幻读？",
+    "options": {
+      "A": "是，无任何例外",
+      "B": "不应绝对化；快照读与当前读混用等场景仍需仔细分析",
+      "C": "RR 不支持快照读",
+      "D": "幻读只存在 Redis"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "InnoDB 用 MVCC 与 next-key lock 大幅缓解幻读，但语句类型和执行序列会影响结果。",
+    "difficulty": 3
+  },
+  {
+    "id": "mysql-0149",
+    "code": "mysql-0149",
+    "module": "mysql",
+    "chapter": "事务与MVCC",
+    "type": "short_answer",
+    "stem": "说明脏读、不可重复读和幻读。",
+    "options": null,
+    "answer": "脏读是读到未提交数据；不可重复读是同一行前后读取值改变；幻读是按条件重新查询时结果集的行出现或消失。",
+    "key_points": [
+      "未提交",
+      "同一行",
+      "值改变",
+      "条件查询",
+      "结果集",
+      "行出现或消失"
+    ],
+    "explanation": "脏读是读到未提交数据；不可重复读是同一行前后读取值改变；幻读是按条件重新查询时结果集的行出现或消失。",
+    "difficulty": 1
+  },
+  {
+    "id": "mysql-0150",
+    "code": "mysql-0150",
+    "module": "mysql",
+    "chapter": "事务与MVCC",
+    "type": "short_answer",
+    "stem": "MVCC 为什么能提高读写并发？",
+    "options": null,
+    "answer": "读操作可根据 Read View 访问 undo 版本链中的可见版本，通常无需与普通写锁互相阻塞；写写冲突仍需锁。",
+    "key_points": [
+      "Read View",
+      "undo",
+      "可见版本",
+      "读写不阻塞",
+      "写写冲突"
+    ],
+    "explanation": "读操作可根据 Read View 访问 undo 版本链中的可见版本，通常无需与普通写锁互相阻塞；写写冲突仍需锁。",
+    "difficulty": 2
+  },
+  {
+    "id": "mysql-0151",
+    "code": "mysql-0151",
+    "module": "mysql",
+    "chapter": "锁",
+    "type": "choice",
+    "stem": "InnoDB 行锁实际上主要加在？",
+    "options": {
+      "A": "索引记录上",
+      "B": "整个 MySQL 进程上",
+      "C": "网卡上",
+      "D": "binlog 文件名上"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "锁定范围与实际使用的索引和扫描区间密切相关。",
+    "difficulty": 2
+  },
+  {
+    "id": "mysql-0152",
+    "code": "mysql-0152",
+    "module": "mysql",
+    "chapter": "锁",
+    "type": "choice",
+    "stem": "记录锁（Record Lock）锁定什么？",
+    "options": {
+      "A": "某个索引记录",
+      "B": "两个键之间的空隙",
+      "C": "整个数据库",
+      "D": "未来的事务 ID"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "Record Lock 防止其他事务修改同一索引记录。",
+    "difficulty": 1
+  },
+  {
+    "id": "mysql-0153",
+    "code": "mysql-0153",
+    "module": "mysql",
+    "chapter": "锁",
+    "type": "choice",
+    "stem": "间隙锁（Gap Lock）主要防止？",
+    "options": {
+      "A": "其他事务在锁定索引区间插入新记录",
+      "B": "读取已有行",
+      "C": "备份 binlog",
+      "D": "连接数据库"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "间隙锁锁定键之间的区间而非已有记录本身。",
+    "difficulty": 2
+  },
+  {
+    "id": "mysql-0154",
+    "code": "mysql-0154",
+    "module": "mysql",
+    "chapter": "锁",
+    "type": "choice",
+    "stem": "Next-Key Lock 是什么的组合？",
+    "options": {
+      "A": "记录锁加间隙锁",
+      "B": "表锁加元数据锁",
+      "C": "读锁加写锁",
+      "D": "redo log 加 binlog"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "Next-Key Lock 通常锁住一个左开右闭的索引区间。",
+    "difficulty": 1
+  },
+  {
+    "id": "mysql-0155",
+    "code": "mysql-0155",
+    "module": "mysql",
+    "chapter": "锁",
+    "type": "choice",
+    "stem": "UPDATE 的 WHERE 列没有合适索引时，为什么常感觉像“锁全表”？",
+    "options": {
+      "A": "执行计划可能扫描并锁定大量索引记录/区间",
+      "B": "InnoDB 的 UPDATE 永远只有表锁",
+      "C": "SQL 语法要求",
+      "D": "因为 binlog 太大"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "行锁加在扫描到的索引范围，全表扫描会造成大面积锁定。",
+    "difficulty": 2
+  },
+  {
+    "id": "mysql-0156",
+    "code": "mysql-0156",
+    "module": "mysql",
+    "chapter": "锁",
+    "type": "choice",
+    "stem": "意向锁的主要目的是？",
+    "options": {
+      "A": "让表级锁快速判断表中是否存在行级锁",
+      "B": "替代所有行锁",
+      "C": "存储 SQL 文本",
+      "D": "保护 Redis 键"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "IS/IX 表示事务打算或已在更细粒度上持有相应锁。",
+    "difficulty": 2
+  },
+  {
+    "id": "mysql-0157",
+    "code": "mysql-0157",
+    "module": "mysql",
+    "chapter": "锁",
+    "type": "choice",
+    "stem": "两个事务以相反顺序更新两行，可能产生？",
+    "options": {
+      "A": "死锁",
+      "B": "脏读而绝不死锁",
+      "C": "只有页分裂",
+      "D": "DNS 超时"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "每个事务持有一把锁并等待对方的锁，形成循环等待。",
+    "difficulty": 1
+  },
+  {
+    "id": "mysql-0158",
+    "code": "mysql-0158",
+    "module": "mysql",
+    "chapter": "锁",
+    "type": "short_answer",
+    "stem": "排查和减少 MySQL 死锁的常见方法有哪些？",
+    "options": null,
+    "answer": "查看死锁日志/性能视图确认锁定语句；统一资源访问顺序；缩短事务；为谓词建合适索引减小锁范围；对死锁牺牲事务做有界、幂等重试。",
+    "key_points": [
+      "死锁日志",
+      "访问顺序",
+      "缩短事务",
+      "索引",
+      "锁范围",
+      "幂等重试"
+    ],
+    "explanation": "查看死锁日志/性能视图确认锁定语句；统一资源访问顺序；缩短事务；为谓词建合适索引减小锁范围；对死锁牺牲事务做有界、幂等重试。",
+    "difficulty": 3
+  },
+  {
+    "id": "mysql-0159",
+    "code": "mysql-0159",
+    "module": "mysql",
+    "chapter": "日志",
+    "type": "choice",
+    "stem": "undo log 的主要用途是？",
+    "options": {
+      "A": "事务回滚和 MVCC 历史版本",
+      "B": "主从复制",
+      "C": "只记录 DDL 文本",
+      "D": "保存网络包"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "undo 保存逻辑上恢复修改前版本所需的信息。",
+    "difficulty": 1
+  },
+  {
+    "id": "mysql-0160",
+    "code": "mysql-0160",
+    "module": "mysql",
+    "chapter": "日志",
+    "type": "choice",
+    "stem": "redo log 的核心作用是？",
+    "options": {
+      "A": "保证 InnoDB 已提交修改的崩溃恢复能力",
+      "B": "记录所有 SELECT",
+      "C": "进行 DNS 解析",
+      "D": "替代所有数据页"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "WAL 先持久化 redo，脏数据页可以延后刷盘。",
+    "difficulty": 1
+  },
+  {
+    "id": "mysql-0161",
+    "code": "mysql-0161",
+    "module": "mysql",
+    "chapter": "日志",
+    "type": "choice",
+    "stem": "binlog 主要属于哪一层？",
+    "options": {
+      "A": "MySQL Server 层",
+      "B": "InnoDB 专属内存页",
+      "C": "Linux 网络层",
+      "D": "Redis 持久化层"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "binlog 是 Server 层的归档日志，用于复制和按时间点恢复等。",
+    "difficulty": 1
+  },
+  {
+    "id": "mysql-0162",
+    "code": "mysql-0162",
+    "module": "mysql",
+    "chapter": "日志",
+    "type": "choice",
+    "stem": "MySQL 提交中使用两阶段提交协调 redo log 与 binlog，主要为了？",
+    "options": {
+      "A": "保持两份日志的事务一致性",
+      "B": "减少 SQL 列数",
+      "C": "避免使用主键",
+      "D": "消除所有 fsync"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "prepare/commit 阶段使崩溃恢复能根据 binlog 完整性决定 redo 事务是否提交。",
+    "difficulty": 3
+  },
+  {
+    "id": "mysql-0163",
+    "code": "mysql-0163",
+    "module": "mysql",
+    "chapter": "日志",
+    "type": "short_answer",
+    "stem": "redo log 与 binlog 有哪些主要区别？",
+    "options": null,
+    "answer": "redo log 是 InnoDB 的物理性恢复日志，通常循环使用，服务于崩溃恢复；binlog 是 Server 层的归档日志，追加写入，主要用于复制、审计与时点恢复。",
+    "key_points": [
+      "InnoDB",
+      "物理日志",
+      "崩溃恢复",
+      "Server 层",
+      "归档日志",
+      "复制"
+    ],
+    "explanation": "redo log 是 InnoDB 的物理性恢复日志，通常循环使用，服务于崩溃恢复；binlog 是 Server 层的归档日志，追加写入，主要用于复制、审计与时点恢复。",
+    "difficulty": 2
+  },
+  {
+    "id": "mysql-0164",
+    "code": "mysql-0164",
+    "module": "mysql",
+    "chapter": "Buffer Pool",
+    "type": "choice",
+    "stem": "InnoDB Buffer Pool 主要缓存什么？",
+    "options": {
+      "A": "数据页和索引页等",
+      "B": "只有 SQL 文本",
+      "C": "操作系统内核",
+      "D": "DNS 记录"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "Buffer Pool 用内存吸收随机 I/O，也包含适应性哈希、锁信息等相关结构。",
+    "difficulty": 1
+  },
+  {
+    "id": "mysql-0165",
+    "code": "mysql-0165",
+    "module": "mysql",
+    "chapter": "Buffer Pool",
+    "type": "choice",
+    "stem": "Buffer Pool 中的脏页是指？",
+    "options": {
+      "A": "内存中已修改但尚未写回磁盘的页",
+      "B": "校验失败的页",
+      "C": "不再使用的页",
+      "D": "只包含 NULL 的页"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "redo 允许脏页延后刷盘，checkpoint 推进时需回写相关页。",
+    "difficulty": 1
+  },
+  {
+    "id": "mysql-0166",
+    "code": "mysql-0166",
+    "module": "mysql",
+    "chapter": "Buffer Pool",
+    "type": "choice",
+    "stem": "InnoDB 的 LRU 链表为什么要区分 young 和 old 区域？",
+    "options": {
+      "A": "降低全表扫描等一次性大量访问污染热数据",
+      "B": "为了保存两份相同数据",
+      "C": "只为统计行数",
+      "D": "避免事务提交"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "新页先进 old 区，符合再次访问条件才升入 young 区。",
+    "difficulty": 2
+  },
+  {
+    "id": "mysql-0167",
+    "code": "mysql-0167",
+    "module": "mysql",
+    "chapter": "Buffer Pool",
+    "type": "short_answer",
+    "stem": "为什么 Buffer Pool 很大时仍需要 redo log？",
+    "options": null,
+    "answer": "Buffer Pool 是易失内存，机器崩溃或掉电后脏页丢失。redo log 是持久化的 WAL，能在重启时重做已提交但尚未刷入数据文件的修改。",
+    "key_points": [
+      "易失内存",
+      "脏页",
+      "WAL",
+      "持久化",
+      "崩溃恢复"
+    ],
+    "explanation": "Buffer Pool 是易失内存，机器崩溃或掉电后脏页丢失。redo log 是持久化的 WAL，能在重启时重做已提交但尚未刷入数据文件的修改。",
+    "difficulty": 2
+  },
+  {
+    "id": "mysql-0168",
+    "code": "mysql-0168",
+    "module": "mysql",
+    "chapter": "架构",
+    "type": "choice",
+    "stem": "MySQL 体系结构中，Server 层与存储引擎层的分工是？",
+    "options": {
+      "A": "Server 层处理连接、SQL 解析与优化；引擎负责数据存取与事务细节",
+      "B": "Server 层只负责网卡",
+      "C": "引擎层只负责语法",
+      "D": "二者无边界"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "插件式存储引擎接口使 MySQL 可支持 InnoDB 等不同引擎。",
+    "difficulty": 1
+  },
+  {
+    "id": "mysql-0169",
+    "code": "mysql-0169",
+    "module": "mysql",
+    "chapter": "架构",
+    "type": "choice",
+    "stem": "InnoDB 相比 MyISAM 的关键能力是？",
+    "options": {
+      "A": "支持事务、行级锁、MVCC 和崩溃恢复",
+      "B": "不支持索引",
+      "C": "只能读",
+      "D": "不能持久化"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "InnoDB 是现代 MySQL 默认存储引擎，适合事务型负载。",
+    "difficulty": 1
+  },
+  {
+    "id": "mysql-0170",
+    "code": "mysql-0170",
+    "module": "mysql",
+    "chapter": "架构",
+    "type": "short_answer",
+    "stem": "主从复制的基本数据流是什么？",
+    "options": null,
+    "answer": "主库将提交事件写入 binlog；从库 I/O 线程拉取并保存为 relay log；SQL/应用线程重放 relay log。异步复制可能存在延迟与数据丢失窗口。",
+    "key_points": [
+      "binlog",
+      "I/O 线程",
+      "relay log",
+      "重放",
+      "异步复制",
+      "延迟"
+    ],
+    "explanation": "主库将提交事件写入 binlog；从库 I/O 线程拉取并保存为 relay log；SQL/应用线程重放 relay log。异步复制可能存在延迟与数据丢失窗口。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0171",
+    "code": "redis-0171",
+    "module": "redis",
+    "chapter": "基础",
+    "type": "choice",
+    "stem": "Redis 高性能的主要原因不包括？",
+    "options": {
+      "A": "主要在内存操作",
+      "B": "高效数据结构",
+      "C": "I/O 多路复用和高效执行模型",
+      "D": "每条命令都必须访问磁盘"
+    },
+    "answer": "D",
+    "key_points": null,
+    "explanation": "Redis 命令主要操作内存，持久化是可配置的后台/追加工作。",
+    "difficulty": 1
+  },
+  {
+    "id": "redis-0172",
+    "code": "redis-0172",
+    "module": "redis",
+    "chapter": "基础",
+    "type": "choice",
+    "stem": "Redis 命令主执行路径采用单线程的一个直接好处是？",
+    "options": {
+      "A": "命令间避免复杂的共享数据锁竞争",
+      "B": "可以使用无限 CPU 核",
+      "C": "所有命令都 O(1)",
+      "D": "永远不阻塞"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "单线程串行执行命令简化并发控制，但慢命令会阻塞其他请求。",
+    "difficulty": 1
+  },
+  {
+    "id": "redis-0173",
+    "code": "redis-0173",
+    "module": "redis",
+    "chapter": "基础",
+    "type": "choice",
+    "stem": "Redis 6 引入的 I/O 线程主要处理？",
+    "options": {
+      "A": "网络数据读写等 I/O，命令执行仍主要串行",
+      "B": "同时并行修改同一键",
+      "C": "RDB 文件的 SQL 解析",
+      "D": "MySQL 事务"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "多线程 I/O 用于分担网络读写开销，不改变主命令执行的基本原子性语义。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0174",
+    "code": "redis-0174",
+    "module": "redis",
+    "chapter": "基础",
+    "type": "choice",
+    "stem": "下列哪种情况最容易阻塞 Redis 主线程？",
+    "options": {
+      "A": "对超大集合执行高复杂度命令",
+      "B": "读取小 String",
+      "C": "PING",
+      "D": "查询不存在的小 key"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "单次处理超大数据量会拉长事件循环停顿。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0175",
+    "code": "redis-0175",
+    "module": "redis",
+    "chapter": "基础",
+    "type": "short_answer",
+    "stem": "为什么 Redis 快不等于可以无限堆积请求？",
+    "options": null,
+    "answer": "Redis 仍受 CPU、内存、网络和单命令耗时限制。大 Key、慢命令、持久化 fork、内存压力和输出缓冲区都会造成延迟或故障。",
+    "key_points": [
+      "CPU",
+      "内存",
+      "网络",
+      "大 Key",
+      "慢命令",
+      "输出缓冲区"
+    ],
+    "explanation": "Redis 仍受 CPU、内存、网络和单命令耗时限制。大 Key、慢命令、持久化 fork、内存压力和输出缓冲区都会造成延迟或故障。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0176",
+    "code": "redis-0176",
+    "module": "redis",
+    "chapter": "数据类型",
+    "type": "choice",
+    "stem": "Redis String 类型的值除文本外还可存储？",
+    "options": {
+      "A": "整数、二进制数据等字节序列",
+      "B": "只能存 UTF-8 文本",
+      "C": "只能存浮点数",
+      "D": "只能存 JSON"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "String 是二进制安全的，可用于缓存对象、计数和位图等。",
+    "difficulty": 1
+  },
+  {
+    "id": "redis-0177",
+    "code": "redis-0177",
+    "module": "redis",
+    "chapter": "数据类型",
+    "type": "choice",
+    "stem": "Hash 最适合的典型场景是？",
+    "options": {
+      "A": "存储对象的多个字段并单独更新",
+      "B": "按分数排行",
+      "C": "去重集合交集",
+      "D": "只做消息广播"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "Hash 将一个 key 下的 field-value 映射组织在一起。",
+    "difficulty": 1
+  },
+  {
+    "id": "redis-0178",
+    "code": "redis-0178",
+    "module": "redis",
+    "chapter": "数据类型",
+    "type": "choice",
+    "stem": "List 的常见使用场景是？",
+    "options": {
+      "A": "双端队列或简单消息队列",
+      "B": "精确去重",
+      "C": "地理半径查询",
+      "D": "基数估算"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "LPUSH/RPUSH 与 LPOP/RPOP 可组合出队列或栈。",
+    "difficulty": 1
+  },
+  {
+    "id": "redis-0179",
+    "code": "redis-0179",
+    "module": "redis",
+    "chapter": "数据类型",
+    "type": "choice",
+    "stem": "Set 的核心特性是？",
+    "options": {
+      "A": "成员唯一、无序，支持交并差集",
+      "B": "成员自动按分数排序",
+      "C": "允许大量重复成员",
+      "D": "只允许整数"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "Set 适合标签、共同关注、抽奖等需要去重的场景。",
+    "difficulty": 1
+  },
+  {
+    "id": "redis-0180",
+    "code": "redis-0180",
+    "module": "redis",
+    "chapter": "数据类型",
+    "type": "choice",
+    "stem": "ZSet 与 Set 的关键区别是？",
+    "options": {
+      "A": "ZSet 为每个唯一成员关联 score 并按其排序",
+      "B": "ZSet 允许重复成员",
+      "C": "Set 有 score",
+      "D": "ZSet 不能做范围查询"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "ZSet 适合排行榜、延迟队列等有序场景。",
+    "difficulty": 1
+  },
+  {
+    "id": "redis-0181",
+    "code": "redis-0181",
+    "module": "redis",
+    "chapter": "数据类型",
+    "type": "choice",
+    "stem": "Bitmap 适合什么场景？",
+    "options": {
+      "A": "用位紧凑表示大量二值状态，如签到",
+      "B": "存储高精度地图矢量",
+      "C": "保存超大视频",
+      "D": "事务回滚"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "Bitmap 基于 String 的位操作，对稠密 ID 的二值状态很节省空间。",
+    "difficulty": 1
+  },
+  {
+    "id": "redis-0182",
+    "code": "redis-0182",
+    "module": "redis",
+    "chapter": "数据类型",
+    "type": "choice",
+    "stem": "HyperLogLog 的特点是？",
+    "options": {
+      "A": "以小而固定的空间近似统计基数",
+      "B": "精确保存每个成员",
+      "C": "按分数排序",
+      "D": "支持回滚"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "HyperLogLog 适合 UV 等允许小误差的基数统计，不能取回原始成员。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0183",
+    "code": "redis-0183",
+    "module": "redis",
+    "chapter": "数据类型",
+    "type": "choice",
+    "stem": "GEO 类命令的常见用途是？",
+    "options": {
+      "A": "存储经纬度并查找附近位置",
+      "B": "保存 SQL 执行计划",
+      "C": "保存文件 inode",
+      "D": "实现 TCP 重传"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "Redis GEO 底层使用 ZSet 等编码组织位置数据。",
+    "difficulty": 1
+  },
+  {
+    "id": "redis-0184",
+    "code": "redis-0184",
+    "module": "redis",
+    "chapter": "数据类型",
+    "type": "choice",
+    "stem": "Stream 相比简单 List 做队列的关键能力是？",
+    "options": {
+      "A": "消息 ID、消费者组、确认与待处理列表",
+      "B": "只能保存一条消息",
+      "C": "不能阻塞读",
+      "D": "自动跨集群事务"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "Stream 更接近可持续消费的消息日志模型。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0185",
+    "code": "redis-0185",
+    "module": "redis",
+    "chapter": "数据类型",
+    "type": "short_answer",
+    "stem": "设计排行榜时为什么常用 ZSet？",
+    "options": null,
+    "answer": "ZSet 同时维护成员唯一性与 score 有序性，可高效更新分数、查排名、按分数或排名范围取数据。",
+    "key_points": [
+      "成员唯一",
+      "score",
+      "有序",
+      "更新分数",
+      "排名",
+      "范围查询"
+    ],
+    "explanation": "ZSet 同时维护成员唯一性与 score 有序性，可高效更新分数、查排名、按分数或排名范围取数据。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0186",
+    "code": "redis-0186",
+    "module": "redis",
+    "chapter": "底层数据结构",
+    "type": "choice",
+    "stem": "SDS 相比 C 字符串的主要优点是？",
+    "options": {
+      "A": "保存长度、二进制安全，并降低频繁扩容成本",
+      "B": "永远不占内存",
+      "C": "只支持 ASCII",
+      "D": "不允许修改"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "SDS 不依赖 '\\0' 判断长度，可存任意字节。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0187",
+    "code": "redis-0187",
+    "module": "redis",
+    "chapter": "底层数据结构",
+    "type": "choice",
+    "stem": "Redis 哈希表解决键冲突的典型方式是？",
+    "options": {
+      "A": "链式冲突处理",
+      "B": "删除新键",
+      "C": "改用 B+ 树",
+      "D": "禁止相同哈希值"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "多个键可落在同一桶的链上。",
+    "difficulty": 1
+  },
+  {
+    "id": "redis-0188",
+    "code": "redis-0188",
+    "module": "redis",
+    "chapter": "底层数据结构",
+    "type": "choice",
+    "stem": "Redis 渐进式 rehash 的好处是？",
+    "options": {
+      "A": "将大表迁移分散到多次操作，避免长时间阻塞",
+      "B": "一次性占用全部 CPU",
+      "C": "永不扩容",
+      "D": "不需要新哈希表"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "rehash 期间同时维护旧表和新表，逐步迁移桶。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0189",
+    "code": "redis-0189",
+    "module": "redis",
+    "chapter": "底层数据结构",
+    "type": "choice",
+    "stem": "跳表为什么能快速查找？",
+    "options": {
+      "A": "用多层有序索引跨越大量节点",
+      "B": "所有元素放在数组中",
+      "C": "只支持线性遍历",
+      "D": "使用磁盘页"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "随机层高使平均查找、插入、删除为 O(log n)。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0190",
+    "code": "redis-0190",
+    "module": "redis",
+    "chapter": "底层数据结构",
+    "type": "choice",
+    "stem": "ZSet 使用跳表时为什么还配合哈希表？",
+    "options": {
+      "A": "哈希表便于按成员查 score，跳表便于排名和范围查询",
+      "B": "两份结构数据完全无关",
+      "C": "跳表不能存 score",
+      "D": "哈希表保证持久化"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "两种结构共享成员和分值，换取不同查询的高效性。",
+    "difficulty": 3
+  },
+  {
+    "id": "redis-0191",
+    "code": "redis-0191",
+    "module": "redis",
+    "chapter": "底层数据结构",
+    "type": "choice",
+    "stem": "quicklist 的基本设计是？",
+    "options": {
+      "A": "以链表串联多个紧凑列表节点，折中连续内存与插入性能",
+      "B": "纯二叉树",
+      "C": "只有一个整数",
+      "D": "磁盘 B+ 树"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "quicklist 长期用于 Redis List 的底层表示。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0192",
+    "code": "redis-0192",
+    "module": "redis",
+    "chapter": "底层数据结构",
+    "type": "choice",
+    "stem": "listpack 设计上相比旧 ziplist 的一个重要改进是？",
+    "options": {
+      "A": "避免 ziplist 更新前一节点长度字段引发的连锁更新问题",
+      "B": "必须为每项分配独立指针",
+      "C": "只能存字符",
+      "D": "不能遍历"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "listpack 使用当前元素自身长度信息支持反向遍历。",
+    "difficulty": 3
+  },
+  {
+    "id": "redis-0193",
+    "code": "redis-0193",
+    "module": "redis",
+    "chapter": "底层数据结构",
+    "type": "choice",
+    "stem": "intset 适用于？",
+    "options": {
+      "A": "元素全为整数且数量较少的 Set 紧凑编码",
+      "B": "任意大型 Hash",
+      "C": "排行榜范围查询",
+      "D": "网络事件循环"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "intset 按整数宽度编码有序数组，插入更大宽度值时可整体升级。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0194",
+    "code": "redis-0194",
+    "module": "redis",
+    "chapter": "AOF",
+    "type": "choice",
+    "stem": "AOF 持久化记录的主要内容是？",
+    "options": {
+      "A": "对数据集的写命令",
+      "B": "每次读命令",
+      "C": "整个内存的原始镜像",
+      "D": "TCP 报文"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "重启时通过重放 AOF 写命令恢复数据。",
+    "difficulty": 1
+  },
+  {
+    "id": "redis-0195",
+    "code": "redis-0195",
+    "module": "redis",
+    "chapter": "AOF",
+    "type": "choice",
+    "stem": "appendfsync everysec 的含义是？",
+    "options": {
+      "A": "通常每秒将 AOF 缓冲刷到持久介质，折中性能和丢失窗口",
+      "B": "每条命令都必然单独 fsync",
+      "C": "永不 fsync",
+      "D": "每秒生成 RDB"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "宕机时理论上可能丢失约 1 秒内的 AOF 数据。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0196",
+    "code": "redis-0196",
+    "module": "redis",
+    "chapter": "AOF",
+    "type": "choice",
+    "stem": "AOF 重写的目的是？",
+    "options": {
+      "A": "根据当前数据状态生成更紧凑的写命令集",
+      "B": "重新执行所有读命令",
+      "C": "清空数据库",
+      "D": "改成 MySQL binlog"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "多次更新同一 key 可压缩为表示当前值的少量命令。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0197",
+    "code": "redis-0197",
+    "module": "redis",
+    "chapter": "AOF",
+    "type": "choice",
+    "stem": "AOF 重写期间主进程仍接收新写入，如何避免丢失增量？",
+    "options": {
+      "A": "将增量写入缓冲/增量文件，完成后与重写结果衔接",
+      "B": "暂停服务数小时",
+      "C": "丢弃新写入",
+      "D": "改为只读"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "具体实现随 Redis 版本演进，核心是保留重写起点后的增量。",
+    "difficulty": 3
+  },
+  {
+    "id": "redis-0198",
+    "code": "redis-0198",
+    "module": "redis",
+    "chapter": "AOF",
+    "type": "short_answer",
+    "stem": "AOF 的 always、everysec、no 三种刷盘策略如何取舍？",
+    "options": null,
+    "answer": "always 每次写命令后 fsync，数据丢失窗口小但慢；everysec 约每秒 fsync，常用于折中；no 交给操作系统决定刷盘，性能高但丢失窗口更不可控。",
+    "key_points": [
+      "always",
+      "everysec",
+      "no",
+      "fsync",
+      "性能",
+      "数据丢失"
+    ],
+    "explanation": "always 每次写命令后 fsync，数据丢失窗口小但慢；everysec 约每秒 fsync，常用于折中；no 交给操作系统决定刷盘，性能高但丢失窗口更不可控。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0199",
+    "code": "redis-0199",
+    "module": "redis",
+    "chapter": "RDB",
+    "type": "choice",
+    "stem": "RDB 持久化的本质是？",
+    "options": {
+      "A": "在某个时点将数据集生成紧凑快照",
+      "B": "记录每条写命令",
+      "C": "复制 TCP 连接",
+      "D": "只存过期时间"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "RDB 恢复速度快、文件紧凑，但两次快照间的数据可丢失。",
+    "difficulty": 1
+  },
+  {
+    "id": "redis-0200",
+    "code": "redis-0200",
+    "module": "redis",
+    "chapter": "RDB",
+    "type": "choice",
+    "stem": "bgsave 生成 RDB 时通常利用？",
+    "options": {
+      "A": "fork 子进程与写时复制",
+      "B": "MySQL 事务",
+      "C": "DNS 缓存",
+      "D": "一致性哈希"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "子进程看到 fork 时的内存快照，主进程继续处理命令。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0201",
+    "code": "redis-0201",
+    "module": "redis",
+    "chapter": "RDB",
+    "type": "choice",
+    "stem": "RDB 期间 Copy-on-Write 最容易显著增大内存的场景是？",
+    "options": {
+      "A": "快照期间有大量写入，大量页被复制",
+      "B": "纯读且无写入",
+      "C": "数据集为空",
+      "D": "只执行 PING"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "fork 后修改内存页会为父进程创建私有副本，写负载大时内存峰值上升。",
+    "difficulty": 3
+  },
+  {
+    "id": "redis-0202",
+    "code": "redis-0202",
+    "module": "redis",
+    "chapter": "RDB",
+    "type": "short_answer",
+    "stem": "对比 RDB 和 AOF 的主要优缺点。",
+    "options": null,
+    "answer": "RDB 文件紧凑、备份和加载快，但定期快照的数据丢失窗口较大；AOF 可以更频繁地持久写入，数据安全性通常更高，但文件、写放大与恢复成本可更高。实际可组合使用。",
+    "key_points": [
+      "RDB",
+      "快照",
+      "加载快",
+      "AOF",
+      "数据安全",
+      "恢复成本"
+    ],
+    "explanation": "RDB 文件紧凑、备份和加载快，但定期快照的数据丢失窗口较大；AOF 可以更频繁地持久写入，数据安全性通常更高，但文件、写放大与恢复成本可更高。实际可组合使用。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0203",
+    "code": "redis-0203",
+    "module": "redis",
+    "chapter": "过期与淘汰",
+    "type": "choice",
+    "stem": "Redis 过期键删除通常结合什么策略？",
+    "options": {
+      "A": "惰性删除与定期抽样删除",
+      "B": "只在启动时删除",
+      "C": "每毫秒全量扫描",
+      "D": "永不删除"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "访问 key 时检查过期，后台也周期性抽样清理，在 CPU 和内存之间折中。",
+    "difficulty": 1
+  },
+  {
+    "id": "redis-0204",
+    "code": "redis-0204",
+    "module": "redis",
+    "chapter": "过期与淘汰",
+    "type": "choice",
+    "stem": "过期删除与内存淘汰的触发条件有何不同？",
+    "options": {
+      "A": "前者处理已到 TTL 的键，后者在超过 maxmemory 等内存限制时腾空空间",
+      "B": "完全没有区别",
+      "C": "淘汰只删已过期键",
+      "D": "过期删除只在内存满时"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "TTL 是键的生命周期，淘汰策略是内存不足时的取舍。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0205",
+    "code": "redis-0205",
+    "module": "redis",
+    "chapter": "过期与淘汰",
+    "type": "choice",
+    "stem": "allkeys-lru 的含义是？",
+    "options": {
+      "A": "从所有键中近似淘汰最久未使用键",
+      "B": "只从设置 TTL 的键中随机删除",
+      "C": "拒绝所有写入且不删键",
+      "D": "删除 TTL 最长的键"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "allkeys 表示候选集是所有键，LRU 是近似最近最少使用。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0206",
+    "code": "redis-0206",
+    "module": "redis",
+    "chapter": "过期与淘汰",
+    "type": "choice",
+    "stem": "LFU 淘汰相比 LRU 更关注？",
+    "options": {
+      "A": "访问频率",
+      "B": "键的字典序",
+      "C": "创建者用户名",
+      "D": "网络延迟"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "LFU 尝试保留长期访问更频繁的数据，Redis 使用衰减计数的近似实现。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0207",
+    "code": "redis-0207",
+    "module": "redis",
+    "chapter": "分布式锁",
+    "type": "choice",
+    "stem": "单实例 Redis 获取分布式锁的典型命令是？",
+    "options": {
+      "A": "SET key unique_value NX PX ttl",
+      "B": "GETSET key",
+      "C": "LPUSH lock",
+      "D": "FLUSHALL"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "NX 保证不存在才设置，PX 设置过期防止永久死锁。",
+    "difficulty": 1
+  },
+  {
+    "id": "redis-0208",
+    "code": "redis-0208",
+    "module": "redis",
+    "chapter": "分布式锁",
+    "type": "choice",
+    "stem": "释放 Redis 分布式锁时为什么要比较唯一值再删除？",
+    "options": {
+      "A": "避免误删过期后由其他客户端新获得的锁",
+      "B": "为了让键更长",
+      "C": "为了使用集合",
+      "D": "为了触发 RDB"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "每个持有者用随机令牌标识所有权。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0209",
+    "code": "redis-0209",
+    "module": "redis",
+    "chapter": "分布式锁",
+    "type": "choice",
+    "stem": "“判断值是自己的，再 DEL”为什么要用 Lua 脚本？",
+    "options": {
+      "A": "使比较与删除原子执行",
+      "B": "让 Redis 支持 SQL",
+      "C": "自动备份",
+      "D": "增加网络往返"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "若 GET 和 DEL 分开，中间锁可过期并被别人获取，导致误删。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0210",
+    "code": "redis-0210",
+    "module": "redis",
+    "chapter": "分布式锁",
+    "type": "short_answer",
+    "stem": "分布式锁的 TTL 太短时有什么风险，如何处理？",
+    "options": null,
+    "answer": "业务尚未完成锁已过期，其他客户端可进入临界区。可估算合理 TTL、使用安全续期看门狗、给资源写入加 fencing token，并保证业务幂等。",
+    "key_points": [
+      "锁过期",
+      "临界区",
+      "合理 TTL",
+      "续期",
+      "fencing token",
+      "幂等"
+    ],
+    "explanation": "业务尚未完成锁已过期，其他客户端可进入临界区。可估算合理 TTL、使用安全续期看门狗、给资源写入加 fencing token，并保证业务幂等。",
+    "difficulty": 3
+  },
+  {
+    "id": "redis-0211",
+    "code": "redis-0211",
+    "module": "redis",
+    "chapter": "主从复制",
+    "type": "choice",
+    "stem": "Redis 主从首次全量同步通常包括？",
+    "options": {
+      "A": "主库生成并发送 RDB，从库加载，再追上期间增量命令",
+      "B": "只发送一个 PING",
+      "C": "只复制 AOF 文件名",
+      "D": "共享同一内存"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "全量同步期间的新写入会记录下来，快照加载完再发给从库。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0212",
+    "code": "redis-0212",
+    "module": "redis",
+    "chapter": "主从复制",
+    "type": "choice",
+    "stem": "部分重同步依赖的关键信息是？",
+    "options": {
+      "A": "复制 ID、偏移量和 replication backlog",
+      "B": "MySQL 主键",
+      "C": "HTTP Cookie",
+      "D": "inode 号"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "断线后若所缺增量仍在 backlog 中，可避免再做全量同步。",
+    "difficulty": 3
+  },
+  {
+    "id": "redis-0213",
+    "code": "redis-0213",
+    "module": "redis",
+    "chapter": "主从复制",
+    "type": "choice",
+    "stem": "读写分离下从库读可能出现？",
+    "options": {
+      "A": "复制延迟导致读到旧数据",
+      "B": "每次都强一致",
+      "C": "从库自动修改主库",
+      "D": "永不会断连"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "Redis 复制默认是异步的，对一致性敏感的读要设计路由或等待策略。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0214",
+    "code": "redis-0214",
+    "module": "redis",
+    "chapter": "主从复制",
+    "type": "short_answer",
+    "stem": "主从复制能否单独保证主节点故障时自动恢复？",
+    "options": null,
+    "answer": "不能。复制提供数据副本，但自动故障检测、领导者选举和主从切换需要 Sentinel 或 Cluster 等高可用组件。",
+    "key_points": [
+      "不能",
+      "数据副本",
+      "故障检测",
+      "领导者选举",
+      "主从切换",
+      "Sentinel"
+    ],
+    "explanation": "不能。复制提供数据副本，但自动故障检测、领导者选举和主从切换需要 Sentinel 或 Cluster 等高可用组件。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0215",
+    "code": "redis-0215",
+    "module": "redis",
+    "chapter": "哨兵",
+    "type": "choice",
+    "stem": "Sentinel 的主要职责不包括？",
+    "options": {
+      "A": "监控主从、故障转移、通知和服务发现",
+      "B": "将每个 key 分片到 16384 槽",
+      "C": "判断主节点是否下线",
+      "D": "选择从节点升主"
+    },
+    "answer": "B",
+    "key_points": null,
+    "explanation": "16384 哈希槽是 Redis Cluster 的数据分片机制。",
+    "difficulty": 1
+  },
+  {
+    "id": "redis-0216",
+    "code": "redis-0216",
+    "module": "redis",
+    "chapter": "哨兵",
+    "type": "choice",
+    "stem": "Sentinel 中“客观下线”一般需要？",
+    "options": {
+      "A": "足够多 Sentinel 达成 quorum 意见",
+      "B": "一个客户端报错",
+      "C": "主库一次慢查询",
+      "D": "RDB 刚完成"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "单个 Sentinel 判断是主观下线，多个 Sentinel 达到法定数才确认客观下线。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0217",
+    "code": "redis-0217",
+    "module": "redis",
+    "chapter": "哨兵",
+    "type": "short_answer",
+    "stem": "Sentinel 故障转移大致经过哪些步骤？",
+    "options": null,
+    "answer": "多个 Sentinel 确认主库客观下线；选举领导 Sentinel；选择合适从库升主；让其他从库改为复制新主；更新配置并通知客户端。",
+    "key_points": [
+      "客观下线",
+      "领导 Sentinel",
+      "从库升主",
+      "复制新主",
+      "通知客户端"
+    ],
+    "explanation": "多个 Sentinel 确认主库客观下线；选举领导 Sentinel；选择合适从库升主；让其他从库改为复制新主；更新配置并通知客户端。",
+    "difficulty": 3
+  },
+  {
+    "id": "redis-0218",
+    "code": "redis-0218",
+    "module": "redis",
+    "chapter": "Cluster",
+    "type": "choice",
+    "stem": "Redis Cluster 将键空间划分为多少个哈希槽？",
+    "options": {
+      "A": "1024",
+      "B": "4096",
+      "C": "16384",
+      "D": "65536"
+    },
+    "answer": "C",
+    "key_points": null,
+    "explanation": "key 的 CRC16 结果对 16384 取模得到槽位。",
+    "difficulty": 1
+  },
+  {
+    "id": "redis-0219",
+    "code": "redis-0219",
+    "module": "redis",
+    "chapter": "Cluster",
+    "type": "choice",
+    "stem": "Cluster 中客户端访问了错误节点时，常收到？",
+    "options": {
+      "A": "MOVED 重定向",
+      "B": "HTTP 301",
+      "C": "MySQL 1062",
+      "D": "ICMP Echo"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "MOVED 告诉客户端该槽的正确节点，智能客户端会更新槽映射。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0220",
+    "code": "redis-0220",
+    "module": "redis",
+    "chapter": "Cluster",
+    "type": "choice",
+    "stem": "Redis Cluster 的 hash tag（如 user:{42}:name）主要用于？",
+    "options": {
+      "A": "让具有相同花括号内容的键落在同一槽",
+      "B": "加密 key",
+      "C": "设置 TTL",
+      "D": "保存备注"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "多键命令通常要求 key 在同一槽，hash tag 可控制这一点。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0221",
+    "code": "redis-0221",
+    "module": "redis",
+    "chapter": "Cluster",
+    "type": "short_answer",
+    "stem": "Redis Cluster 的扩容本质上做了什么？",
+    "options": null,
+    "answer": "加入新节点后，将部分哈希槽及槽内键从原节点迁移到新节点，并在集群中传播新槽映射。",
+    "key_points": [
+      "新节点",
+      "哈希槽",
+      "键迁移",
+      "槽映射"
+    ],
+    "explanation": "加入新节点后，将部分哈希槽及槽内键从原节点迁移到新节点，并在集群中传播新槽映射。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0222",
+    "code": "redis-0222",
+    "module": "redis",
+    "chapter": "缓存问题",
+    "type": "choice",
+    "stem": "缓存穿透是指？",
+    "options": {
+      "A": "持续查询缓存和数据库都不存在的数据",
+      "B": "一个热 key 突然过期",
+      "C": "大量 key 同时过期",
+      "D": "缓存内存满"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "可缓存空值、做参数校验或在前端使用布隆过滤器。",
+    "difficulty": 1
+  },
+  {
+    "id": "redis-0223",
+    "code": "redis-0223",
+    "module": "redis",
+    "chapter": "缓存问题",
+    "type": "choice",
+    "stem": "缓存击穿是指？",
+    "options": {
+      "A": "某个热点 key 过期后大量并发请求同时打到数据库",
+      "B": "任意不存在 key 查询",
+      "C": "Redis 主机断电",
+      "D": "数据库索引失效"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "可用互斥重建、逻辑过期、预热等方式缓解。",
+    "difficulty": 1
+  },
+  {
+    "id": "redis-0224",
+    "code": "redis-0224",
+    "module": "redis",
+    "chapter": "缓存问题",
+    "type": "choice",
+    "stem": "缓存雪崩的常见成因是？",
+    "options": {
+      "A": "大量 key 在近似时间过期或 Redis 整体故障",
+      "B": "单个不存在 key",
+      "C": "一个客户端主动关闭",
+      "D": "只有网页缓存过期"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "可为 TTL 加随机值、做高可用和多级缓存，并用限流降级保护数据库。",
+    "difficulty": 1
+  },
+  {
+    "id": "redis-0225",
+    "code": "redis-0225",
+    "module": "redis",
+    "chapter": "缓存问题",
+    "type": "choice",
+    "stem": "布隆过滤器用于防穿透时有什么性质？",
+    "options": {
+      "A": "判定一定不存在时可直接拒绝；判定可能存在时仍可能是假阳性",
+      "B": "有假阴性但绝无假阳性",
+      "C": "能直接返回原始数据",
+      "D": "元素越多误判率必然越低"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "标准布隆过滤器可能把不存在的元素判为可能存在。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0226",
+    "code": "redis-0226",
+    "module": "redis",
+    "chapter": "缓存问题",
+    "type": "short_answer",
+    "stem": "说明大 Key 可能带来的问题。",
+    "options": null,
+    "answer": "单次读写、删除或遍历耗时过长阻塞主线程；网络流量尖峰；集群分片不均；持久化和主从同步压力增大；fork 后修改大 Key 可增加 COW 内存。应拆分、渐进删除并限制大范围命令。",
+    "key_points": [
+      "阻塞",
+      "流量尖峰",
+      "分片不均",
+      "持久化",
+      "主从同步",
+      "COW"
+    ],
+    "explanation": "单次读写、删除或遍历耗时过长阻塞主线程；网络流量尖峰；集群分片不均；持久化和主从同步压力增大；fork 后修改大 Key 可增加 COW 内存。应拆分、渐进删除并限制大范围命令。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0227",
+    "code": "redis-0227",
+    "module": "redis",
+    "chapter": "缓存一致性",
+    "type": "choice",
+    "stem": "Cache Aside 更新数据的常见推荐顺序是？",
+    "options": {
+      "A": "先更新数据库，再删除缓存",
+      "B": "先更新缓存，不写数据库",
+      "C": "先删数据库",
+      "D": "只等待 TTL"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "删缓存比直接更新缓存更容易避免并发覆盖顺序问题，但仍需处理删除失败。",
+    "difficulty": 2
+  },
+  {
+    "id": "redis-0228",
+    "code": "redis-0228",
+    "module": "redis",
+    "chapter": "缓存一致性",
+    "type": "choice",
+    "stem": "为什么“先删缓存，再更新数据库”有风险？",
+    "options": {
+      "A": "并发读可在数据库更新前读到旧值并回填缓存",
+      "B": "缓存永远不会被删",
+      "C": "数据库不支持更新",
+      "D": "Redis 会自动回滚 MySQL"
+    },
+    "answer": "A",
+    "key_points": null,
+    "explanation": "这会使旧值在新值提交前重新进入缓存并持续到过期。",
+    "difficulty": 3
+  },
+  {
+    "id": "redis-0229",
+    "code": "redis-0229",
+    "module": "redis",
+    "chapter": "缓存一致性",
+    "type": "short_answer",
+    "stem": "如何降低“更新数据库后删除缓存失败”的影响？",
+    "options": null,
+    "answer": "对删除操作做有界重试与幂等；将重试任务投递到可靠消息队列；或订阅 binlog/CDC 异步删除缓存。同时设置合理 TTL 作为最终兜底，并根据业务决定一致性等级。",
+    "key_points": [
+      "重试",
+      "幂等",
+      "消息队列",
+      "binlog",
+      "CDC",
+      "TTL"
+    ],
+    "explanation": "对删除操作做有界重试与幂等；将重试任务投递到可靠消息队列；或订阅 binlog/CDC 异步删除缓存。同时设置合理 TTL 作为最终兜底，并根据业务决定一致性等级。",
+    "difficulty": 3
+  }
+]

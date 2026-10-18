@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>后端八股刷题助手</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .tabs {
+            margin-bottom: 20px;
+        }
+
+        .tabs button {
+            padding: 8px 16px;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        #module-bar button {
+            padding: 6px 12px;
+            margin-right: 6px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+        }
+        #module-bar button.active {
+            background: #1890ff;
+            color: white;
+            border-color: #1890ff;
+        }
+
+        .tabs button.active {
+            background: #1890ff;
+            color: white;
+            border: none;
+        }
+
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .option {
+            display: block;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            background: white;
+        }
+
+        .option:hover {
+            background: #f0f0f0;
+        }
+
+        .correct {
+            background: #d4edda;
+        }
+
+        .wrong {
+            background: #f8d7da;
+        }
+
+        button.action {
+            padding: 10px 24px;
+            background: #1890ff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+
+        .history-toggle {
+            width: 100%;
+            padding: 0;
+            border: 0;
+            background: transparent;
+            cursor: pointer;
+            text-align: left;
+            font: inherit;
+        }
+
+        .history-toggle:focus-visible {
+            outline: 2px solid #1890ff;
+            outline-offset: 4px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                max-width: none;
+                margin: 0;
+                padding: 12px 12px 84px;
+            }
+
+            h1 {
+                font-size: 22px;
+                margin: 8px 0 12px;
+            }
+
+            .tabs {
+                display: flex;
+                gap: 4px;
+                overflow-x: auto;
+                padding-bottom: 6px;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .tabs button {
+                flex: 0 0 auto;
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+
+            .card {
+                padding: 14px;
+                border-radius: 10px;
+            }
+
+            .option {
+                padding: 12px;
+            }
+
+            input[type="text"] {
+                width: 100%;
+                box-sizing: border-box;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>八股刷题小助手</h1>
+    <div class="tabs">
+        <button onclick="showTab('quiz')" id="tab-quiz">答题</button>
+        <button onclick="showTab('daily')" id="tab-daily">每日一练</button>
+        <button onclick="showTab('review')" id="tab-review">复习</button>
+        <button onclick="showTab('wrong')" id="tab-wrong">错题本</button>
+        <button onclick="showTab('favorites')" id="tab-favorites">收藏</button>
+        <button onclick="showTab('stats')" id="tab-stats">统计</button>
+        <button onclick="showTab('history')" id="tab-history">历史</button>
+    </div>
+
+    <div id="view-quiz">
+        <div id="module-bar" style="margin-bottom: 16px;">
+            <button onclick="setModule('', this)">全部</button>
+            <button onclick="setModule('network', this)">计算机网络</button>
+            <button onclick="setModule('os', this)">操作系统</button>
+            <button onclick="setModule('mysql', this)">MySQL</button>
+            <button onclick="setModule('redis', this)">Redis</button>
+        </div>
+        <div class="card" id="question-card">
+            <p>点"下一题"开始刷题</p>
+            <button class="action" onclick="loadQuestion()">下一题</button>
+        </div>
+    </div>
+
+    <div id="view-wrong" style="display:none"></div>
+    <div id="view-favorites" style="display:none"></div>
+    <div id="view-stats" style="display:none"></div>
+    <div id="view-daily" style="display:none"></div>
+    <div id="view-review" style="display:none"></div>
+    <div id="view-history" style="display:none"></div>
+    <script src="js/local-api.js"></script>
+    <script>
+        // 同源相对路径：页面由后端直接托管，换端口、换域名、手机访问都不用改代码
+        const API = "";
+        let currentQuestion = null;
+        let currentModule = '';
+        const dailyHistoryCache = new Map();
+        const pendingShortAssessments = new Map();
+
+        function setModule(m, button) {
+            currentModule = m;
+            document.querySelectorAll('#module-bar button').forEach(btn => btn.classList.remove('active'));
+            if (button) button.classList.add('active');
+            loadQuestion();
+        }
+
+        function showTab(name) {
+                for (const t of ['quiz', 'daily', 'review', 'wrong', 'favorites', 'stats', 'history']) {
+                document.getElementById('view-' + t).style.display = 'none';
+                document.getElementById('tab-' + t).classList.remove('active');
+            }
+            document.getElementById('view-' + name).style.display = 'block';
+            document.getElementById('tab-' + name).classList.add('active');
+            if (name === 'wrong') loadWrong();
+            if (name === 'review') loadReview();
+            if (name === 'favorites') loadFavorites();
+            if (name === 'stats') loadStats();
+            if (name === 'daily') loadDaily();
+            if (name === 'history') loadHistory();
+        }
+
+        async function loadQuestion() {
+            let url = API + '/api/questions?limit=1';
+            if (currentModule) url += '&module=' + currentModule;
+            const res = await fetch(url);
+            const data = await res.json();
+            if (data.length === 0) {
+                document.getElementById('question-card').innerHTML = '<p>这个模块还没有题目</p>';
+                return;
+            }
+            currentQuestion = data[0];
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = currentQuestion;
+            let html = `<h3>[${q.module}] ${q.stem} ${masteryBadge(q.mastery_level)}</h3>`;
+            if (q.options) {
+                for (const [k, v] of Object.entries(q.options)) {
+                    html += `<div class="option" onclick="submitAnswer('${k}')">${k}. ${v}</div>`;
+                }
+            } else {
+                html += `<input type="text" id="short-answer" placeholder="输入你的答案">`;
+                html += `<p><button class="action" onclick="submitShort()">提交</button></p>`;
+            }
+            document.getElementById('question-card').innerHTML = html;
+        }
+
+        async function submitAnswer(choice) {
+            const res = await fetch(API + '/api/answers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question_id: currentQuestion.id, user_answer: choice })
+            });
+            const result = await res.json();
+            showResult(result);
+        }
+
+        async function submitShort() {
+            const ans = document.getElementById('short-answer').value;
+            const card = document.getElementById('question-card');
+            await beginShortAssessment({
+                key: 'quiz',
+                question: currentQuestion,
+                userAnswer: ans,
+                container: card,
+                kind: 'quiz'
+            });
+        }
+
+        function renderShortAssessment(preview, key) {
+            const matched = preview.matched_points.length
+                ? preview.matched_points.join('、')
+                : '暂无';
+            const missing = preview.missing_points.length
+                ? preview.missing_points.join('、')
+                : '无';
+            const uncertain = (preview.uncertain_points || []).length
+                ? `<p style="color:#8c8c8c">疑似覆盖（不计入覆盖率）：${preview.uncertain_points.join('、')}</p>`
+                : '';
+            return `
+                <p>你的回答：${preview.display_user_answer}</p>
+                <p><strong>关键点覆盖率：${preview.coverage}%</strong></p>
+                <p style="color:green">已覆盖：${matched}</p>
+                <p style="color:orange">待补充：${missing}</p>
+                ${uncertain}
+                <div class="correct">
+                    <p>参考答案：${preview.correct_answer}</p>
+                    <p>解析：${preview.explanation}</p>
+                </div>
+                <p><strong>结合关键点和参考答案，你现在的掌握程度是？</strong></p>
+                <button class="action" onclick="finalizeShortAnswer('${key}', 'mastered')">掌握</button>
+                <button class="action" onclick="finalizeShortAnswer('${key}', 'fuzzy')">模糊</button>
+                <button class="action" onclick="finalizeShortAnswer('${key}', 'unknown')">不会</button>
+            `;
+        }
+
+        async function beginShortAssessment(context) {
+            if (!context.userAnswer.trim()) {
+                alert('请先输入你的回答');
+                return;
+            }
+            context.container.innerHTML = '<p>正在分析关键点...</p>';
+            try {
+                const res = await fetch(API + '/api/answers/preview', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        question_id: context.question.id,
+                        user_answer: context.userAnswer
+                    })
+                });
+                if (!res.ok) throw new Error('关键点分析失败');
+                const preview = await res.json();
+                context.preview = preview;
+                pendingShortAssessments.set(context.key, context);
+                context.container.innerHTML = `
+                    <p>${context.title || `[${context.question.module}] ${context.question.stem}`}</p>
+                    ${renderShortAssessment(preview, context.key)}
+                `;
+            } catch (error) {
+                context.container.innerHTML = '<p style="color:red">关键点分析失败，请重新作答</p>';
+            }
+        }
+
+        function shortRatingLabel(rating) {
+            if (rating === 'mastered') return '掌握';
+            if (rating === 'fuzzy') return '模糊';
+            return '不会';
+        }
+
+        function renderFinalShortResult(context, result) {
+            const label = shortRatingLabel(result.self_rating);
+            const color = result.is_correct ? 'correct' : 'wrong';
+            return `
+                <p>${context.title || `[${context.question.module}] ${context.question.stem}`}</p>
+                <div class="${color}">
+                    <p><strong>已标记为${label}</strong></p>
+                    <p>你的回答：${result.display_user_answer}</p>
+                    <p>参考答案：${result.correct_answer}</p>
+                    <p>解析：${result.explanation}</p>
+                </div>
+            `;
+        }
+
+        async function finalizeShortAnswer(key, selfRating) {
+            const context = pendingShortAssessments.get(key);
+            if (!context || context.submitting) return;
+            if (
+                selfRating === 'mastered' &&
+                context.preview.coverage < 50 &&
+                !window.confirm('你的回答遗漏了较多关键点，仍要标记为掌握吗？')
+            ) {
+                return;
+            }
+            context.submitting = true;
+
+            const body = {
+                question_id: context.question.id,
+                user_answer: context.userAnswer,
+                self_rating: selfRating
+            };
+            if (context.dailyPracticeId !== undefined) {
+                body.daily_practice_id = context.dailyPracticeId;
+            }
+            const res = await fetch(API + '/api/answers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            if (!res.ok) {
+                context.submitting = false;
+                context.container.innerHTML += '<p style="color:red">提交失败，请重试</p>';
+                return;
+            }
+            const result = await res.json();
+            pendingShortAssessments.delete(key);
+            context.container.innerHTML = renderFinalShortResult(context, result);
+
+            if (context.kind === 'quiz') {
+                context.container.innerHTML += `
+                    <button class="action" onclick="favoriteCurrent()">⭐ 收藏本题</button>
+                    <button class="action" onclick="loadQuestion()">下一题</button>
+                `;
+            } else if (context.kind === 'daily') {
+                if (window.dailyDate) dailyHistoryCache.delete(window.dailyDate);
+                window.dailyAnswers[context.index] = result.is_correct;
+                renderDailyScore();
+            } else if (context.kind === 'review') {
+                window.reviewAnswers[context.index] = result.is_correct;
+                renderReviewScore();
+            }
+        }
+
+        function showResult(result) {
+            const color = result.is_correct ? 'correct' : 'wrong';
+            document.getElementById('question-card').innerHTML = `
+                <div class="${color}">
+                    <h3>${result.is_correct ? '✓ 答对了！' : '✗ 答错了'}</h3>
+                    <p>正确答案：${result.correct_answer}</p>
+                    <p>解析：${result.explanation}</p>
+                </div>
+                <button class="action" onclick="favoriteCurrent()">⭐ 收藏本题</button>
+                <button class="action" onclick="loadQuestion()">下一题</button>
+            `;
+        }
+
+        async function favoriteCurrent() {
+            await fetch(API + '/api/favorites/' + currentQuestion.id, { method: 'POST' });
+            alert('已收藏！');
+        }
+
+        async function loadWrong() {
+            const res = await fetch(API + '/api/wrong-questions');
+            const data = await res.json();
+            let html = `<h2>错题本（共 ${data.length} 题）</h2>`;
+            for (const w of data) {
+                html += `<div class="card"><p>[${w.module}] ${w.stem}</p><p>正确答案：${w.answer}（错了 ${w.wrong_count} 次）</p><p>${w.explanation}</p><button class="action" onclick="removeWrong(${w.question_id})">已掌握，移出</button></div>`;
+            }
+            document.getElementById('view-wrong').innerHTML = html;
+        }
+
+        async function removeWrong(questionId) {
+            await fetch(API + '/api/wrong-questions/' + questionId, { method: 'DELETE' });
+            loadWrong();
+        }
+
+        async function loadFavorites() {
+            const res = await fetch(API + '/api/favorites');
+            const data = await res.json();
+            let html = `<h2>收藏（共 ${data.length} 题）</h2>`;
+            for (const f of data) {
+                html += `<div class="card"><p>[${f.module}] ${f.stem}</p><p>答案：${f.answer}</p><p>${f.explanation}</p><button class="action" onclick="removeFavorite(${f.question_id})">取消收藏</button></div>`;
+            }
+            document.getElementById('view-favorites').innerHTML = html;
+        }
+
+        async function removeFavorite(questionId) {
+            await fetch(API + '/api/favorites/' + questionId, { method: 'DELETE' });
+            loadFavorites();
+        }
+
+        async function loadStats() {
+            const res = await fetch(API + '/api/stats');
+            const s = await res.json();
+            let html = `<h2>学习统计</h2>`;
+            html += `<div class="card"><p>总答题：${s.total} 题</p><p>答对：${s.correct} 题</p><p>总正确率：${s.accuracy}%</p></div>`;
+            html += '<h3>掌握度</h3>';
+            html += `<div class="card">
+            <p><span style="color:red">薄弱</span>：${s.mastery['薄弱']} 道</p>
+            <p><span style="color:orange">一般</span>：${s.mastery['一般']} 道</p>
+            <p><span style="color:green">熟练</span>：${s.mastery['熟练']} 道</p>
+        </div>`;
+            html += '<h3>各模块</h3>';
+            for (const m of s.by_module) {
+                html += `<div class="card"><p>${m.module}：${m.total} 题，正确率 ${m.accuracy}%</p></div>`;
+            }
+
+            document.getElementById('view-stats').innerHTML = html;
+        }
+
+        async function loadHistory() {
+            const view = document.getElementById('view-history');
+            view.innerHTML = '<p>正在加载练习历史...</p>';
+            try {
+                const res = await fetch(API + '/api/daily/history');
+                if (!res.ok) throw new Error('加载历史记录失败');
+                const data = await res.json();
+                let html = `<h2>练习历史（连续打卡 ${data.streak} 天）</h2>`;
+                if (data.records.length === 0) {
+                    html += '<p>还没有练习记录</p>';
+                } else {
+                    for (const record of data.records) {
+                        const status = record.is_completed
+                            ? '<span style="color:green">已完成</span>'
+                            : '<span style="color:orange">未完成</span>';
+                        html += `<div class="card">
+                            <button class="history-toggle" id="history-toggle-${record.date}" type="button"
+                                aria-expanded="false"
+                                aria-controls="history-${record.date}"
+                                onclick="loadDailyHistory('${record.date}')">
+                                ${record.date}　已答 ${record.answered}/${record.total}　
+                                已答正确率 ${record.accuracy}%　完成率 ${record.completion_rate}%　
+                                ${status}　<span id="history-arrow-${record.date}">▼</span>
+                            </button>
+                            <div id="history-${record.date}" style="display:none"></div>
+                        </div>`;
+                    }
+                }
+                view.innerHTML = html;
+            } catch (error) {
+                view.innerHTML = '<p style="color:red">历史记录加载失败，请稍后重试</p>';
+            }
+        }
+
+        async function loadDailyHistory(day) {
+            const box = document.getElementById('history-' + day);
+            const arrow = document.getElementById('history-arrow-' + day);
+            const toggle = document.getElementById('history-toggle-' + day);
+            if (box.style.display === 'block') {
+                box.style.display = 'none';
+                if (arrow) arrow.textContent = '▼';
+                if (toggle) toggle.setAttribute('aria-expanded', 'false');
+                return;
+            }
+
+            if (dailyHistoryCache.has(day)) {
+                box.innerHTML = dailyHistoryCache.get(day);
+                box.style.display = 'block';
+                if (arrow) arrow.textContent = '▲';
+                if (toggle) toggle.setAttribute('aria-expanded', 'true');
+                return;
+            }
+
+            box.innerHTML = '<p>正在加载详情...</p>';
+            box.style.display = 'block';
+            if (arrow) arrow.textContent = '▲';
+            if (toggle) toggle.setAttribute('aria-expanded', 'true');
+            try {
+                const res = await fetch(API + '/api/daily/history/' + encodeURIComponent(day));
+                if (!res.ok) throw new Error('加载历史详情失败');
+                const data = await res.json();
+                let html = '';
+                data.questions.forEach((q, i) => {
+                    html += `<p style="margin-top:10px">${i + 1}. [${q.module}] ${q.stem}</p>`;
+                    if (q.user_answer !== null && q.user_answer !== undefined) {
+                        const answerStatus = q.is_correct
+                            ? '<span style="color:green">答对</span>'
+                            : '<span style="color:red">答错</span>';
+                        html += `<p>${answerStatus}</p>`;
+                        if (q.type === 'choice') {
+                            for (const [k, v] of Object.entries(q.options)) {
+                                let cls = '';
+                                if (k === q.correct_answer) cls = 'correct';
+                                else if (k === q.user_answer && !q.is_correct) cls = 'wrong';
+                                html += `<div class="option ${cls}" style="cursor:default">${k}. ${v}</div>`;
+                            }
+                        } else {
+                            html += `<p style="color:red">你的答案：${q.display_user_answer}</p>`;
+                            html += `<div class="correct"><p>正确答案：${q.correct_answer}</p><p>解析：${q.explanation}</p></div>`;
+                        }
+                    } else {
+                        html += `<p style="color:#999">未作答</p>`;
+                    }
+                });
+                dailyHistoryCache.set(day, html);
+                box.innerHTML = html;
+            } catch (error) {
+                box.innerHTML = '<p style="color:red">详情加载失败，请收起后重试</p>';
+            }
+        }
+
+        async function loadDaily() {
+                const res = await fetch(API + '/api/daily');
+                const data = await res.json();
+                let html = `<h2>每日一练（${data.date}）</h2>`;
+                let answeredCount = 0;
+                let correctCount = 0;
+                data.questions.forEach((q, i) => {
+                    html += `<div class="card" id="daily-card-${i}">
+        <p>${i + 1}. [${q.module}] ${q.stem} ${masteryBadge(q.mastery_level)}</p>`;
+                    if (q.user_answer !== null && q.user_answer !== undefined) {
+                        answeredCount++;
+                        if (q.is_correct) correctCount++;
+                        if (q.type === 'choice') {
+                            for (const [k, v] of Object.entries(q.options)) {
+                                let cls = 'option';
+                                if (k === q.correct_answer) cls += ' correct';
+                                else if (k === q.user_answer && !q.is_correct) cls += ' wrong';
+                                html += `<div class="${cls}">${k}. ${v}</div>`;
+                            }
+                        } else {
+                            if (q.is_correct) {
+                                html += `<div class="correct">`;
+                                html += `<p>你的答案：${q.display_user_answer}</p>`;
+                                html += `<p>正确答案：${q.correct_answer}</p>`;
+                                html += `<p>解析：${q.explanation}</p>`;
+                                html += `</div>`;
+                            } else {
+                                html += `<p style="color:red">你的答案：${q.display_user_answer}</p>`;
+                                html += `<div class="correct">`;
+                                html += `<p>正确答案：${q.correct_answer}</p>`;
+                                html += `<p>解析：${q.explanation}</p>`;
+                                html += `</div>`;
+                            }
+                        }
+                    } else {
+                        if (q.options) {
+                            for (const [k, v] of Object.entries(q.options)) {
+                                html += `<div class="option" onclick="submitDailyAnswer(${i}, '${k}', this)">${k}. ${v}</div>`;
+                            }
+                        } else {
+                            html += `<input type="text" id="daily-input-${i}" placeholder="输入你的答案">`;
+                            html += `<p><button class="action" onclick="submitDailyShort(${i})">提交</button></p>`;
+                        }
+                    }
+                    html += `</div>`;
+                });
+                html += `<div id="daily-score"></div>`;
+                document.getElementById('view-daily').innerHTML = html;
+                window.dailyQuestions = data.questions;
+                window.dailyPracticeId = data.practice_id;
+                window.dailyDate = data.date;
+                window.dailyAnswers = data.questions.map(q => q.is_correct);
+                window.dailyDoneIds = data.questions.map(q => q.id);
+                renderDailyScore();
+                renderLoadMoreButton();
+            }
+
+        async function submitDailyAnswer(index, choice, el) {
+            const q = window.dailyQuestions[index];
+            const res = await fetch(API + '/api/answers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    question_id: q.id,
+                    user_answer: choice,
+                    daily_practice_id: window.dailyPracticeId
+                })
+            });
+            const result = await res.json();
+            if (window.dailyDate) dailyHistoryCache.delete(window.dailyDate);
+            // 标记对错
+            const options = el.parentNode.querySelectorAll('.option');
+            options.forEach(o => o.style.pointerEvents = 'none');
+            if (result.is_correct) {
+                el.classList.add('correct');
+            } else {
+                el.classList.add('wrong');
+                // 高亮正确答案
+                options.forEach(o => {
+                    if (o.textContent.startsWith(result.correct_answer + '.')) {
+                        o.classList.add('correct');
+                    }
+                });
+            }
+            window.dailyAnswers[index] = result.is_correct;
+            renderDailyScore();
+        }
+
+        function masteryBadge(level) {
+                if (level === 1) return '<span style="color:red;font-size:14px">薄弱</span>';
+                if (level === 2) return '<span style="color:orange;font-size:14px">一般</span>';
+                if (level === 3) return '<span style="color:green;font-size:14px">熟练</span>';
+                return '';
+            }
+
+        async function submitDailyShort(index) {
+                const q = window.dailyQuestions[index];
+                const ans = document.getElementById('daily-input-' + index).value;
+                const card = document.getElementById('daily-card-' + index);
+                await beginShortAssessment({
+                    key: 'daily-' + index,
+                    question: q,
+                    userAnswer: ans,
+                    container: card,
+                    kind: 'daily',
+                    index,
+                    dailyPracticeId: window.dailyPracticeId,
+                    title: `${index + 1}. [${q.module}] ${q.stem}`
+                });
+            }
+
+        async function loadMoreDaily() {
+                const button = document.getElementById('load-more-btn').querySelector('button');
+                button.disabled = true;
+                const res = await fetch(API + '/api/daily/extend', { method: 'POST' });
+                if (!res.ok) {
+                    const error = await res.json().catch(() => ({}));
+                    alert(error.detail || '追加题目失败，请稍后重试');
+                    button.disabled = false;
+                    return;
+                }
+                const data = await res.json();
+                if (window.dailyDate) dailyHistoryCache.delete(window.dailyDate);
+                if (data.count === 0) {
+                    alert('没有更多题了');
+                    return;
+                }
+                const container = document.getElementById('view-daily');
+                let html = '';
+                const startIndex = window.dailyQuestions.length;
+                data.questions.forEach((q, i) => {
+                    const realIndex = startIndex + i;
+                    html += `<div class="card" id="daily-card-${realIndex}">
+            <p>${realIndex + 1}. [${q.module}] ${q.stem} ${masteryBadge(q.mastery_level)}</p>`;
+                    if (q.options) {
+                        for (const [k, v] of Object.entries(q.options)) {
+                            html += `<div class="option" onclick="submitDailyAnswer(${realIndex}, '${k}', this)">${k}. ${v}</div>`;
+                        }
+                    } else {
+                        html += `<input type="text" id="daily-input-${realIndex}" placeholder="输入你的答案">`;
+                        html += `<p><button class="action" onclick="submitDailyShort(${realIndex})">提交</button></p>`;
+                    }
+                    html += `</div>`;
+                    window.dailyQuestions.push(q);
+                    window.dailyDoneIds.push(q.id);
+                });
+                container.insertAdjacentHTML('beforeend', html);
+                renderDailyScore();
+                renderLoadMoreButton();
+            }
+
+        function renderLoadMoreButton() {
+                const container = document.getElementById('view-daily');
+                let btn = document.getElementById('load-more-btn');
+                if (btn) btn.remove();
+                container.insertAdjacentHTML('beforeend',
+                    `<p id="load-more-btn" style="text-align:center;margin-top:20px"><button class="action" onclick="loadMoreDaily()">再来5题</button></p>`);
+            }
+
+        function renderDailyScore() {
+                const container = document.getElementById('view-daily');
+                let score = document.getElementById('daily-score-box');
+                if (score) score.remove();
+                const answered = window.dailyAnswers.filter(a => a === true || a === false).length;
+                const total = window.dailyQuestions.length;
+                if (answered === total && total > 0) {
+                    const correct = window.dailyAnswers.filter(a => a === true).length;
+                    container.insertAdjacentHTML('beforeend',
+                        `<div id="daily-score-box" class="card" style="text-align:center"><h2>今日得分：${correct} / ${total}</h2></div>`);
+                }
+            }
+
+        async function loadReview() {
+            const res = await fetch(API + '/api/review');
+            const data = await res.json();
+            let html = `<h2>待复习（${data.count} 题）</h2>`;
+            if (data.count === 0) {
+                html += `<p>太棒了，今天没有需要复习的题！</p>`;
+            }
+            data.questions.forEach((q, i) => {
+                let badge = '';
+                if (q.mastery_level === 1) badge = '<span style="color:red">薄弱</span>';
+                else if (q.mastery_level === 2) badge = '<span style="color:orange">一般</span>';
+                html += `<div class="card">
+                <p>${i + 1}. [${q.module}] ${q.stem} ${badge}</p>`;
+                if (q.options) {
+                    for (const [k, v] of Object.entries(q.options)) {
+                        html += `<div class="option" onclick="submitReviewAnswer(${i}, '${k}', this)">${k}. ${v}</div>`;
+                    }
+                } else {
+                    html += `<input type="text" id="review-input-${i}" placeholder="输入你的答案">`;
+                    html += `<p><button class="action" onclick="submitReviewShort(${i})">提交</button></p>`;
+                }
+                html += `</div>`;
+            });
+            html += `<div id="review-score"></div>`;
+            document.getElementById('view-review').innerHTML = html;
+            window.reviewQuestions = data.questions;
+            window.reviewAnswers = [];
+        }
+
+        async function submitReviewAnswer(index, choice, el) {
+            const q = window.reviewQuestions[index];
+            const res = await fetch(API + '/api/answers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question_id: q.id, user_answer: choice })
+            });
+            const result = await res.json();
+            const options = el.parentNode.querySelectorAll('.option');
+            options.forEach(o => o.style.pointerEvents = 'none');
+            if (result.is_correct) {
+                el.classList.add('correct');
+            } else {
+                el.classList.add('wrong');
+                options.forEach(o => {
+                    if (o.textContent.startsWith(result.correct_answer + '.')) {
+                        o.classList.add('correct');
+                    }
+                });
+            }
+            window.reviewAnswers[index] = result.is_correct;
+            const answered = window.reviewAnswers.filter(a => a !== undefined).length;
+            if (answered === window.reviewQuestions.length) {
+                const correct = window.reviewAnswers.filter(a => a).length;
+                document.getElementById('review-score').innerHTML =
+                    `<div class="card" style="text-align:center">
+                    <h2>复习完成：${correct} / ${window.reviewQuestions.length}</h2>
+                </div>`;
+            }
+        }
+
+        async function submitReviewShort(index) {
+            const q = window.reviewQuestions[index];
+            const ans = document.getElementById('review-input-' + index).value;
+            const card = document.querySelectorAll('#view-review .card')[index];
+            await beginShortAssessment({
+                key: 'review-' + index,
+                question: q,
+                userAnswer: ans,
+                container: card,
+                kind: 'review',
+                index,
+                title: `${index + 1}. [${q.module}] ${q.stem}`
+            });
+        }
+
+        function renderReviewScore() {
+            const answered = window.reviewAnswers.filter(a => a !== undefined).length;
+            if (answered === window.reviewQuestions.length) {
+                const correct = window.reviewAnswers.filter(a => a).length;
+                document.getElementById('review-score').innerHTML =
+                    `<div class="card" style="text-align:center">
+                    <h2>复习完成：${correct} / ${window.reviewQuestions.length}</h2>
+                </div>`;
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,14 @@
+{
+  "generatedAt": "2026-10-18T14:33:41",
+  "questionCount": 224,
+  "byModule": {
+    "os": 51,
+    "network": 60,
+    "mysql": 54,
+    "redis": 59
+  },
+  "byType": {
+    "short_answer": 40,
+    "choice": 184
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "interview-grind-mobile",
+  "version": "0.1.0",
+  "private": true,
+  "description": "面试八股刷题 Android 单机版",
+  "scripts": {
+    "smoke": "node scripts/smoke-local-api.mjs",
+    "sync": "cap sync android",
+    "open": "cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/core": "^8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.3",
+    "fake-indexeddb": "^6.2.6"
+  }
+}
