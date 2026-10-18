@@ -72,3 +72,29 @@ def test_wrong_question_service_lists_question_details_and_removes_item(db, ques
     assert wrong_questions[0]["wrong_count"] == 2
     assert remove_wrong_question(db, question.id) is True
     assert remove_wrong_question(db, question.id) is False
+
+
+def test_pick_questions_excludes_retired_questions(db, question_factory):
+    active = question_factory(stem="在役题")
+    question_factory(stem="已停用题", is_active=False)
+
+    result = pick_questions(db, limit=10)
+
+    assert [question.id for question in result] == [active.id]
+
+
+def test_wrong_book_and_favorites_hide_retired_questions(db, question_factory):
+    active = question_factory(stem="在役的收藏题")
+    retired = question_factory(stem="停用的收藏题", is_active=False)
+    db.add_all(
+        [
+            WrongQuestion(question_id=active.id, wrong_count=1),
+            WrongQuestion(question_id=retired.id, wrong_count=1),
+        ]
+    )
+    db.commit()
+    add_favorite(db, active.id)
+    add_favorite(db, retired.id)
+
+    assert {row["question_id"] for row in list_wrong_questions(db)} == {active.id}
+    assert {row["question_id"] for row in list_favorites(db)} == {active.id}

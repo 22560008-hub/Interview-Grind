@@ -7,6 +7,7 @@
 ## 当前已完成功能总览
 
 - **题库与组卷**：内置 224 道题，覆盖计算机网络、操作系统、MySQL、Redis；支持按模块和题型随机抽题
+- **题库维护**：每题有稳定 `code`；seed 全字段同步，改答案 / 解析 / 选项后重跑即可生效；从 seed 删除的题软停用，学习记录不丢
 - **答题与判分**：选择题自动判分；简答题先分析关键点，再由用户自评“掌握 / 模糊 / 不会”；用户输入经过 HTML 安全转义
 - **错题与收藏**：答错自动进入错题本并累计错次；支持收藏、取消收藏和将错题标记为已掌握
 - **掌握度与间隔复习**：维护每题的答题次数、连续答对次数、掌握等级和下次复习时间；复习页按到期时间排序
@@ -15,7 +16,35 @@
 - **练习历史**：展示最近练习的已答数量、正确率、完成率和完成状态；支持连续打卡统计与逐题详情
 - **学习统计**：展示总答题量、总正确率、各模块正确率和掌握度分布
 - **前端应用**：现有答题、每日一练、复习、错题本、收藏、统计、历史 7 个标签页
-- **工程基础**：FastAPI 自动接口文档、分层业务结构、独立测试数据库；当前 57 个自动化测试全部通过
+- **工程基础**：FastAPI 自动接口文档、分层业务结构、独立测试数据库；当前 75 个自动化测试全部通过
+
+---
+
+## 2026-10-18 阶段进展
+
+### 一、题库同步机制重做
+
+- `question` 增加 `code`（稳定标识）与 `is_active`（是否在役），旧库启动时自动补列和索引，重复执行安全
+- `sync_questions()` 改为按 `code` 优先、题干兜底认领旧题，并更新模块、章节、题型、题干、选项、答案、关键点、解析、难度全部字段
+- seed 中消失的题改为 `is_active=0` 软停用，答题记录、错题、收藏、掌握度全部保留
+- 抽题、复习、每日一练、错题本、收藏、掌握度统计统一过滤停用题
+- 新增 `scripts/legacy_questions.py`：按显式映射把旧题的答题流水、错题、收藏、进度合并到接替题，重复执行安全
+- 处理历史遗留的 2 道孤儿题（进程 / 线程、TCP 握手的旧版本），共迁移 8 条答题记录，数据库回到 224 道在役题
+- 同步时发现并修复一处真实内容漂移：`产生死锁的四个必要条件是什么？` 的章节、答案、解析、难度此前只改了 seed，数据库仍在发旧版答案
+
+### 二、接口与前端收尾
+
+- 前端 API 地址改为同源相对路径，换端口、换域名、手机访问不再需要改代码
+- `setModule()` 改为显式传入按钮元素，去掉对隐式全局 `event` 的依赖
+- 新增 `app/core/constants.py`：`Module` / `QuestionType` 枚举；`/api/questions` 非法参数返回 422
+- 统一错误响应：不存在的题目返回 404；`/api/daily/extend` 无当日练习返回 404，不再返回 HTTP 200 + `error` 字段
+- `ensure_question_schema()` 在结构已最新时不开启写事务，启动和测试不会因为数据库只读而失败
+- 每日一练追加按钮在前端处理非 2xx 响应，并恢复按钮可用状态
+
+### 三、测试
+
+- 新增 18 个测试，当前 **75 个测试全部通过**
+- 覆盖全字段同步、软停用与恢复、按 `code` 保留进度、旧题记录合并、停用题过滤、422 / 404 语义
 
 ---
 
@@ -271,6 +300,9 @@ uvicorn app.main:app --reload
 # 灌入/更新题库
 python -m scripts.seed
 
+# 改题干前查稳定 code（把“关键词”换成题干片段）
+python -c "from app.core.database import SessionLocal; from app.models.question import Question; db=SessionLocal(); [print(q.code, q.stem) for q in db.query(Question).filter(Question.stem.like('%关键词%'))]"
+
 # 建新表（手动触发，需确保所有模型均已导入）
 python -c "from app.core.database import Base, engine; from app.models import question, answer, favorite, progress, daily; Base.metadata.create_all(bind=engine)"
 
@@ -286,7 +318,17 @@ git push
 
 # 测试所有接口点
 pytest tests/ -v
+
+#重置每日一练
+python -c "from app.core.database import SessionLocal; from app.models.daily import DailyPractice, DailyPracticeItem; db = SessionLocal(); db.query(DailyPracticeItem).delete(); db.query(DailyPractice).delete(); db.commit(); print('已清空两张表')"
 ```
+
+**题库维护流程：**
+
+1. 改答案 / 解析 / 选项 / 难度 / 章节：直接改 `seed.py`，重跑 `python -m scripts.seed` 即可生效。
+2. 改题干：先查出该题的 `code`，在对应 `C()` / `S()` 条目末尾加 `code="..."`，再重跑，学习记录不会丢。
+3. 删题：从 `seed.py` 移除后重跑，题目自动 `is_active=0` 停用，答题记录和错题仍保留。
+4. 不要直接改 `question` 表；`seed.py` 是题库的唯一来源。
 
 **访问地址：**
 
@@ -336,11 +378,12 @@ pytest tests/ -v
 功能继续扩大前先处理技术债：
 
 - 已修正 `.gitignore`，虚拟环境和本地数据库不再被 Git 跟踪
-- 引入数据库迁移工具
-- 持续扩充自动化测试，目前已有 57 个测试覆盖核心业务和关键前端行为
-- 统一模块枚举
-- 继续完善接口响应 schema 与统一错误处理
-- 前端 API 地址改成相对路径
+- 题库同步与软停用（已完成）
+- 引入数据库迁移工具（待做；目前为启动时幂等补列）
+- 持续扩充自动化测试，目前已有 75 个测试覆盖核心业务和关键前端行为
+- 统一模块枚举（已完成）
+- 继续完善接口响应 schema 与统一错误处理（错误状态码已统一，响应 schema 待收口）
+- 前端 API 地址改成相对路径（已完成）
 
 #### 第五阶段：用户与上线
 

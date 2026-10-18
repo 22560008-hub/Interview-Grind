@@ -43,8 +43,10 @@ def test_seed_sync_backfills_key_points_for_existing_question(db):
     }
 
     assert hasattr(seed, "sync_questions")
-    added, updated = seed.sync_questions(db, [question_data])
+    result = seed.sync_questions(db, [question_data])
     db.refresh(existing)
 
-    assert (added, updated) == (0, 1)
+    assert (result.added, result.updated) == (0, 1)
     assert existing.key_points == ["序列号", "确认应答"]
+    assert existing.is_active is True
+    assert existing.code

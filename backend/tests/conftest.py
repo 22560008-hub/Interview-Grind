@@ -43,8 +43,11 @@ def question_factory(db: Session) -> Callable[..., Question]:
         key_points: list[str] | None = None,
         explanation: str = "测试解析",
         difficulty: int = 2,
+        code: str | None = None,
+        is_active: bool = True,
     ) -> Question:
         question = Question(
+            code=code,
             module=module,
             chapter=chapter,
             type=q_type,
@@ -54,6 +57,7 @@ def question_factory(db: Session) -> Callable[..., Question]:
             key_points=key_points,
             explanation=explanation,
             difficulty=difficulty,
+            is_active=is_active,
         )
         db.add(question)
         db.commit()

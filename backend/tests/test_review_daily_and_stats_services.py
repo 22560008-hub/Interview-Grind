@@ -173,3 +173,30 @@ def test_stats_returns_empty_values_when_no_one_has_answered(db):
         "by_module": [],
         "mastery": {"薄弱": 0, "一般": 0, "熟练": 0},
     }
+
+
+def test_review_skips_retired_questions(db, question_factory, progress_factory):
+    retired = question_factory(stem="停用复习题", is_active=False)
+    progress_factory(
+        retired, next_review_at=datetime.now() - timedelta(minutes=5)
+    )
+
+    assert get_review_questions(db) == []
+
+
+def test_daily_question_pool_skips_retired_questions(db, question_factory):
+    active = question_factory(stem="在役每日题", options={"A": "正确"})
+    question_factory(stem="停用每日题", options={"A": "正确"}, is_active=False)
+
+    result = get_daily_questions(db, count=5)
+
+    assert [question["id"] for question in result] == [active.id]
+
+
+def test_stats_mastery_ignores_retired_questions(
+    db, question_factory, progress_factory
+):
+    retired = question_factory(stem="停用统计题", is_active=False)
+    progress_factory(retired, mastery_level=1)
+
+    assert get_stats(db)["mastery"] == {"薄弱": 0, "一般": 0, "熟练": 0}

@@ -176,8 +176,12 @@ def test_unknown_short_answer_is_due_immediately(db, question_factory):
     assert progress.next_review_at <= datetime.now() + timedelta(seconds=1)
 
 
-def test_unknown_question_returns_error_without_creating_records(db):
-    result = grade_answer(db, question_id=99999, user_answer="A")
+def test_unknown_question_raises_lookup_error_without_creating_records(db):
+    try:
+        grade_answer(db, question_id=99999, user_answer="A")
+    except LookupError as exc:
+        assert str(exc) == "题目不存在"
+    else:
+        raise AssertionError("grade_answer 应该对不存在的题目抛出 LookupError")
 
-    assert result == {"error": "题目不存在"}
     assert db.query(AnswerRecord).count() == 0

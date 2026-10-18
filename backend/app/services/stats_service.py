@@ -38,6 +38,8 @@ def get_stats(db: Session):
         )
     mastery_rows = (
         db.query(QuestionProgress.mastery_level, func.count(QuestionProgress.id))
+        .join(Question, Question.id == QuestionProgress.question_id)
+        .filter(Question.is_active.is_(True))
         .group_by(QuestionProgress.mastery_level)
         .all()
     )

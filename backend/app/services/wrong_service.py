@@ -9,6 +9,7 @@ def list_wrong_questions(db: Session):
     rows = (
         db.query(WrongQuestion, Question)
         .join(Question, WrongQuestion.question_id == Question.id)
+        .filter(Question.is_active.is_(True))
         .order_by(WrongQuestion.last_wrong_at.desc())
         .all()
     )

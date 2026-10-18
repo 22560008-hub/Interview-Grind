@@ -12,7 +12,7 @@ def pick_questions(
     q_type: str | None = None,
     limit: int = 10,
 ) -> list[Question]:
-    stmt = select(Question)
+    stmt = select(Question).where(Question.is_active.is_(True))
     if module:
         stmt = stmt.where(Question.module == module)
     if q_type:

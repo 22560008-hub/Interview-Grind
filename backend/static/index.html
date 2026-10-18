@@ -113,11 +113,11 @@
 
     <div id="view-quiz">
         <div id="module-bar" style="margin-bottom: 16px;">
-            <button onclick="setModule('')">全部</button>
-            <button onclick="setModule('network')">计算机网络</button>
-            <button onclick="setModule('os')">操作系统</button>
-            <button onclick="setModule('mysql')">MySQL</button>
-            <button onclick="setModule('redis')">Redis</button>
+            <button onclick="setModule('', this)">全部</button>
+            <button onclick="setModule('network', this)">计算机网络</button>
+            <button onclick="setModule('os', this)">操作系统</button>
+            <button onclick="setModule('mysql', this)">MySQL</button>
+            <button onclick="setModule('redis', this)">Redis</button>
         </div>
         <div class="card" id="question-card">
             <p>点"下一题"开始刷题</p>
@@ -132,16 +132,17 @@
     <div id="view-review" style="display:none"></div>
     <div id="view-history" style="display:none"></div>
     <script>
-        const API = "http://127.0.0.1:8000";
+        // 同源相对路径：页面由后端直接托管，换端口、换域名、手机访问都不用改代码
+        const API = "";
         let currentQuestion = null;
         let currentModule = '';
         const dailyHistoryCache = new Map();
         const pendingShortAssessments = new Map();
 
-        function setModule(m) {
+        function setModule(m, button) {
             currentModule = m;
             document.querySelectorAll('#module-bar button').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            if (button) button.classList.add('active');
             loadQuestion();
         }
 
@@ -599,8 +600,15 @@
             }
 
         async function loadMoreDaily() {
-                document.getElementById('load-more-btn').querySelector('button').disabled = true;
+                const button = document.getElementById('load-more-btn').querySelector('button');
+                button.disabled = true;
                 const res = await fetch(API + '/api/daily/extend', { method: 'POST' });
+                if (!res.ok) {
+                    const error = await res.json().catch(() => ({}));
+                    alert(error.detail || '追加题目失败，请稍后重试');
+                    button.disabled = false;
+                    return;
+                }
                 const data = await res.json();
                 if (window.dailyDate) dailyHistoryCache.delete(window.dailyDate);
                 if (data.count === 0) {

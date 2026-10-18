@@ -4,21 +4,35 @@
 目录组织；题干、答案与解析均为独立编写。
 """
 
+from dataclasses import dataclass
+
+from app.core.constants import Module, QuestionType
 from app.core.database import (
     Base,
     SessionLocal,
     engine,
-    ensure_question_key_points_column,
+    ensure_question_schema,
 )
 from app.models.question import Question
+from scripts.legacy_questions import replace_legacy_questions
 
 
-def C(module, chapter, stem, choices, answer, explanation, difficulty=2):
+def C(
+    module,
+    chapter,
+    stem,
+    choices,
+    answer,
+    explanation,
+    difficulty=2,
+    code=None,
+):
     """构造四选一题。"""
     return {
-        "module": module,
+        "code": code,
+        "module": Module(module).value,
         "chapter": chapter,
-        "type": "choice",
+        "type": QuestionType.CHOICE.value,
         "stem": stem,
         "options": dict(zip("ABCD", choices)),
         "answer": answer,
@@ -305,12 +319,13 @@ SHORT_ANSWER_KEY_POINTS = {
 }
 
 
-def S(module, chapter, stem, answer, explanation=None, difficulty=2):
+def S(module, chapter, stem, answer, explanation=None, difficulty=2, code=None):
     """构造简答题。"""
     return {
-        "module": module,
+        "code": code,
+        "module": Module(module).value,
         "chapter": chapter,
-        "type": "short_answer",
+        "type": QuestionType.SHORT_ANSWER.value,
         "stem": stem,
         "options": None,
         "answer": answer,
@@ -2801,29 +2816,128 @@ QUESTIONS = [
 ]
 
 
-def sync_questions(db, questions):
-    added = 0
-    updated = 0
-    for question_data in questions:
-        existing = db.query(Question).filter_by(stem=question_data["stem"]).first()
-        if existing is None:
-            db.add(Question(**question_data))
-            added += 1
-        elif existing.key_points != question_data.get("key_points"):
-            existing.key_points = question_data.get("key_points")
-            updated += 1
+CONTENT_FIELDS = (
+    "module",
+    "chapter",
+    "type",
+    "stem",
+    "options",
+    "answer",
+    "key_points",
+    "explanation",
+    "difficulty",
+)
+
+
+@dataclass
+class SyncResult:
+    added: int = 0
+    updated: int = 0
+    retired: int = 0
+    unchanged: int = 0
+
+
+def validate_questions(questions) -> None:
+    """写库前拦住重复标识、重复题干等问题，避免静默写坏题库。"""
+    codes = [q["code"] for q in questions if q.get("code")]
+    duplicate_codes = {code for code in codes if codes.count(code) > 1}
+    if duplicate_codes:
+        raise ValueError(f"题目 code 重复：{sorted(duplicate_codes)}")
+
+    stems = [q["stem"] for q in questions]
+    duplicate_stems = {stem for stem in stems if stems.count(stem) > 1}
+    if duplicate_stems:
+        raise ValueError(f"题干重复：{sorted(duplicate_stems)}")
+
+
+def _generated_code(question: Question) -> str:
+    return f"{question.module}-{question.id:04d}"
+
+
+def sync_questions(db, questions) -> SyncResult:
+    """让数据库和 seed 保持一致。
+
+    - 按 code 或题干认领已有题目，并更新所有内容字段（不再只更新关键点）；
+    - seed 里新增的题插入，seed 里删掉的题把 is_active 置为 0，不物理删除；
+    - 改题干时，在 seed 条目上补 ``code=<库里该题原有 code>`` 就能保留学习进度，
+      不补 code 会按新题处理，旧题自动停用。
+    """
+    validate_questions(questions)
+    existing = db.query(Question).all()
+    by_code = {row.code: row for row in existing if row.code}
+    by_stem: dict[str, Question] = {}
+    for row in existing:
+        by_stem.setdefault(row.stem, row)
+    used_codes = {row.code: row for row in existing if row.code}
+
+    matched_ids: set[int] = set()
+    result = SyncResult()
+
+    for data in questions:
+        code = data.get("code")
+        row = by_code.get(code) if code else None
+        if row is None:
+            row = by_stem.get(data["stem"])
+
+        if row is None:
+            row = Question(**data)
+            db.add(row)
+            db.flush()
+            result.added += 1
+        else:
+            changed = False
+            for field in CONTENT_FIELDS:
+                value = data.get(field)
+                if getattr(row, field) != value:
+                    setattr(row, field, value)
+                    changed = True
+            if code and row.code != code:
+                row.code = code
+                changed = True
+            if changed:
+                result.updated += 1
+            else:
+                result.unchanged += 1
+
+        if row.code is None:
+            generated = _generated_code(row)
+            if generated in used_codes and used_codes[generated] is not row:
+                generated = f"{generated}-{row.id}"
+            row.code = generated
+        used_codes[row.code] = row
+        row.is_active = True
+        matched_ids.add(row.id)
+
+    for row in existing:
+        if row.id not in matched_ids and row.is_active:
+            row.is_active = False
+            result.retired += 1
+
     db.commit()
-    return added, updated
+    return result
 
 
 def run():
-    ensure_question_key_points_column(engine)
+    ensure_question_schema(engine)
     Base.metadata.create_all(bind=engine)
+    validate_questions(QUESTIONS)
     db = SessionLocal()
     try:
-        added, updated = sync_questions(db, QUESTIONS)
+        result = sync_questions(db, QUESTIONS)
+        replaced = replace_legacy_questions(db)
+        active_total = db.query(Question).filter(Question.is_active.is_(True)).count()
         total = db.query(Question).count()
-        print(f"新增 {added} 道题，更新 {updated} 道题，题库现有 {total} 道题。")
+        print(
+            f"新增 {result.added} 道，更新 {result.updated} 道，"
+            f"停用 {result.retired} 道，在役 {active_total} 道（共 {total} 行）。"
+        )
+        for item in replaced:
+            moved = item["moved"]
+            print(
+                f"合并旧题「{item['from']}」→「{item['to']}」："
+                f"{moved['answers']} 条答题记录、"
+                f"{moved['daily_items']} 条每日练习明细。"
+            )
     except Exception:
         db.rollback()
         raise

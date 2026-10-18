@@ -3,6 +3,7 @@ from html import escape
 
 from sqlalchemy.orm import Session
 
+from app.core.constants import QuestionType
 from app.models.answer import AnswerRecord, WrongQuestion
 from app.models.daily import DailyPractice, DailyPracticeItem
 from app.models.progress import QuestionProgress
@@ -10,7 +11,7 @@ from app.models.question import Question
 
 
 def analyze_short_answer(question: Question, user_answer: str) -> dict:
-    if question.type == "choice":
+    if question.type == QuestionType.CHOICE.value:
         raise ValueError("选择题不支持简答题预判")
 
     key_points = question.key_points or []
@@ -41,8 +42,8 @@ def grade_answer(
     # 1. 根据 question_id 查出这道题
     question = db.get(Question, question_id)
     if question is None:
-        return {"error": "题目不存在"}
-    if question.type != "choice" and self_rating is None:
+        raise LookupError("题目不存在")
+    if question.type != QuestionType.CHOICE.value and self_rating is None:
         raise ValueError("简答题提交前请选择掌握程度")
 
     daily_item = None
@@ -69,7 +70,7 @@ def grade_answer(
             }
 
     # 2. 判分：忽略大小写和首尾空格，比较用户答案和正确答案
-    if question.type == "choice":
+    if question.type == QuestionType.CHOICE.value:
         # 选择题：精确匹配（A/B/C/D）
         is_correct = user_answer.strip().upper() == question.answer.strip().upper()
     else:
@@ -129,7 +130,7 @@ def grade_answer(
     else:
         progress.consecutive_correct = 0
         progress.mastery_level = 1  # 薄弱
-        if question.type != "choice" and self_rating == "fuzzy":
+        if question.type != QuestionType.CHOICE.value and self_rating == "fuzzy":
             progress.next_review_at = datetime.now() + timedelta(days=1)
         else:
             # 选择题答错或简答题选择“不会”，马上再复习。

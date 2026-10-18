@@ -12,6 +12,7 @@ def get_review_questions(db: Session, limit: int = 10):
         .join(QuestionProgress, Question.id == QuestionProgress.question_id)
         .filter(QuestionProgress.next_review_at <= now)
         .filter(QuestionProgress.mastery_level < 3)
+        .filter(Question.is_active.is_(True))
         .order_by(QuestionProgress.next_review_at)
         .limit(limit)
         .all()

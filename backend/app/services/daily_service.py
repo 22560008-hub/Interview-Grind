@@ -68,7 +68,7 @@ def ensure_daily_items(db: Session, practice: DailyPractice) -> list[DailyPracti
 
 def _select_questions(db: Session, count: int, today: str) -> list[Question]:
     rng = random.Random(today)
-    all_questions = db.query(Question).all()
+    all_questions = db.query(Question).filter(Question.is_active.is_(True)).all()
     now = datetime.now()
 
     review_ids = {

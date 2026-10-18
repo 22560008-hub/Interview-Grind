@@ -6,7 +6,7 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-框架-009688)
 ![Database](https://img.shields.io/badge/SQLite-3-003B57)
 ![Questions](https://img.shields.io/badge/题库-224%20道-orange)
-![Tests](https://img.shields.io/badge/pytest-57%20用例-success)
+![Tests](https://img.shields.io/badge/pytest-75%20用例-success)
 
 前后端一体、开箱即用：后端基于 **FastAPI + SQLAlchemy + SQLite**，前端为零依赖的**原生 HTML/JavaScript 单页应用**，无需单独启动前端、无需 Docker、无需外部数据库。
 
@@ -68,13 +68,15 @@ interview-app/
     │   ├── main.py               # FastAPI 入口：建表、CORS、路由与静态文件挂载
     │   ├── core/                 # 基础设施
     │   │   ├── config.py         # 配置项（应用名、数据库地址）
-    │   │   └── database.py       # 数据库连接 / 会话 / Base
+    │   │   ├── constants.py      # 模块 / 题型统一枚举
+    │   │   └── database.py       # 数据库连接 / 会话 / Base / 旧库升级
     │   ├── models/               # ORM 数据模型（7 张表）
     │   ├── schemas/              # Pydantic 请求 / 响应模型
     │   ├── services/             # 业务逻辑层（抽题、判分、统计、复习……）
     │   └── api/                  # 路由层（题目、作答、错题、收藏、统计、每日一练、复习）
     ├── scripts/
-    │   └── seed.py               # 题库种子数据（224 道，幂等写入）
+    │   ├── seed.py               # 题库种子数据（224 道，幂等同步）
+    │   └── legacy_questions.py   # 旧题学习记录合并（一次性迁移）
     ├── static/
     │   └── index.html            # 前端单页应用
     ├── tests/                    # pytest 测试
@@ -134,7 +136,7 @@ pip install -r requirements.txt
 python -m scripts.seed
 ```
 
-该脚本会自动建表并写入 224 道题；**幂等**设计，重复运行不会产生重复题目。
+该脚本会自动建表并同步 224 道题：按 `code`（优先）或题干认领已有题目并更新全部字段，seed 中已删除的题会停用而不是物理删除。**幂等**设计，重复运行不会产生重复题目。
 
 ### 5. 启动服务
 
@@ -190,6 +192,8 @@ uvicorn app.main:app --reload
 
 完整的请求 / 响应结构与在线调试见启动后的 `/docs`。
 
+错误响应统一为 `{"detail": "..."}`：非法的 `module` / `type` 返回 422，题目或当日练习不存在返回 404，不符合业务规则的操作返回 400。
+
 ---
 
 ## 核心机制
@@ -222,6 +226,13 @@ uvicorn app.main:app --reload
 
 每道作答会单独写入每日练习明细。重复提交同一道每日练习题不会重复累计答题记录；答完全部题目后记录完成时间，历史页据此计算连续完成天数。
 
+### 题库同步与题目退役
+
+- `python -m scripts.seed` 会按 `code`（优先）或题干认领已有题目，并**更新全部内容字段**：模块、章节、题型、题干、选项、答案、关键点、解析与难度。只改答案或解析时，重跑 seed 即可生效。
+- seed 中已删除的题不会物理删除，而是把 `is_active` 置为 0（停用）。答题记录、错题、收藏和掌握度全部保留，抽题、每日一练、复习和掌握度统计会自动跳过停用题。
+- 改写题干时，在对应的 `C()` / `S()` 条目上补 `code="..."`（值为库中该题原有 code），即可继续使用同一行、保留学习进度；不补 code 会被视为新题，旧题自动停用。
+- 早期因改题干留下的旧题，可通过 `backend/scripts/legacy_questions.py` 中的显式映射，把答题流水、错题、收藏和进度合并到接替它的新题上。
+
 ---
 
 ## 数据模型
@@ -230,7 +241,7 @@ uvicorn app.main:app --reload
 
 | 表名 | 作用 | 关键字段 |
 | --- | --- | --- |
-| `question` | 题目库 | `module`、`chapter`、`type`、`stem`、`options`、`answer`、`key_points`、`explanation`、`difficulty` |
+| `question` | 题目库 | `code`、`module`、`chapter`、`type`、`stem`、`options`、`answer`、`key_points`、`explanation`、`difficulty`、`is_active` |
 | `answer_record` | 答题流水 | `question_id`、`user_answer`、`is_correct` |
 | `wrong_question` | 错题本 | `question_id`、`wrong_count`、`last_wrong_at` |
 | `favorite` | 收藏 | `question_id`、`created_at` |
@@ -249,13 +260,15 @@ pip install -r requirements-dev.txt
 pytest
 ```
 
-当前共 **57 个测试用例**，覆盖选择题判分、简答题关键点预判与自评、间隔复习、收藏 / 错题本、统计接口、每日一练选题与持久化、重复提交、历史统计与详情、数据库兼容升级、参数校验、HTML 安全转义，以及关键前端交互。当前测试全部通过。
+当前共 **75 个测试用例**，覆盖选择题判分、简答题关键点预判与自评、间隔复习、收藏 / 错题本、统计接口、每日一练选题与持久化、重复提交、历史统计与详情、数据库兼容升级、参数校验、HTML 安全转义，以及关键前端交互。
+
+其中题库生命周期相关的测试覆盖：全字段同步、删除题目的软停用与恢复、按 `code` 保留学习进度、旧题记录合并、停用题不进入抽题 / 复习 / 每日一练 / 统计 / 错题本 / 收藏。当前测试全部通过。
 
 ---
 
 ## 题库说明
 
-题库由 `backend/scripts/seed.py` 维护，共 **224 道**（184 道选择题 + 40 道简答题），题干、答案与解析均为独立编写：
+题库由 `backend/scripts/seed.py` 维护，共 **224 道**（184 道选择题 + 40 道简答题），题干、答案与解析均为独立编写。每道题都有稳定 `code`，便于改题干时保留学习记录：
 
 | 模块 | 代码 | 题量 | 覆盖章节 |
 | --- | --- | --- | --- |
@@ -273,7 +286,7 @@ pytest
 详见 [DEV_LOG.md](DEV_LOG.md)，规划方向包括：
 
 1. 改进关键点匹配（同义表达、近义词与更细的关键点维护）；
-2. 补齐工程质量（正式数据库迁移工具、统一模块枚举、统一错误响应等）；
+2. 补齐工程质量（正式数据库迁移工具、统一响应 schema 等）；
 3. 丰富学习分析（历史筛选、趋势统计与薄弱知识点聚合）；
 4. 用户体系与上线（登录、多用户隔离、PostgreSQL、部署）；
 5. AI 能力（简答题点评、个性化追问、模拟面试）。

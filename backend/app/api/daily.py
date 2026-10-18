@@ -40,13 +40,18 @@ def extend_daily(db: Session = Depends(get_db)):
     today = date.today().isoformat()
     practice = db.query(DailyPractice).filter_by(date=today).first()
     if not practice:
-        return {"error": "请先开始今日练习"}
+        raise HTTPException(status_code=404, detail="请先开始今日练习")
 
     items = ensure_daily_items(db, practice)
     existing_ids = [item.question_id for item in items]
     if not existing_ids:
         existing_ids = parse_question_ids(practice.question_ids)
-    all_questions = db.query(Question).filter(~Question.id.in_(existing_ids)).all()
+    all_questions = (
+        db.query(Question)
+        .filter(Question.is_active.is_(True))
+        .filter(~Question.id.in_(existing_ids))
+        .all()
+    )
 
     if not all_questions:
         return {"questions": [], "count": 0}

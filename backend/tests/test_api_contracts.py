@@ -316,3 +316,25 @@ def test_question_delivery_hides_answer_and_explanation_before_submission(
 
     assert "answer" not in response.json()[0]
     assert "explanation" not in response.json()[0]
+
+
+def test_questions_endpoint_rejects_unknown_module_and_type(client):
+    assert client.get("/api/questions?module=unknown").status_code == 422
+    assert client.get("/api/questions?type=essay").status_code == 422
+
+
+def test_unknown_question_returns_404_instead_of_200_with_error(
+    client, db
+):
+    response = client.post("/api/answers", json={"question_id": 999, "user_answer": "A"})
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "题目不存在"}
+    assert db.query(AnswerRecord).count() == 0
+
+
+def test_extend_without_daily_practice_returns_404(client):
+    response = client.post("/api/daily/extend")
+
+    assert response.status_code == 404
+    assert response.json()["detail"] == "请先开始今日练习"

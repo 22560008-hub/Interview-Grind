@@ -45,5 +45,7 @@ def submit_answer(
             daily_practice_id=body.daily_practice_id,
             self_rating=body.self_rating,
         )
+    except LookupError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc

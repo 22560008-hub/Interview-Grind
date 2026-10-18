@@ -26,6 +26,7 @@ def list_favorites(db: Session):
     rows = (
         db.query(Favorite, Question)
         .join(Question, Favorite.question_id == Question.id)
+        .filter(Question.is_active.is_(True))
         .order_by(Favorite.created_at.desc())
         .all()
     )
